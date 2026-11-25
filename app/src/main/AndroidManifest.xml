@@ -1,0 +1,172 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- Internet access for on-demand language downloads & multi-engine visual search WebView -->
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <!-- Overlay permission for Mode B Assistant Overlay -->
+    <uses-permission android:name="android.permission.SYSTEM_ALERT_WINDOW" />
+
+    <!-- Foreground service required for legacy Android 7-10 MediaProjection fallback -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Query installed packages so Google Lens & payment app availability work on API 30+ -->
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <queries>
+        <package android:name="com.google.ar.lens" />
+        <package android:name="com.google.android.googlequicksearchbox" />
+        <intent>
+            <action android:name="android.intent.action.SEND" />
+            <data android:mimeType="image/*" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="https" />
+        </intent>
+    </queries>
+
+    <application
+        android:name=".BubbleApp"
+        android:allowBackup="false"
+        android:icon="@drawable/ic_bubble_logo"
+        android:label="@string/app_name"
+        android:roundIcon="@drawable/ic_bubble_logo"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Bubble">
+
+        <!-- Mode A: Normal Application (Launcher) -->
+        <activity
+            android:name=".ui.main.MainActivity"
+            android:exported="true"
+            android:launchMode="singleTop">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Offline Language & Custom .traineddata OCR Model Manager -->
+        <activity
+            android:name=".ui.main.LanguageManagerActivity"
+            android:exported="false"
+            android:label="@string/lang_manager_title" />
+
+        <!-- In-App Multi-Engine Visual Search (Bing, Yandex, TinEye, Google Lens Web) -->
+        <activity
+            android:name=".lens.VisualSearchWebActivity"
+            android:exported="false"
+            android:configChanges="orientation|screenSize|keyboardHidden"
+            android:label="Visual Search" />
+
+        <!-- Transparent single-purpose activity to request MediaProjection consent (legacy Android 7-10 fallback only) -->
+        <activity
+            android:name=".capture.MediaProjectionConsentActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@style/Theme.Bubble.Transparent" />
+
+        <!-- Transparent trampoline to safely collapse Quick Settings panel or handle ACTION_ASSIST fallback -->
+        <activity
+            android:name=".service.OverlayTriggerActivity"
+            android:exported="true"
+            android:excludeFromRecents="true"
+            android:noHistory="true"
+            android:theme="@style/Theme.Bubble.Transparent">
+            <intent-filter>
+                <action android:name="android.intent.action.ASSIST" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+        <!-- Fullscreen Digital Assistant session UI (works without MediaProjection or Accessibility) -->
+        <activity
+            android:name=".ui.overlay.BubbleAssistantActivity"
+            android:exported="false"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTop"
+            android:theme="@style/Theme.Bubble.OverlayFullscreen" />
+
+        <!-- Default Digital Assistant VoiceInteractionService (CircleToSearch v0.5 style, zero recording prompt) -->
+        <service
+            android:name=".service.BubbleVoiceInteractionService"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:permission="android.permission.BIND_VOICE_INTERACTION">
+            <meta-data
+                android:name="android.voice_interaction"
+                android:resource="@xml/voice_interaction_service" />
+            <intent-filter>
+                <action android:name="android.service.voice.VoiceInteractionService" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name=".service.BubbleVoiceInteractionSessionService"
+            android:exported="true"
+            android:permission="android.permission.BIND_VOICE_INTERACTION" />
+
+        <!-- Required RecognitionService so Android RoleManager lists Bubble in Default Digital Assistant settings -->
+        <service
+            android:name=".service.BubbleRecognitionService"
+            android:exported="true"
+            android:label="@string/app_name">
+            <intent-filter>
+                <action android:name="android.speech.RecognitionService" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+        <!-- Primary Scanning & Safe Mode Foreground App Monitor -->
+        <service
+            android:name=".service.BubbleAccessibilityService"
+            android:exported="true"
+            android:label="@string/accessibility_service_label"
+            android:permission="android.permission.BIND_ACCESSIBILITY_SERVICE">
+            <intent-filter>
+                <action android:name="android.accessibilityservice.AccessibilityService" />
+            </intent-filter>
+            <meta-data
+                android:name="android.accessibilityservice"
+                android:resource="@xml/accessibility_service_config" />
+        </service>
+
+        <!-- Quick Settings Tile for launching Mode B Assistant Overlay -->
+        <service
+            android:name=".service.BubbleTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_tile_bubble"
+            android:label="@string/tile_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
+        <!-- Ephemeral MediaProjection Foreground Service (legacy Android 7-10 fallback only) -->
+        <service
+            android:name=".service.MediaProjectionService"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection" />
+
+        <!-- FileProvider for temporary cache image handoff to Google Lens / Payment Apps / Sharesheet -->
+        <provider
+            android:name=".lens.TemporaryImageProvider"
+            android:authorities="${applicationId}.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+    </application>
+
+</manifest>

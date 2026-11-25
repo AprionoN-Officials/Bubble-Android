@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Core App -->
+    <string name="app_name">Bubble</string>
+    <string name="app_tagline">Penerjemah layar langsung, pemindai QR &amp; pencarian visual tanpa root</string>
+    <string name="accessibility_service_label">Bubble Screen Scanner</string>
+    <string name="accessibility_service_description">Membaca teks di layar dalam area yang Anda pilih saat overlay Bubble aktif, serta mendeteksi aplikasi sensitif untuk menghentikan pemindaian secara otomatis (Safe Mode). Bubble tidak pernah menyimpan riwayat layar atau membaca kata sandi.</string>
+    <string name="tile_label">Bubble Layar</string>
+    <string name="safe_mode_blocked_message">Bubble dinonaktifkan pada aplikasi ini untuk melindungi privasi dan mencegah gangguan terhadap fitur keamanan.</string>
+    <string name="open_accessibility_settings">Buka Pengaturan Aksesibilitas Bubble</string>
+    <string name="lens_unavailable_message">Google Lens tidak terpasang atau tidak mendukung penerimaan gambar langsung.</string>
+    <string name="capture_notification_channel">Sesi Capture Layar Bubble</string>
+    <string name="capture_notification_title">Bubble sedang memindai area pilihan</string>
+    <string name="capture_notification_body">Sesi sementara di RAM — ketuk untuk menghentikan</string>
+
+    <!-- Main Dashboard: Segment 1 (Status & Activation) -->
+    <string name="section_status_activation">Status &amp; Aktivasi</string>
+    <string name="btn_try_bubble">Coba Bubble Sekarang</string>
+    <string name="btn_default_assistant">Asisten Default</string>
+    <string name="btn_accessibility">Aksesibilitas</string>
+    <string name="btn_overlay_optional">Izin Overlay (Opsional)</string>
+    <string name="status_assistant_label">Asisten Default</string>
+    <string name="status_accessibility_label">Aksesibilitas</string>
+    <string name="status_capture_label">Capture Layar</string>
+    <string name="status_visual_search_label">Visual Search</string>
+    <string name="status_offline_langs_label">Bahasa Offline</string>
+    <string name="status_active_check">Aktif ✓</string>
+    <string name="status_not_set">Belum diatur</string>
+    <string name="status_inactive">Nonaktif</string>
+    <string name="status_capture_both">Tanpa dialog rekam (Asisten &amp; Aksesibilitas)</string>
+    <string name="status_capture_assistant">Tanpa dialog rekam (Asisten Default — tahan Home)</string>
+    <string name="status_capture_a11y">Tanpa dialog rekam (Android 11+ Aksesibilitas)</string>
+    <string name="status_capture_enable_hint">Aktifkan Asisten Default atau Aksesibilitas</string>
+    <string name="status_lens_ready">Google Lens siap</string>
+    <string name="status_google_app_ready">Google App siap</string>
+    <string name="status_multi_engine_ready">Multi-mesin siap</string>
+    <string name="status_models_auto">Unduh otomatis / lewat menu Unduh Bahasa</string>
+    <string name="status_models_count">%1$d bahasa (%2$s)</string>
+    <string name="status_last_blocked_app">Aplikasi terakhir diblokir: %1$s</string>
+    <string name="toast_enable_a11y_or_assistant">Aktifkan Aksesibilitas atau jadikan Bubble Asisten Default (tahan tombol Home).</string>
+    <string name="toast_open_assistant_manual">Buka Pengaturan &gt; Aplikasi Default &gt; Aplikasi Asisten Digital, lalu pilih Bubble.</string>
+
+    <!-- Main Dashboard: Segment 2 (Translation & Languages) -->
+    <string name="section_translation">Pengaturan Terjemahan</string>
+    <string name="btn_source_lang_fmt">Asal: %1$s</string>
+    <string name="btn_target_lang_fmt">Target: %1$s</string>
+    <string name="active_lang_pair_fmt">Aktif: %1$s → %2$s</string>
+    <string name="dialog_pick_source_lang">Pilih Bahasa Asal</string>
+    <string name="dialog_pick_target_lang">Pilih Bahasa Terjemahan</string>
+    <string name="toast_swapped_fmt">Ditukar: %1$s → %2$s</string>
+    <string name="switch_auto_detect">Deteksi Bahasa Otomatis</string>
+    <string name="switch_auto_translate">Terjemahkan Otomatis Setelah Seleksi</string>
+    <string name="switch_translate_entire_screen">Terjemahkan Seluruh Layar</string>
+    <string name="ocr_engine_tess_fmt">Mesin OCR: Tesseract (%1$s.traineddata) • %2$d model terpasang</string>
+    <string name="ocr_engine_mlkit_fmt">Mesin OCR: ML Kit Play Services (Default) • %1$d model .traineddata terpasang</string>
+    <string name="btn_download_languages">Unduh Bahasa</string>
+    <string name="btn_import_ocr">Impor OCR</string>
+
+    <!-- Main Dashboard: Segment 3 (Lens & Visual Search) -->
+    <string name="section_visual_search">Pengaturan Lens &amp; Visual Search</string>
+    <string name="visual_search_subtitle">Pilih mesin pencari gambar utama (Google Lens sebagai default).</string>
+    <string name="engine_google_lens">Google Lens</string>
+    <string name="engine_yandex">Yandex</string>
+    <string name="engine_tineye">TinEye</string>
+    <string name="engine_pick_app">Pilih App</string>
+    <string name="switch_auto_visual_search">Cari Gambar Otomatis Setelah Seleksi</string>
+
+    <!-- Main Dashboard: Segment 4 (QR Code, Overlay & App Language) -->
+    <string name="section_qr_overlay">Pengaturan QR, Overlay &amp; Bahasa App</string>
+    <string name="switch_auto_qr">Otomatis Scan QR Code</string>
+    <string name="auto_qr_subtitle">Langsung mendeteksi QRIS/Pembayaran, Wi-Fi, Tautan &amp; Kontak begitu Bubble dibuka tanpa perlu tekan tombol Lens.</string>
+    <string name="label_default_shape">Bentuk Seleksi Default</string>
+    <string name="shape_rectangle">Kotak</string>
+    <string name="shape_ellipse">Elips</string>
+    <string name="shape_freeform">Lingkari Bebas</string>
+    <string name="label_default_action">Mode Aksi Awal</string>
+    <string name="action_translate">Terjemahkan</string>
+    <string name="action_visual_search">Cari Gambar</string>
+    <string name="label_app_language">Bahasa Tampilan Aplikasi</string>
+    <string name="app_lang_system">Sistem</string>
+    <string name="app_lang_english">English</string>
+    <string name="app_lang_indonesian">Indonesia</string>
+
+    <!-- Main Dashboard: Segment 5 (Privacy & Safe Mode) -->
+    <string name="section_privacy">Privasi &amp; Keamanan</string>
+    <string name="switch_safe_mode">Bubble Safe Mode (Aktif Default)</string>
+    <string name="safe_mode_subtitle">Otomatis menghentikan scan pada m-banking &amp; aplikasi sensitif. Untuk kompatibilitas maksimal, gunakan Mode Asisten Default.</string>
+    <string name="btn_excluded_apps_fmt">Pengecualian (%1$d)</string>
+    <string name="btn_clear_cache">Bersihkan Cache</string>
+    <string name="btn_legacy_capture">Izin Capture Legacy (Android 7–10)</string>
+    <string name="toast_cache_cleared">Cache terjemahan dan gambar sementara dibersihkan.</string>
+    <string name="dialog_excluded_title">Aplikasi Dikecualikan (Safe Mode)</string>
+    <string name="dialog_remove_excluded_title">Hapus dari Safe Mode?</string>
+    <string name="dialog_remove_excluded_msg">Hapus %1$s dari daftar pengecualian Safe Mode?</string>
+    <string name="dialog_add_excluded_title">Tambah Aplikasi ke Safe Mode</string>
+    <string name="hint_package_name">Contoh: com.bca</string>
+    <string name="btn_add_package">Tambah Package</string>
+    <string name="btn_add">Tambah</string>
+    <string name="btn_remove">Hapus</string>
+    <string name="btn_close">Tutup</string>
+    <string name="btn_cancel">Batal</string>
+    <string name="toast_pkg_added">%1$s ditambahkan ke Safe Mode.</string>
+    <string name="toast_pkg_removed">%1$s dihapus dari pengecualian.</string>
+
+    <!-- Overlay & Assistant UI -->
+    <string name="overlay_select_text">Pilih Teks</string>
+    <string name="overlay_select_text_count">Pilih Teks (%1$d)</string>
+    <string name="overlay_done">Selesai</string>
+    <string name="overlay_copy">Salin</string>
+    <string name="overlay_original">Asli</string>
+    <string name="overlay_translated">Terjemahan</string>
+    <string name="overlay_tools">Menu</string>
+    <string name="overlay_close_cd">Tutup Overlay</string>
+    <string name="overlay_swap_cd">Tukar Bahasa</string>
+    <string name="overlay_select_all">Pilih Semua</string>
+    <string name="overlay_web_search">Cari Web</string>
+    <string name="overlay_tap_text_hint">Ketuk kotak teks yang disorot di layar, atau tekan Pilih Semua.</string>
+    <string name="overlay_tap_text_header_fmt">Ketuk teks di layar untuk memilih (%1$d terdeteksi)</string>
+    <string name="overlay_selected_blocks_fmt">%1$d blok teks dipilih</string>
+    <string name="overlay_engine_pill_fmt">Mesin: %1$s ▾</string>
+    <string name="overlay_pick_engine_title">Pilih Mesin Visual Search</string>
+    <string name="overlay_pick_app_open_title">Pilih aplikasi untuk membuka</string>
+    <string name="overlay_other_android_apps">Buka dengan aplikasi Android lainnya…</string>
+    <string name="overlay_reading_text">Membaca teks…</string>
+    <string name="overlay_translating_fmt">Menerjemahkan %1$d blok teks…</string>
+    <string name="overlay_no_text_found">Tidak ada teks ditemukan di area ini.</string>
+    <string name="overlay_preparing_search_fmt">Menyiapkan area untuk %1$s…</string>
+    <string name="overlay_countdown_fmt">Membuka %1$s dalam %2$d dtk… (sentuh area untuk ubah)</string>
+    <string name="overlay_flag_secure_blocked">Layar dilindungi FLAG_SECURE. Bubble tidak membaca konten terlindungi.</string>
+    <string name="overlay_wait_rate_limit">Tunggu sebentar sebelum memindai ulang…</string>
+    <string name="overlay_capture_denied">Izin screen capture ditolak.</string>
+    <string name="overlay_requesting_capture">Meminta izin capture layar…</string>
+    <string name="overlay_no_text_to_select">Belum ada teks terdeteksi di layar.</string>
+    <string name="overlay_select_text_first">Ketuk teks di layar atau tekan Pilih Semua terlebih dahulu.</string>
+    <string name="overlay_copied_fmt">%1$s disalin ke clipboard.</string>
+    <string name="overlay_label_original_text">Teks Asli</string>
+    <string name="overlay_label_translated_text">Hasil Terjemahan</string>
+    <string name="overlay_label_screen_text">Teks Layar</string>
+
+    <!-- Language & OCR Manager Activity -->
+    <string name="lang_manager_title">Bahasa Offline &amp; Model OCR</string>
+    <string name="tab_offline_translation">Terjemahan Offline</string>
+    <string name="tab_custom_ocr">Impor OCR (.traineddata)</string>
+    <string name="lang_manager_info">Unduh paket bahasa agar terjemahan langsung bekerja 100% offline (~30 MB per bahasa). Kamu bisa menghapus paket yang tidak dipakai kapan saja.</string>
+    <string name="lang_search_hint">Cari bahasa (contoh: Jepang, Korea, Arab)…</string>
+    <string name="status_processing">Memproses…</string>
+    <string name="status_downloaded_offline">Terunduh (Siap Offline)</string>
+    <string name="status_not_downloaded_fmt">Belum diunduh (%1$s)</string>
+    <string name="btn_download">Unduh</string>
+    <string name="btn_downloading">Mengunduh…</string>
+    <string name="btn_delete">Hapus</string>
+    <string name="btn_installed">Terpasang</string>
+    <string name="btn_use">Pakai</string>
+    <string name="ocr_card_title">Model OCR Kustom (Tesseract 5)</string>
+    <string name="ocr_card_desc">Impor file .traineddata milik sendiri atau unduh langsung untuk membaca teks gambar beraksara non-Latin (Jepang, Korea, Mandarin, Arab, Thailand, Rusia, dll.).</string>
+    <string name="switch_use_tesseract">Gunakan Tesseract OCR Saat Scan Gambar</string>
+    <string name="btn_import_traineddata">Impor File .traineddata dari Penyimpanan HP</string>
+    <string name="ocr_installed_header_fmt">Model OCR Terpasang (%1$d)</string>
+    <string name="ocr_none_installed">Belum ada file .traineddata terpasang. Impor file dari HP atau gunakan Unduh Cepat di bawah.</string>
+    <string name="ocr_quick_download_header">Unduh Cepat Model OCR Resmi (tessdata_fast)</string>
+    <string name="ocr_active_label_fmt">✓  %1$s (Aktif)</string>
+    <string name="dialog_delete_ocr_title">Hapus Model OCR?</string>
+    <string name="dialog_delete_ocr_msg">Hapus %1$s dari perangkat?</string>
+    <string name="toast_importing_ocr">Mengimpor file .traineddata…</string>
+    <string name="toast_imported_ocr_ok">Model OCR %1$s.traineddata berhasil diimpor dan diaktifkan!</string>
+    <string name="toast_need_one_ocr_model">Impor atau unduh minimal 1 model .traineddata terlebih dahulu.</string>
+    <string name="toast_ocr_active_fmt">Model OCR aktif: %1$s</string>
+    <string name="toast_ocr_download_ok">Model OCR %1$s berhasil diunduh!</string>
+    <string name="toast_lang_downloaded">Bahasa %1$s siap offline!</string>
+    <string name="toast_lang_download_failed">Gagal mengunduh. Cek koneksi internet.</string>
+    <string name="toast_lang_deleted">Bahasa %1$s dihapus.</string>
+    <string name="toast_lang_delete_failed">Gagal menghapus bahasa.</string>
+
+    <!-- Visual Search WebView -->
+    <string name="menu_browser">Browser</string>
+    <string name="menu_open_in_app">Buka di App</string>
+    <string name="toast_image_not_found">Gambar tidak ditemukan.</string>
+    <string name="toast_lens_not_installed">Aplikasi Google Lens tidak terpasang di perangkat ini.</string>
+</resources>

@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Core App -->
+    <string name="app_name">Bubble</string>
+    <string name="app_tagline">Live screen translator, QR scanner &amp; visual search without root</string>
+    <string name="accessibility_service_label">Bubble Screen Scanner</string>
+    <string name="accessibility_service_description">Reads on-screen text inside your selected region while the Bubble overlay is active, and detects excluded sensitive apps to halt scanning automatically (Safe Mode). Bubble never stores screen history or reads passwords.</string>
+    <string name="tile_label">Bubble Screen</string>
+    <string name="safe_mode_blocked_message">Bubble is disabled on this app to protect privacy and avoid interfering with security features.</string>
+    <string name="open_accessibility_settings">Open Bubble Accessibility Settings</string>
+    <string name="lens_unavailable_message">Google Lens is not installed or does not support direct image handoff.</string>
+    <string name="capture_notification_channel">Bubble Screen Capture Session</string>
+    <string name="capture_notification_title">Bubble is scanning selected region</string>
+    <string name="capture_notification_body">In-memory temporary session — tap to stop</string>
+
+    <!-- Main Dashboard: Segment 1 (Status & Activation) -->
+    <string name="section_status_activation">Status &amp; Activation</string>
+    <string name="btn_try_bubble">Try Bubble Now</string>
+    <string name="btn_default_assistant">Default Assistant</string>
+    <string name="btn_accessibility">Accessibility</string>
+    <string name="btn_overlay_optional">Overlay Permission (Optional)</string>
+    <string name="status_assistant_label">Default Assistant</string>
+    <string name="status_accessibility_label">Accessibility</string>
+    <string name="status_capture_label">Screen Capture</string>
+    <string name="status_visual_search_label">Visual Search</string>
+    <string name="status_offline_langs_label">Offline Languages</string>
+    <string name="status_active_check">Active ✓</string>
+    <string name="status_not_set">Not set</string>
+    <string name="status_inactive">Inactive</string>
+    <string name="status_capture_both">No recording prompt (Assistant &amp; Accessibility)</string>
+    <string name="status_capture_assistant">No recording prompt (Default Assistant — hold Home)</string>
+    <string name="status_capture_a11y">No recording prompt (Android 11+ Accessibility)</string>
+    <string name="status_capture_enable_hint">Enable Default Assistant or Accessibility</string>
+    <string name="status_lens_ready">Google Lens ready</string>
+    <string name="status_google_app_ready">Google App ready</string>
+    <string name="status_multi_engine_ready">Multi-engine ready</string>
+    <string name="status_models_auto">Auto-download or via Download Languages</string>
+    <string name="status_models_count">%1$d language(s) (%2$s)</string>
+    <string name="status_last_blocked_app">Last blocked app: %1$s</string>
+    <string name="toast_enable_a11y_or_assistant">Enable Accessibility or set Bubble as your Default Digital Assistant (hold Home button).</string>
+    <string name="toast_open_assistant_manual">Open Settings &gt; Default Apps &gt; Digital Assistant App, then select Bubble.</string>
+
+    <!-- Main Dashboard: Segment 2 (Translation & Languages) -->
+    <string name="section_translation">Translation Settings</string>
+    <string name="btn_source_lang_fmt">From: %1$s</string>
+    <string name="btn_target_lang_fmt">To: %1$s</string>
+    <string name="active_lang_pair_fmt">Active: %1$s → %2$s</string>
+    <string name="dialog_pick_source_lang">Choose Source Language</string>
+    <string name="dialog_pick_target_lang">Choose Target Language</string>
+    <string name="toast_swapped_fmt">Swapped: %1$s → %2$s</string>
+    <string name="switch_auto_detect">Auto-Detect Language</string>
+    <string name="switch_auto_translate">Auto-Translate After Selection</string>
+    <string name="switch_translate_entire_screen">Translate Entire Screen</string>
+    <string name="ocr_engine_tess_fmt">OCR Engine: Tesseract (%1$s.traineddata) • %2$d model(s) installed</string>
+    <string name="ocr_engine_mlkit_fmt">OCR Engine: ML Kit Play Services (Default) • %1$d .traineddata model(s) installed</string>
+    <string name="btn_download_languages">Download Languages</string>
+    <string name="btn_import_ocr">Import OCR</string>
+
+    <!-- Main Dashboard: Segment 3 (Lens & Visual Search) -->
+    <string name="section_visual_search">Lens &amp; Visual Search</string>
+    <string name="visual_search_subtitle">Choose your primary reverse image search engine (Google Lens as default).</string>
+    <string name="engine_google_lens">Google Lens</string>
+    <string name="engine_yandex">Yandex</string>
+    <string name="engine_tineye">TinEye</string>
+    <string name="engine_pick_app">Open With</string>
+    <string name="switch_auto_visual_search">Auto-Search After Selection</string>
+
+    <!-- Main Dashboard: Segment 4 (QR Code, Overlay & App Language) -->
+    <string name="section_qr_overlay">QR Code, Overlay &amp; App Language</string>
+    <string name="switch_auto_qr">Auto-Scan QR Codes</string>
+    <string name="auto_qr_subtitle">Automatically detects QRIS/Payment, Wi-Fi, Links &amp; Contacts when Bubble opens without pressing Lens.</string>
+    <string name="label_default_shape">Default Selection Shape</string>
+    <string name="shape_rectangle">Rectangle</string>
+    <string name="shape_ellipse">Ellipse</string>
+    <string name="shape_freeform">Freeform</string>
+    <string name="label_default_action">Default Action Mode</string>
+    <string name="action_translate">Translate</string>
+    <string name="action_visual_search">Search Image</string>
+    <string name="label_app_language">App Interface Language</string>
+    <string name="app_lang_system">System</string>
+    <string name="app_lang_english">English</string>
+    <string name="app_lang_indonesian">Indonesia</string>
+
+    <!-- Main Dashboard: Segment 5 (Privacy & Safe Mode) -->
+    <string name="section_privacy">Privacy &amp; Security</string>
+    <string name="switch_safe_mode">Bubble Safe Mode (Enabled by Default)</string>
+    <string name="safe_mode_subtitle">Automatically halts scanning on banking &amp; sensitive apps. For maximum compatibility, use Default Assistant mode.</string>
+    <string name="btn_excluded_apps_fmt">Excluded (%1$d)</string>
+    <string name="btn_clear_cache">Clear Cache</string>
+    <string name="btn_legacy_capture">Legacy Capture Permission (Android 7–10)</string>
+    <string name="toast_cache_cleared">Translation and temporary image caches cleared.</string>
+    <string name="dialog_excluded_title">Excluded Apps (Safe Mode)</string>
+    <string name="dialog_remove_excluded_title">Remove from Safe Mode?</string>
+    <string name="dialog_remove_excluded_msg">Remove %1$s from Safe Mode exclusion list?</string>
+    <string name="dialog_add_excluded_title">Add App to Safe Mode</string>
+    <string name="hint_package_name">Example: com.bca</string>
+    <string name="btn_add_package">Add Package</string>
+    <string name="btn_add">Add</string>
+    <string name="btn_remove">Remove</string>
+    <string name="btn_close">Close</string>
+    <string name="btn_cancel">Cancel</string>
+    <string name="toast_pkg_added">%1$s added to Safe Mode.</string>
+    <string name="toast_pkg_removed">%1$s removed from exclusions.</string>
+
+    <!-- Overlay & Assistant UI -->
+    <string name="overlay_select_text">Select Text</string>
+    <string name="overlay_select_text_count">Select Text (%1$d)</string>
+    <string name="overlay_done">Done</string>
+    <string name="overlay_copy">Copy</string>
+    <string name="overlay_original">Original</string>
+    <string name="overlay_translated">Translated</string>
+    <string name="overlay_tools">Menu</string>
+    <string name="overlay_close_cd">Close Overlay</string>
+    <string name="overlay_swap_cd">Swap Languages</string>
+    <string name="overlay_select_all">Select All</string>
+    <string name="overlay_web_search">Web Search</string>
+    <string name="overlay_tap_text_hint">Tap highlighted text blocks on screen, or tap Select All.</string>
+    <string name="overlay_tap_text_header_fmt">Tap text on screen to select (%1$d detected)</string>
+    <string name="overlay_selected_blocks_fmt">%1$d text block(s) selected</string>
+    <string name="overlay_engine_pill_fmt">Engine: %1$s ▾</string>
+    <string name="overlay_pick_engine_title">Choose Visual Search Engine</string>
+    <string name="overlay_pick_app_open_title">Choose app to open with</string>
+    <string name="overlay_other_android_apps">Open with other Android apps…</string>
+    <string name="overlay_reading_text">Reading text…</string>
+    <string name="overlay_translating_fmt">Translating %1$d text block(s)…</string>
+    <string name="overlay_no_text_found">No text found in this area.</string>
+    <string name="overlay_preparing_search_fmt">Preparing region for %1$s…</string>
+    <string name="overlay_countdown_fmt">Opening %1$s in %2$d s… (touch screen to adjust)</string>
+    <string name="overlay_flag_secure_blocked">Screen is protected by FLAG_SECURE. Bubble does not read protected content.</string>
+    <string name="overlay_wait_rate_limit">Please wait a moment before scanning again…</string>
+    <string name="overlay_capture_denied">Screen capture permission denied.</string>
+    <string name="overlay_requesting_capture">Requesting screen capture permission…</string>
+    <string name="overlay_no_text_to_select">No text detected on screen yet.</string>
+    <string name="overlay_select_text_first">Tap text on screen or tap Select All first.</string>
+    <string name="overlay_copied_fmt">%1$s copied to clipboard.</string>
+    <string name="overlay_label_original_text">Original Text</string>
+    <string name="overlay_label_translated_text">Translated Text</string>
+    <string name="overlay_label_screen_text">Screen Text</string>
+
+    <!-- Language & OCR Manager Activity -->
+    <string name="lang_manager_title">Offline Languages &amp; OCR Models</string>
+    <string name="tab_offline_translation">Offline Translation</string>
+    <string name="tab_custom_ocr">Import OCR (.traineddata)</string>
+    <string name="lang_manager_info">Download language packs for instant 100% offline translation (~30 MB per language). You can delete unused packs anytime.</string>
+    <string name="lang_search_hint">Search language (e.g. Japanese, Korean, Arabic)…</string>
+    <string name="status_processing">Processing…</string>
+    <string name="status_downloaded_offline">Downloaded (Ready Offline)</string>
+    <string name="status_not_downloaded_fmt">Not downloaded (%1$s)</string>
+    <string name="btn_download">Download</string>
+    <string name="btn_downloading">Downloading…</string>
+    <string name="btn_delete">Delete</string>
+    <string name="btn_installed">Installed</string>
+    <string name="btn_use">Use</string>
+    <string name="ocr_card_title">Custom OCR Models (Tesseract 5)</string>
+    <string name="ocr_card_desc">Import your own .traineddata file or quick-download models to recognize non-Latin scripts (Japanese, Korean, Chinese, Arabic, Thai, Russian, etc.).</string>
+    <string name="switch_use_tesseract">Use Tesseract OCR for Image Scans</string>
+    <string name="btn_import_traineddata">Import .traineddata File from Storage</string>
+    <string name="ocr_installed_header_fmt">Installed OCR Models (%1$d)</string>
+    <string name="ocr_none_installed">No .traineddata models installed yet. Import a file from your device or use Quick Download below.</string>
+    <string name="ocr_quick_download_header">Quick Download Official Models (tessdata_fast)</string>
+    <string name="ocr_active_label_fmt">✓  %1$s (Active)</string>
+    <string name="dialog_delete_ocr_title">Delete OCR Model?</string>
+    <string name="dialog_delete_ocr_msg">Delete %1$s from this device?</string>
+    <string name="toast_importing_ocr">Importing .traineddata file…</string>
+    <string name="toast_imported_ocr_ok">OCR model %1$s.traineddata imported and activated!</string>
+    <string name="toast_need_one_ocr_model">Import or download at least 1 .traineddata model first.</string>
+    <string name="toast_ocr_active_fmt">Active OCR model: %1$s</string>
+    <string name="toast_ocr_download_ok">OCR model %1$s downloaded!</string>
+    <string name="toast_lang_downloaded">Language %1$s is ready offline!</string>
+    <string name="toast_lang_download_failed">Download failed. Check your internet connection.</string>
+    <string name="toast_lang_deleted">Language %1$s deleted.</string>
+    <string name="toast_lang_delete_failed">Failed to delete language.</string>
+
+    <!-- Visual Search WebView -->
+    <string name="menu_browser">Browser</string>
+    <string name="menu_open_in_app">Open in App</string>
+    <string name="toast_image_not_found">Image not found.</string>
+    <string name="toast_lens_not_installed">Google Lens app is not installed on this device.</string>
+</resources>
