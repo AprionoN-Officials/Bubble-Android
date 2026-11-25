@@ -20,6 +20,16 @@ Asisten layar Android yang ringan dan mengutamakan privasi untuk penerjemahan la
 
 ---
 
+## Future Plan
+
+Rencana pengembangan dan ide fitur untuk pembaruan **Bubble** di masa mendatang:
+
+- [ ] **Update UI** — Pembaruan antarmuka pengguna agar lebih modern, rapi, dan nyaman digunakan.
+- [ ] **Uncensored Search With Image** — Dukungan pencarian gambar tanpa sensor (bisa mencari gambar NSFW).
+- [ ] **Simple ChatBot AI** — Fitur chatbot AI sederhana *(masih tahap konsep, bisa dibatalkan atau dilanjutkan)*.
+
+---
+
 ## Tentang Bubble
 
 Memahami aplikasi, game, artikel, atau gambar berbahasa asing di Android biasanya mengharuskan pengguna mengambil tangkapan layar, berpindah ke aplikasi penerjemah atau pencari gambar, mengimpor gambar, lalu kembali lagi ke aplikasi sebelumnya.
