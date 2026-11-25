@@ -20,6 +20,17 @@ A lightweight, privacy-first Android screen assistant for live on-screen transla
 
 ---
 
+## Future Plan
+
+Planned improvements and feature ideas for future **Bubble** updates:
+
+- [ ] **Update UI** — Refreshing the user interface for a cleaner, more modern, and comfortable experience.
+- [ ] **Uncensored Search With Image** — Support for uncensored visual search (capable of searching NSFW images).
+- [ ] **Simple ChatBot AI** — A lightweight AI chatbot feature *(still in the concept stage; may be canceled or continued)*.
+
+---
+
+
 ## About Bubble
 
 Reading foreign-language apps, games, articles, or images on Android normally requires taking a screenshot, switching to a translation or search app, importing the image, and switching back.
