@@ -176,4 +176,41 @@
     <string name="menu_open_in_app">Open in App</string>
     <string name="toast_image_not_found">Image not found.</string>
     <string name="toast_lens_not_installed">Google Lens app is not installed on this device.</string>
+
+    <!-- Material You Expressive UI -->
+    <string name="status_ready_pill">Ready</string>
+    <string name="status_setup_pill">Setup needed</string>
+    <string name="btn_dismiss">Dismiss</string>
+
+    <string name="models_downloaded_count_fmt">%1$d offline</string>
+    <string name="models_empty_search">No matching languages found.</string>
+    <string name="tab_models_translation_short">Translation</string>
+    <string name="tab_models_ocr_short">OCR Models</string>
+    <string name="lang_search_hint_short">Search languages…</string>
+
+    <string name="version_label_fmt">v%1$s</string>
+    <string name="jump_overlay_qr">Overlay &amp; QR</string>
+
+    <string name="section_appearance">Appearance</string>
+    <string name="appearance_theme_mode">Theme mode</string>
+    <string name="theme_auto">Auto</string>
+    <string name="theme_light">Light</string>
+    <string name="theme_dark">Dark</string>
+    <string name="theme_desc_auto">Follow system default</string>
+    <string name="theme_desc_light">Light theme enabled</string>
+    <string name="theme_desc_dark">Dark theme enabled</string>
+    <string name="appearance_pure_black">Pure black</string>
+    <string name="appearance_pure_black_desc">True black background in dark mode</string>
+    <string name="appearance_accent_color">Color palette</string>
+    <string name="accent_wallpaper">Dynamic Material You colors from your wallpaper</string>
+    <string name="palette_preset_desc">Expressive Material 3 preset palette</string>
+    <string name="palette_wallpaper">Wallpaper</string>
+    <string name="palette_blue">Bubble</string>
+    <string name="palette_lagoon">Lagoon</string>
+    <string name="palette_lavender">Lavender</string>
+    <string name="palette_coral">Coral</string>
+
+    <string name="privacy_excluded_desc">Manage banking, wallet, and sensitive app packages</string>
+    <string name="privacy_clear_cache_desc">Clear volatile translation memory and temporary Lens images</string>
+    <string name="dialog_excluded_empty">No excluded packages configured.</string>
 </resources>

@@ -6,232 +6,279 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.util.Base64
-import android.view.View
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
 import android.webkit.WebResourceRequest
 import android.webkit.WebSettings
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.widget.HorizontalScrollView
-import android.widget.LinearLayout
-import android.widget.ProgressBar
 import android.widget.Toast
+import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowCompat
-import androidx.core.view.WindowInsetsCompat
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.outlined.OpenInBrowser
+import androidx.compose.material.icons.outlined.OpenInNew
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.viewinterop.AndroidView
+import com.bubble.screentools.R
+import com.bubble.screentools.data.BubblePreferences
 import com.bubble.screentools.model.VisualSearchEngine
-import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.chip.Chip
-import com.google.android.material.chip.ChipGroup
+import com.bubble.screentools.ui.theme.BubbleExpressiveTheme
+import com.bubble.screentools.ui.theme.BubblePalette
 
 /**
  * In-App Visual Search WebView supporting Yandex Images and TinEye
- * with automatic image file injection and engine switcher chips.
+ * with automatic image file injection and Material You Expressive engine switcher pills.
  */
 class VisualSearchWebActivity : AppCompatActivity() {
 
-    private lateinit var webView: WebView
-    private lateinit var progressBar: ProgressBar
-    private lateinit var toolbar: MaterialToolbar
-
+    private var webViewRef: WebView? = null
     private var imageUri: Uri? = null
     private var imageBase64: String? = null
-    private var currentEngine: VisualSearchEngine = VisualSearchEngine.YANDEX
+    private var currentEngine by mutableStateOf(VisualSearchEngine.YANDEX)
+    private var loadProgress by mutableIntStateOf(0)
     private var hasInjectedForCurrentPage = false
 
+    @OptIn(ExperimentalMaterial3Api::class)
     @SuppressLint("SetJavaScriptEnabled")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        WindowCompat.setDecorFitsSystemWindows(window, false)
-        com.bubble.screentools.util.CompatibilityHelper.applySystemBarAppearance(window, this)
+        enableEdgeToEdge()
 
         val uriStr = intent.getStringExtra(EXTRA_IMAGE_URI)
         imageUri = uriStr?.let { Uri.parse(it) }
-        currentEngine = runCatching {
-            VisualSearchEngine.valueOf(
-                intent.getStringExtra(EXTRA_ENGINE) ?: VisualSearchEngine.YANDEX.name
-            )
-        }.getOrDefault(VisualSearchEngine.YANDEX)
+        currentEngine =
+            runCatching {
+                VisualSearchEngine.valueOf(
+                    intent.getStringExtra(EXTRA_ENGINE) ?: VisualSearchEngine.YANDEX.name,
+                )
+            }.getOrDefault(VisualSearchEngine.YANDEX)
 
         if (imageUri == null) {
-            Toast.makeText(this, getString(com.bubble.screentools.R.string.toast_image_not_found), Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, getString(R.string.toast_image_not_found), Toast.LENGTH_SHORT).show()
             finish()
             return
         }
 
         imageBase64 = loadBase64FromUri(imageUri!!)
+        val preferences = BubblePreferences(this)
 
-        val root = LinearLayout(this).apply {
-            orientation = LinearLayout.VERTICAL
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                LinearLayout.LayoutParams.MATCH_PARENT
+        val engines =
+            listOf(
+                VisualSearchEngine.GOOGLE_LENS,
+                VisualSearchEngine.YANDEX,
+                VisualSearchEngine.TINEYE,
             )
-        }
 
-        toolbar = MaterialToolbar(this).apply {
-            title = currentEngine.displayName
-            setNavigationIcon(android.R.drawable.ic_menu_close_clear_cancel)
-            setNavigationOnClickListener { finish() }
-            menu.add(0, MENU_OPEN_BROWSER, 0, getString(com.bubble.screentools.R.string.menu_browser))
-                .setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_IF_ROOM)
-            menu.add(0, MENU_OPEN_WITH, 1, getString(com.bubble.screentools.R.string.menu_open_in_app))
-                .setShowAsAction(android.view.MenuItem.SHOW_AS_ACTION_IF_ROOM)
-            setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    MENU_OPEN_BROWSER -> {
-                        val url = webView.url ?: getEngineUrl(currentEngine)
-                        runCatching {
-                            startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+        setContent {
+            val systemDark = isSystemInDarkTheme()
+            val darkTheme =
+                when (preferences.themeMode) {
+                    "dark" -> true
+                    "light" -> false
+                    else -> systemDark
+                }
+
+            BubbleExpressiveTheme(
+                darkTheme = darkTheme,
+                pureBlack = preferences.pureBlack,
+                palette = BubblePalette.fromKey(preferences.themePalette),
+            ) {
+                Scaffold(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    topBar = {
+                        Column {
+                            TopAppBar(
+                                title = {
+                                    Text(
+                                        text = currentEngine.displayName,
+                                        style = MaterialTheme.typography.titleLarge,
+                                    )
+                                },
+                                navigationIcon = {
+                                    IconButton(onClick = { finish() }) {
+                                        Icon(
+                                            imageVector = Icons.Filled.Close,
+                                            contentDescription = stringResource(R.string.btn_close),
+                                        )
+                                    }
+                                },
+                                actions = {
+                                    IconButton(
+                                        onClick = {
+                                            val url = webViewRef?.url ?: getEngineUrl(currentEngine)
+                                            runCatching {
+                                                startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url)))
+                                            }
+                                        },
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.OpenInBrowser,
+                                            contentDescription = stringResource(R.string.menu_browser),
+                                        )
+                                    }
+                                    IconButton(onClick = { openImageWithExternalApp() }) {
+                                        Icon(
+                                            imageVector = Icons.Outlined.OpenInNew,
+                                            contentDescription = stringResource(R.string.menu_open_in_app),
+                                        )
+                                    }
+                                },
+                                colors =
+                                    TopAppBarDefaults.topAppBarColors(
+                                        containerColor = MaterialTheme.colorScheme.surface,
+                                    ),
+                            )
+
+                            LazyRow(
+                                contentPadding = PaddingValues(horizontal = 16.dp, vertical = 4.dp),
+                                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                                modifier = Modifier.fillMaxWidth(),
+                            ) {
+                                items(engines) { engine ->
+                                    FilterChip(
+                                        selected = engine == currentEngine,
+                                        onClick = {
+                                            if (engine == VisualSearchEngine.GOOGLE_LENS) {
+                                                val uri = imageUri ?: return@FilterChip
+                                                val lensManager = LensIntegrationManager(this@VisualSearchWebActivity)
+                                                if (lensManager.tryLaunchNativeGoogleLens(uri)) {
+                                                    finish()
+                                                } else {
+                                                    Toast.makeText(
+                                                        this@VisualSearchWebActivity,
+                                                        getString(R.string.toast_lens_not_installed),
+                                                        Toast.LENGTH_SHORT,
+                                                    ).show()
+                                                }
+                                            } else {
+                                                loadEngine(engine)
+                                            }
+                                        },
+                                        label = { Text(engine.shortLabel) },
+                                        shape = RoundedCornerShape(50),
+                                    )
+                                }
+                            }
+
+                            if (loadProgress in 1..99) {
+                                LinearProgressIndicator(
+                                    progress = { loadProgress / 100f },
+                                    modifier = Modifier.fillMaxWidth().height(3.dp),
+                                )
+                            }
                         }
-                        true
-                    }
-                    MENU_OPEN_WITH -> {
-                        openImageWithExternalApp()
-                        true
-                    }
-                    else -> false
+                    },
+                ) { padding ->
+                    AndroidView(
+                        modifier = Modifier.fillMaxSize().padding(padding),
+                        factory = { ctx ->
+                            WebView(ctx).apply {
+                                settings.javaScriptEnabled = true
+                                settings.domStorageEnabled = true
+                                settings.allowFileAccess = true
+                                settings.allowContentAccess = true
+                                settings.loadsImagesAutomatically = true
+                                settings.mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
+                                settings.userAgentString =
+                                    "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36"
+
+                                webChromeClient =
+                                    object : WebChromeClient() {
+                                        override fun onProgressChanged(view: WebView?, newProgress: Int) {
+                                            loadProgress = newProgress
+                                        }
+
+                                        override fun onShowFileChooser(
+                                            webView: WebView?,
+                                            filePathCallback: ValueCallback<Array<Uri>>?,
+                                            fileChooserParams: FileChooserParams?,
+                                        ): Boolean {
+                                            val uri = imageUri
+                                            if (uri != null && filePathCallback != null) {
+                                                filePathCallback.onReceiveValue(arrayOf(uri))
+                                                return true
+                                            }
+                                            return false
+                                        }
+                                    }
+
+                                webViewClient =
+                                    object : WebViewClient() {
+                                        override fun shouldOverrideUrlLoading(
+                                            view: WebView?,
+                                            request: WebResourceRequest?,
+                                        ): Boolean {
+                                            val url = request?.url?.toString() ?: return false
+                                            return if (url.startsWith("http://") || url.startsWith("https://")) {
+                                                false
+                                            } else {
+                                                runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
+                                                true
+                                            }
+                                        }
+
+                                        override fun onPageFinished(view: WebView?, url: String?) {
+                                            super.onPageFinished(view, url)
+                                            if (!hasInjectedForCurrentPage && url != null && isEngineLandingPage(url, currentEngine)) {
+                                                hasInjectedForCurrentPage = true
+                                                injectAutoUploadScript(view)
+                                            }
+                                        }
+                                    }
+
+                                webViewRef = this
+                                hasInjectedForCurrentPage = false
+                                loadUrl(getEngineUrl(currentEngine))
+                            }
+                        },
+                    )
                 }
             }
         }
-        root.addView(toolbar)
-
-        val chipScroll = HorizontalScrollView(this).apply {
-            isHorizontalScrollBarEnabled = false
-            setPadding(dp(12), dp(4), dp(12), dp(6))
-        }
-        val chipGroup = ChipGroup(this).apply {
-            isSingleSelection = true
-            isSingleLine = true
-        }
-        val engines = listOf(
-            VisualSearchEngine.GOOGLE_LENS,
-            VisualSearchEngine.YANDEX,
-            VisualSearchEngine.TINEYE
-        )
-        for (engine in engines) {
-            val chip = Chip(this).apply {
-                text = engine.shortLabel
-                isCheckable = true
-                isChecked = (engine == currentEngine)
-                setOnClickListener {
-                    if (engine == VisualSearchEngine.GOOGLE_LENS) {
-                        val uri = imageUri ?: return@setOnClickListener
-                        val lensManager = LensIntegrationManager(this@VisualSearchWebActivity)
-                        if (lensManager.tryLaunchNativeGoogleLens(uri)) {
-                            finish()
-                        } else {
-                            Toast.makeText(
-                                this@VisualSearchWebActivity,
-                                getString(com.bubble.screentools.R.string.toast_lens_not_installed),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-                    } else {
-                        loadEngine(engine)
-                    }
-                }
-            }
-            chipGroup.addView(chip)
-        }
-        chipScroll.addView(chipGroup)
-        root.addView(chipScroll)
-
-        progressBar = ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                dp(3)
-            )
-            max = 100
-        }
-        root.addView(progressBar)
-
-        webView = WebView(this).apply {
-            layoutParams = LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT,
-                0,
-                1f
-            )
-            settings.javaScriptEnabled = true
-            settings.domStorageEnabled = true
-            settings.allowFileAccess = true
-            settings.allowContentAccess = true
-            settings.loadsImagesAutomatically = true
-            settings.mixedContentMode = WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE
-            settings.userAgentString =
-                "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0.0.0 Mobile Safari/537.36"
-
-            webChromeClient = object : WebChromeClient() {
-                override fun onProgressChanged(view: WebView?, newProgress: Int) {
-                    progressBar.progress = newProgress
-                    progressBar.visibility = if (newProgress >= 100) View.GONE else View.VISIBLE
-                }
-
-                override fun onShowFileChooser(
-                    webView: WebView?,
-                    filePathCallback: ValueCallback<Array<Uri>>?,
-                    fileChooserParams: FileChooserParams?
-                ): Boolean {
-                    val uri = imageUri
-                    if (uri != null && filePathCallback != null) {
-                        filePathCallback.onReceiveValue(arrayOf(uri))
-                        return true
-                    }
-                    return false
-                }
-            }
-
-            webViewClient = object : WebViewClient() {
-                override fun shouldOverrideUrlLoading(
-                    view: WebView?,
-                    request: WebResourceRequest?
-                ): Boolean {
-                    val url = request?.url?.toString() ?: return false
-                    return if (url.startsWith("http://") || url.startsWith("https://")) {
-                        false
-                    } else {
-                        runCatching { startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) }
-                        true
-                    }
-                }
-
-                override fun onPageFinished(view: WebView?, url: String?) {
-                    super.onPageFinished(view, url)
-                    if (!hasInjectedForCurrentPage && url != null && isEngineLandingPage(url, currentEngine)) {
-                        hasInjectedForCurrentPage = true
-                        injectAutoUploadScript(view)
-                    }
-                }
-            }
-        }
-        root.addView(webView)
-        setContentView(root)
-
-        ViewCompat.setOnApplyWindowInsetsListener(root) { v, insets ->
-            val bars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(bars.left, bars.top, bars.right, bars.bottom)
-            insets
-        }
-
-        loadEngine(currentEngine)
     }
 
     private fun loadEngine(engine: VisualSearchEngine) {
         currentEngine = engine
-        toolbar.title = engine.displayName
         hasInjectedForCurrentPage = false
-        webView.stopLoading()
-        webView.loadUrl(getEngineUrl(engine))
+        webViewRef?.stopLoading()
+        webViewRef?.loadUrl(getEngineUrl(engine))
     }
 
-    private fun getEngineUrl(engine: VisualSearchEngine): String {
-        return when (engine) {
+    private fun getEngineUrl(engine: VisualSearchEngine): String =
+        when (engine) {
             VisualSearchEngine.TINEYE -> "https://tineye.com/"
             else -> "https://yandex.com/images/"
         }
-    }
 
     private fun isEngineLandingPage(url: String, engine: VisualSearchEngine): Boolean {
         val lower = url.lowercase()
@@ -244,7 +291,8 @@ class VisualSearchWebActivity : AppCompatActivity() {
 
     private fun injectAutoUploadScript(view: WebView?) {
         val b64 = imageBase64 ?: return
-        val js = """
+        val js =
+            """
             (function() {
                 function tryInject(attempt) {
                     var inputs = Array.from(document.querySelectorAll('input[type="file"]'));
@@ -284,50 +332,48 @@ class VisualSearchWebActivity : AppCompatActivity() {
                 }
                 setTimeout(function() { tryInject(1); }, 350);
             })();
-        """.trimIndent()
+            """.trimIndent()
         view?.evaluateJavascript(js, null)
     }
 
-    private fun loadBase64FromUri(uri: Uri): String? {
-        return runCatching {
+    private fun loadBase64FromUri(uri: Uri): String? =
+        runCatching {
             contentResolver.openInputStream(uri)?.use { stream ->
                 val bytes = stream.readBytes()
                 Base64.encodeToString(bytes, Base64.NO_WRAP)
             }
         }.getOrNull()
-    }
 
     private fun openImageWithExternalApp() {
         val uri = imageUri ?: return
-        val viewIntent = Intent(Intent.ACTION_VIEW).apply {
-            setDataAndType(uri, "image/png")
-            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
-        }
+        val viewIntent =
+            Intent(Intent.ACTION_VIEW).apply {
+                setDataAndType(uri, "image/png")
+                addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            }
         val lang = resources.configuration.locales[0]?.language?.lowercase()
         val title = if (lang == "id" || lang == "in") "Pilih aplikasi untuk membuka" else "Open with"
         startActivity(Intent.createChooser(viewIntent, title))
     }
 
     override fun onDestroy() {
-        webView.stopLoading()
-        webView.destroy()
+        webViewRef?.stopLoading()
+        webViewRef?.destroy()
+        webViewRef = null
         super.onDestroy()
     }
-
-    private fun dp(value: Int): Int = (value * resources.displayMetrics.density).toInt()
 
     companion object {
         private const val EXTRA_IMAGE_URI = "extra_image_uri"
         private const val EXTRA_ENGINE = "extra_engine"
-        private const val MENU_OPEN_BROWSER = 101
-        private const val MENU_OPEN_WITH = 102
 
         fun launch(context: Context, imageUri: Uri, engine: VisualSearchEngine) {
-            val intent = Intent(context, VisualSearchWebActivity::class.java).apply {
-                putExtra(EXTRA_IMAGE_URI, imageUri.toString())
-                putExtra(EXTRA_ENGINE, engine.name)
-                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            }
+            val intent =
+                Intent(context, VisualSearchWebActivity::class.java).apply {
+                    putExtra(EXTRA_IMAGE_URI, imageUri.toString())
+                    putExtra(EXTRA_ENGINE, engine.name)
+                    addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
             context.startActivity(intent)
         }
     }
