@@ -36,31 +36,54 @@ Android 13+ Material You themed launcher icon support is provided via an `<adapt
 
 ---
 
-## 2. GitHub Actions CI/CD Workflow
+## 2. GitHub Actions CI/CD Workflows
 
-The repository includes an automated build and test pipeline at `.github/workflows/android-build.yml`.
+The repository includes two GitHub Actions workflows under `.github/workflows/`:
 
-### Triggers
+1. **Continuous Integration** (`.github/workflows/android-build.yml`) — runs unit tests and builds debug + release APKs on every push, pull request, or manual dispatch.
+2. **Automated Release** (`.github/workflows/android-release.yml`) — builds R8-minified per-ABI release APKs, generates `SHA256SUMS.txt`, and publishes a GitHub Release automatically on `v*` tags or manual dispatch.
 
-- **Push** to `main` or `feat/**` branches
-- **Pull Request** targeting `main`
-- **Manual dispatch** (`workflow_dispatch`) from the GitHub Actions tab
+### 2.1 Continuous Integration (`android-build.yml`)
 
-### Pipeline Steps
+**Triggers:**
+- Push to `main` or `feat/**`
+- Pull requests targeting `main`
+- Manual dispatch (`workflow_dispatch`)
 
-1. **Checkout & JDK 17:** Checks out the repository (`actions/checkout@v5`) and configures Eclipse Temurin JDK 17 (`actions/setup-java@v5`).
-2. **Android SDK Setup:** Accepts SDK licenses and installs `platform-tools`, `platforms;android-36`, `build-tools;36.0.0`, and `platforms;android-37.0` (`--channel=2`) via `sdkmanager`.
-3. **Gradle Caching:** Uses `gradle/actions/setup-gradle@v4` to cache Gradle distributions and dependencies across runs.
-4. **Unit Tests & APK Builds:** Executes:
+**Steps:**
+1. Checks out the repository (`actions/checkout@v5`) and sets up Eclipse Temurin JDK 17 (`actions/setup-java@v5`).
+2. Accepts Android SDK licenses and installs `platform-tools`, `platforms;android-36`, `build-tools;36.0.0`, and `platforms;android-37.0` (`--channel=2`).
+3. Enables Gradle caching via `gradle/actions/setup-gradle@v4`.
+4. Runs:
    ```bash
    ./gradlew testDebugUnitTest assembleDebug assembleRelease --no-daemon
    ```
-5. **Artifact Uploads (7-day retention):**
-   - `bubble-debug-arm` — `app-arm64-v8a-debug.apk` and `app-armeabi-v7a-debug.apk` (for physical ARM devices; uses `.debug` applicationId suffix so it installs alongside release builds)
+5. Uploads build artifacts (7-day retention):
+   - `bubble-debug-arm` — `app-arm64-v8a-debug.apk` and `app-armeabi-v7a-debug.apk` (uses `.debug` `applicationIdSuffix` so it installs alongside release builds)
    - `bubble-debug-x86_64` — `app-x86_64-debug.apk` (for x86_64 emulators and desktop Android containers)
    - `bubble-release-apks` — R8-minified, resource-shrunk release APKs (`arm64-v8a`, `armeabi-v7a`, `x86_64`)
 
-### Release Signing Notes
+### 2.2 Automated Release (`android-release.yml`)
 
-- By default in CI (without a private keystore checked into git), `assembleRelease` produces unsigned release APKs to verify R8 minification and resource shrinking without exposing secrets.
-- When `keystore/bubble-release.jks` is present locally or decoded in a release workflow, `app/build.gradle.kts` signs the release build using `BUBBLE_KEYSTORE_PASSWORD`, `BUBBLE_KEY_ALIAS`, and `BUBBLE_KEY_PASSWORD`.
+**Triggers:**
+- Pushing a tag matching `v*` (for example, `git tag v1.1.0 && git push origin v1.1.0`)
+- Manual dispatch (`workflow_dispatch`) with `tag` (e.g. `v1.1.0`) and optional `prerelease` flag
+
+**Published Assets:**
+- `Bubble-<tag>-arm64-v8a.apk`
+- `Bubble-<tag>-armeabi-v7a.apk`
+- `Bubble-<tag>-x86_64.apk`
+- `SHA256SUMS.txt`
+
+**Optional Release Signing Secrets:**
+
+To publish signed release APKs directly from GitHub Actions, add the following repository secrets under **Settings > Secrets and variables > Actions**:
+
+| Secret | Description |
+| --- | --- |
+| `BUBBLE_KEYSTORE_BASE64` | Base64-encoded contents of `bubble-release.jks` (`base64 -w 0 bubble-release.jks`) |
+| `BUBBLE_KEYSTORE_PASSWORD` | Keystore password |
+| `BUBBLE_KEY_ALIAS` | Key alias inside the keystore |
+| `BUBBLE_KEY_PASSWORD` | Key password |
+
+The decoded keystore file is deleted in an `if: always()` cleanup step after the build completes. If `BUBBLE_KEYSTORE_BASE64` is not set, the workflow falls back gracefully to building unsigned release APKs.
