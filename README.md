@@ -20,6 +20,17 @@ A lightweight, privacy-first Android screen assistant for live on-screen transla
 
 ---
 
+## Future Plan
+
+Planned improvements and feature ideas for **Bubble** updates:
+
+- [x] **Update UI** — Refreshing the user interface to **Material You Expressive** (7-tab hub with live previews, True AMOLED Black, and Material You Dynamic Color) — *UI update idea contributed by [Ardyan (@kouzen-neo)](https://github.com/kouzen-neo)*.
+- [x] **Uncensored & Multi-Engine Visual Search** — Multi-engine visual search, custom search delay, built-in browser AdBlocker, and custom engines ([Custom Engine Guide](docs/Custom-Engine.md)).
+- [x] **Full-Screen Selection & Smart Link Detection** — Adjustable full-screen selection and enhanced `X.com` / URL detection.
+- ~~**Simple ChatBot AI**~~ — *Canceled because it does not align with Bubble's lightweight, privacy-first direction; may be explored as a separate project in the future.*
+
+---
+
 ## What's New in v1.1.1 — Personalization & Material 3 Expressive Update
 
 - **Material 3 Expressive 7-Tab UI:** Clean top scrollable segment navigation (**General**, **Translation**, **Search**, **Selection**, **Panel**, **Appearance**, **More**) with preserved per-tab scroll state, dynamic build version badge, and zero bottom navigation clutter. Core controls (**App Language**, **Default Action Mode**, **Auto-Scan QR**, **Auto-Detect Links**) live right in **General**.
@@ -413,15 +424,6 @@ cd Bubble-Android
 
 ---
 
-## Future Plan & Roadmap
-
-- [x] **Update UI** — Material 3 Expressive 7-tab hub with live previews, True AMOLED Black, and Material You Dynamic Color.
-- [x] **Uncensored & Multi-Engine Visual Search** — Multi-engine visual search, custom search delay, built-in browser AdBlocker, and custom engines ([Custom Engine Guide](docs/Custom-Engine.md)).
-- [x] **Full-Screen Selection & Smart Link Detection** — Adjustable full-screen selection and enhanced `X.com` / URL detection.
-- ~~**Simple ChatBot AI**~~ — *Canceled because it does not align with Bubble's lightweight, privacy-first direction; may be explored as a separate project in the future.*
-
----
-
 ## Known Limitations
 
 - **Android `FLAG_SECURE`:** Protected screens (banking PINs, DRM video, incognito tabs) block screenshots at the OS level; Bubble respects this restriction and never attempts to bypass it.
@@ -431,8 +433,10 @@ cd Bubble-Android
 
 ---
 
-## Contributing, Credits & License
+## Contributors, Credits & License
 
+- **Contributors:**
+  - **[Ardyan (@kouzen-neo)](https://github.com/kouzen-neo)** — Contributed the idea for updating Bubble's UI to **Material You Expressive**.
 - **Contributing:** Bug reports, device compatibility feedback, and pull requests are welcome via [GitHub Issues](https://github.com/AprionoN-Officials/Bubble-Android/issues). Please include your Android version, device model, trigger mode (Default Assistant vs. Accessibility), and reproduction steps.
 - **Credits:** Built by **AprionoN-Officials**. Powered by [AndroidX & Material Components](https://developer.android.com/jetpack), [Google ML Kit](https://developers.google.com/ml-kit), and [Tesseract4Android](https://github.com/adaptech-cz/Tesseract4Android).
 - **License:** No open-source license file (`LICENSE`) is currently included in this repository. All rights remain with the repository owner until an explicit license is added.

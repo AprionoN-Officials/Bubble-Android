@@ -20,6 +20,17 @@ Asisten layar Android yang ringan dan mengutamakan privasi untuk penerjemahan la
 
 ---
 
+## Future Plan
+
+Rencana pengembangan dan ide fitur untuk pembaruan **Bubble**:
+
+- [x] **Update UI** — Pembaruan antarmuka ke **Material You Expressive** (7 tab atas dengan pratinjau langsung, True AMOLED Black, dan Material You Dynamic Color) — *ide pembaruan UI diberikan oleh kontributor [Ardyan (@kouzen-neo)](https://github.com/kouzen-neo)*.
+- [x] **Pencarian Gambar Multi-Mesin & Tanpa Sensor** — Dukungan multi-mesin, jeda pencarian kustom, AdBlocker browser bawaan, serta mesin kustom ([Panduan Mesin Kustom](docs/Custom-Engine_ID.md)).
+- [x] **Scan Seluruh Layar & Deteksi Link Pintar** — Seleksi layar penuh yang tetap bisa disesuaikan serta deteksi tautan `X.com` & URL yang lebih akurat.
+- ~~**Simple ChatBot AI**~~ — *Dibatalkan karena tidak selaras dengan arah aplikasi yang ringan dan mengutamakan privasi; mungkin dibuat sebagai proyek terpisah di masa mendatang.*
+
+---
+
 ## Pembaruan v1.1.1 — Personalization & Material 3 Expressive Update
 
 - **Redesign UI Material 3 Expressive (7 Tab Atas):** Navigasi segmen geser horizontal yang bersih di bagian atas (**Umum**, **Terjemahan**, **Pencarian**, **Seleksi**, **Panel**, **Tampilan**, **Lainnya**) tanpa Bottom Navigation Bar, state gulir tersimpan per tab, dan badge versi dinamis. Pengaturan inti (**Bahasa Antarmuka**, **Mode Tindakan Default**, **Pindai QR Otomatis**, **Deteksi Link Otomatis**) langsung tersedia di tab **Umum**.
@@ -413,15 +424,6 @@ cd Bubble-Android
 
 ---
 
-## Rencana & Roadmap
-
-- [x] **Update UI** — Antarmuka Material 3 Expressive 7 tab atas dengan pratinjau langsung, True AMOLED Black, dan Material You Dynamic Color.
-- [x] **Pencarian Gambar Multi-Mesin & Tanpa Sensor** — Dukungan multi-mesin, jeda pencarian kustom, AdBlocker browser bawaan, serta mesin kustom ([Panduan Mesin Kustom](docs/Custom-Engine_ID.md)).
-- [x] **Scan Seluruh Layar & Deteksi Link Pintar** — Seleksi layar penuh yang tetap bisa disesuaikan serta deteksi tautan `X.com` & URL yang lebih akurat.
-- ~~**Simple ChatBot AI**~~ — *Dibatalkan karena tidak selaras dengan arah aplikasi yang ringan dan mengutamakan privasi; mungkin dibuat sebagai proyek terpisah di masa mendatang.*
-
----
-
 ## Keterbatasan yang Diketahui
 
 - **Android `FLAG_SECURE`:** Layar terproteksi (PIN perbankan, video DRM, tab penyamaran) diblokir langsung oleh OS Android; Bubble menghormati pembatasan ini dan tidak pernah mencoba melakukan bypass.
@@ -431,8 +433,10 @@ cd Bubble-Android
 
 ---
 
-## Kontribusi, Kredit & Lisensi
+## Kontributor, Kredit & Lisensi
 
+- **Kontributor:**
+  - **[Ardyan (@kouzen-neo)](https://github.com/kouzen-neo)** — Pemberi ide untuk pembaruan antarmuka Bubble ke **Material You Expressive**.
 - **Kontribusi:** Laporan bug, masukan kompatibilitas perangkat, dan *pull request* sangat diterima melalui [GitHub Issues](https://github.com/AprionoN-Officials/Bubble-Android/issues). Sertakan versi Android, model perangkat, mode aktivasi (Asisten Default vs. Aksesibilitas), serta langkah reproduksinya.
 - **Kredit:** Dikembangkan oleh **AprionoN-Officials**. Menggunakan [AndroidX & Material Components](https://developer.android.com/jetpack), [Google ML Kit](https://developers.google.com/ml-kit), dan [Tesseract4Android](https://github.com/adaptech-cz/Tesseract4Android).
 - **Lisensi:** Belum ada file lisensi open-source (`LICENSE`) pada repository ini. Seluruh hak cipta tetap berada pada pemilik repository hingga lisensi resmi ditetapkan.
