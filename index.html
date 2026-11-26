@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bubble Translation Studio — 1:1 UI Previewer (Local)</title>
+  <style>
+    :root {
+      --bg-app: #0c0d12;
+      --bg-panel: #14161f;
+      --bg-card: #1b1e2b;
+      --border: #2a2e40;
+      --text: #f3f4f8;
+      --muted: #9aa0b4;
+      --accent: #b7a4ff;
+      --blue: #2196f3;
+      --ok: #34d399;
+      --warn: #fbbf24;
+      --err: #f87171;
+      --radius: 14px;
+      --font: 'Segoe UI', Roboto, system-ui, -apple-system, sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background: var(--bg-app);
+      color: var(--text);
+      min-height: 100vh;
+      overflow: auto;
+      display: grid;
+      grid-template-rows: 54px 1fr;
+    }
+    /* Clean custom scrollbars so scrollable areas are always obvious and usable */
+    * { scrollbar-color: rgba(154,160,180,0.42) transparent; scrollbar-width: thin; }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; border-radius: 999px; }
+    ::-webkit-scrollbar-thumb { background: rgba(154,160,180,0.38); border-radius: 999px; }
+    ::-webkit-scrollbar-thumb:hover { background: rgba(183,164,255,0.65); }
+    header.topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 18px;
+      background: #10121a;
+      border-bottom: 1px solid var(--border);
+      gap: 12px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-weight: 700;
+      font-size: 15px;
+    }
+    .brand-icon {
+      width: 28px; height: 28px; border-radius: 8px;
+      background: #2196f3; display: grid; place-items: center;
+      color: #fff; font-weight: 900; font-size: 14px;
+    }
+    .badge {
+      font-size: 11px; font-weight: 700; padding: 3px 9px; border-radius: 999px;
+      background: rgba(183, 164, 255, 0.16); color: var(--accent);
+      border: 1px solid rgba(183, 164, 255, 0.35);
+    }
+    .top-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    a.btn {
+      text-decoration: none; font-family: inherit; font-size: 12.5px; font-weight: 600;
+      padding: 7px 12px; border-radius: 9px; border: 1px solid var(--border);
+      background: var(--bg-card); color: var(--text); cursor: pointer; display: inline-flex; align-items: center;
+    }
+    a.btn:hover { background: #25293b; border-color: #3f4663; }
+    select.lang-select, input.lang-code-input {
+      width: 100%; padding: 7px 9px; border-radius: 8px;
+      border: 1px solid var(--border); background: #10121b; color: var(--text);
+      font-family: inherit; font-size: 12px;
+    }
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.68);
+      display: none; place-items: center; z-index: 999; padding: 16px;
+    }
+    .modal-backdrop.open { display: grid; }
+    .modal-card {
+      background: #161824; border: 1px solid #353b54; border-radius: 18px;
+      max-width: 480px; width: 100%; padding: 20px; display: flex; flex-direction: column; gap: 12px;
+      box-shadow: 0 24px 64px rgba(0,0,0,0.65);
+    }
+    .modal-card h2 { margin: 0; font-size: 17px; }
+    .modal-card ol { margin: 0; padding-left: 20px; font-size: 13px; color: #cbd5e1; line-height: 1.55; }
+    button.btn {
+      font-family: inherit; font-size: 12.5px; font-weight: 600;
+      padding: 7px 12px; border-radius: 9px; border: 1px solid var(--border);
+      background: var(--bg-card); color: var(--text); cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    button.btn:hover { background: #25293b; border-color: #3f4663; }
+    button.btn.primary {
+      background: var(--blue); border-color: var(--blue); color: #fff;
+    }
+    button.btn.primary:hover { background: #1976d2; }
+    button.btn.active {
+      background: rgba(183, 164, 255, 0.22); border-color: var(--accent); color: #fff;
+    }
+
+    main.workspace {
+      display: grid;
+      grid-template-columns: minmax(260px, 290px) minmax(440px, 1fr) minmax(360px, 410px);
+      height: calc(100vh - 54px);
+      min-height: 620px;
+      min-width: 1080px;
+      overflow: hidden;
+    }
+    aside.left, aside.right {
+      background: var(--bg-panel);
+      overflow-y: auto;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    aside.left { border-right: 1px solid var(--border); }
+    aside.right { border-left: 1px solid var(--border); }
+
+    .panel-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+    .panel-box h3 {
+      margin: 0; font-size: 12px; text-transform: uppercase;
+      letter-spacing: 0.06em; color: var(--muted);
+    }
+    .dropzone {
+      border: 2px dashed #3e4562;
+      border-radius: 12px;
+      padding: 16px 12px;
+      text-align: center;
+      cursor: pointer;
+      background: rgba(33, 150, 243, 0.05);
+      transition: all 0.15s;
+    }
+    .dropzone.dragover { border-color: var(--blue); background: rgba(33, 150, 243, 0.16); }
+    .dropzone strong { display: block; font-size: 13px; margin-bottom: 4px; }
+    .dropzone span { font-size: 11.5px; color: var(--muted); }
+
+    .chip-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .chip-row button.btn { padding: 5px 9px; font-size: 11.5px; }
+
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; }
+    .stat-card {
+      background: #12141e; border: 1px solid var(--border); border-radius: 10px;
+      padding: 8px 6px; text-align: center;
+    }
+    .stat-card .num { font-size: 17px; font-weight: 800; }
+    .stat-card .lbl { font-size: 10.5px; color: var(--muted); }
+    .stat-ok .num { color: var(--ok); }
+    .stat-err .num { color: var(--err); }
+    .stat-warn .num { color: var(--warn); }
+
+    .screen-list { display: flex; flex-direction: column; gap: 5px; }
+    .screen-btn {
+      text-align: left; padding: 7px 10px; border-radius: 8px;
+      border: 1px solid transparent; background: transparent; color: var(--text);
+      font-size: 12.5px; cursor: pointer; display: flex; justify-content: space-between;
+    }
+    .screen-btn:hover { background: rgba(255,255,255,0.05); }
+    .screen-btn.active {
+      background: rgba(183, 164, 255, 0.16); border-color: rgba(183, 164, 255, 0.45); font-weight: 700;
+    }
+
+    /* Center Phone Stage */
+    section.stage {
+      background: radial-gradient(circle at 50% 25%, #1c2033 0%, #0b0c11 72%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      padding: 16px 20px;
+      overflow-y: auto;
+      gap: 10px;
+    }
+    .stage-meta {
+      font-size: 12px; color: var(--muted);
+      display: flex; align-items: center; gap: 12px;
+    }
+
+    /* 1:1 Android Phone Shell */
+    .phone-frame {
+      background: #14151a;
+      border-radius: 36px;
+      padding: 11px;
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.72), 0 0 0 1.5px rgba(255,255,255,0.12);
+      transition: width 0.2s ease;
+    }
+    .phone-screen {
+      --m3-bg: #000000;
+      --m3-surface: #121318;
+      --m3-surface-2: #1c1e26;
+      --m3-outline: #2e3140;
+      --m3-text: #f4f4f6;
+      --m3-sub: #a0a4b4;
+      --m3-accent: #b7a4ff;
+      --m3-on-accent: #191230;
+      --m3-tonal: #2d2450;
+      --m3-on-tonal: #e4dcff;
+      border-radius: 26px;
+      background: var(--m3-bg);
+      color: var(--m3-text);
+      height: min(760px, calc(100vh - 135px));
+      min-height: 540px;
+      overflow: hidden;
+      position: relative;
+      font-family: Roboto, 'Segoe UI', sans-serif;
+      display: flex;
+      flex-direction: column;
+    }
+    .phone-screen[data-theme="light"] {
+      --m3-bg: #f6f6fa;
+      --m3-surface: #ffffff;
+      --m3-surface-2: #eef0f6;
+      --m3-outline: #d5d8e2;
+      --m3-text: #14151a;
+      --m3-sub: #595e6e;
+      --m3-accent: #6750a4;
+      --m3-on-accent: #ffffff;
+      --m3-tonal: #eaddff;
+      --m3-on-tonal: #21005d;
+    }
+    .phone-screen[data-theme="dark"] {
+      --m3-bg: #111217;
+      --m3-surface: #1a1c24;
+      --m3-surface-2: #242733;
+      --m3-outline: #35394a;
+      --m3-text: #f2f2f7;
+      --m3-sub: #a4a8b8;
+    }
+    .phone-screen[data-accent="blue"] {
+      --m3-accent: #2196f3; --m3-on-accent: #ffffff;
+      --m3-tonal: rgba(33,150,243,0.22); --m3-on-tonal: #90caf9;
+    }
+    .phone-screen[data-theme="light"][data-accent="blue"] {
+      --m3-tonal: #dbeeff; --m3-on-tonal: #0b4a83;
+    }
+    .phone-screen[data-accent="green"] {
+      --m3-accent: #2e9d5b; --m3-on-accent: #ffffff;
+      --m3-tonal: rgba(46,157,91,0.22); --m3-on-tonal: #8be0ad;
+    }
+    .phone-screen[data-theme="light"][data-accent="green"] {
+      --m3-tonal: #d7f5e3; --m3-on-tonal: #0c4d27;
+    }
+
+    .status-bar {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 8px 18px 4px; font-size: 11px; color: var(--m3-sub); font-weight: 600;
+      flex-shrink: 0;
+    }
+    .punch-hole {
+      width: 10px; height: 10px; border-radius: 50%; background: #090a0d;
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    /* Bubble Android Authentic Header */
+    .b-header {
+      padding: 8px 14px 6px; display: flex; gap: 10px; align-items: center; flex-shrink: 0;
+    }
+    .b-logo {
+      width: 38px; height: 38px; border-radius: 12px; background: #2196f3;
+      display: grid; place-items: center; flex-shrink: 0; color: #fff; font-weight: 900; font-size: 18px;
+    }
+    .b-title-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+    .b-title { font-size: 19px; font-weight: 800; }
+    .b-ver {
+      font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+      background: var(--m3-tonal); color: var(--m3-on-tonal);
+    }
+    .b-tagline { font-size: 11px; color: var(--m3-sub); margin-top: 2px; line-height: 1.3; }
+
+    /* Top Scrollable 7-Tab Bar with horizontal drag/wheel + scroll arrows */
+    .b-tabs-wrap {
+      display: flex; align-items: center;
+      border-bottom: 1px solid var(--m3-outline);
+      flex-shrink: 0;
+      background: var(--m3-bg);
+    }
+    .b-tab-arrow {
+      border: none; background: transparent; color: var(--m3-sub);
+      width: 24px; height: 34px; cursor: pointer; font-size: 16px; font-weight: 700;
+      display: grid; place-items: center; flex-shrink: 0;
+    }
+    .b-tab-arrow:hover { color: var(--m3-accent); background: rgba(183,164,255,0.1); }
+    .b-tabs {
+      display: flex; gap: 2px; overflow-x: auto; padding: 4px 4px 2px;
+      flex: 1; min-width: 0; scroll-behavior: smooth;
+      scrollbar-width: thin;
+      cursor: grab;
+    }
+    .b-tabs:active { cursor: grabbing; }
+    .b-tab {
+      padding: 7px 11px; font-size: 12.5px; font-weight: 600; white-space: nowrap;
+      color: var(--m3-sub); border-bottom: 2.5px solid transparent; cursor: pointer;
+      user-select: none;
+    }
+    .b-tab.active { color: var(--m3-accent); border-bottom-color: var(--m3-accent); }
+
+    /* Bubble Material 3 Cards — vertical scroll container inside phone */
+    .b-content {
+      flex: 1;
+      min-height: 0;
+      overflow-y: auto;
+      overflow-x: hidden;
+      padding: 12px 12px 28px;
+      display: flex;
+      flex-direction: column;
+      gap: 11px;
+    }
+    .h-scroll-row {
+      display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+    .m3-card {
+      background: var(--m3-surface); border: 1px solid var(--m3-outline);
+      border-radius: 18px; padding: 13px; display: flex; flex-direction: column; gap: 9px;
+    }
+    .m3-card-title { font-size: 13.5px; font-weight: 700; color: var(--m3-accent); }
+    .m3-sub { font-size: 11.5px; color: var(--m3-sub); line-height: 1.38; }
+    .m3-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.5px; }
+    .m3-btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .m3-pill {
+      display: inline-flex; align-items: center; justify-content: center; text-align: center;
+      min-height: 38px; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;
+      border: 1px solid var(--m3-outline); background: transparent; color: var(--m3-text);
+      line-height: 1.2;
+    }
+    .m3-pill.filled { background: var(--m3-accent); color: var(--m3-on-accent); border-color: transparent; }
+    .m3-pill.tonal { background: var(--m3-tonal); color: var(--m3-on-tonal); border-color: transparent; }
+    .m3-chip-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+    .m3-chip {
+      padding: 5px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 600;
+      border: 1px solid var(--m3-outline); background: var(--m3-surface-2); color: var(--m3-text);
+    }
+    .m3-chip.selected { background: var(--m3-tonal); color: var(--m3-on-tonal); border-color: var(--m3-accent); }
+    .m3-switch {
+      width: 38px; height: 22px; border-radius: 999px; background: var(--m3-accent);
+      position: relative; flex-shrink: 0;
+    }
+    .m3-switch::after {
+      content: ""; position: absolute; width: 16px; height: 16px; border-radius: 50%;
+      background: var(--m3-on-accent); top: 3px; right: 3px;
+    }
+    .m3-switch.off { background: var(--m3-surface-2); border: 1px solid var(--m3-outline); }
+    .m3-switch.off::after { background: var(--m3-sub); left: 3px; right: auto; top: 2px; }
+    .m3-slider-bar {
+      height: 6px; border-radius: 999px; background: var(--m3-surface-2); position: relative; margin: 4px 0 2px;
+    }
+    .m3-slider-bar::before {
+      content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 64%;
+      border-radius: 999px; background: var(--m3-accent);
+    }
+
+    /* Overlay Mockup */
+    .overlay-bg {
+      flex: 1; min-height: 0; overflow-y: auto;
+      background: linear-gradient(180deg, #1b1e28 0%, #12141b 100%);
+      padding: 10px 10px 22px; display: flex; flex-direction: column; justify-content: space-between;
+      gap: 12px; position: relative;
+    }
+    .overlay-topbar {
+      display: flex; gap: 5px; align-items: center; overflow-x: auto; padding-bottom: 4px;
+      scrollbar-width: thin;
+    }
+    .ov-pill {
+      padding: 5px 9px; border-radius: 999px; font-size: 11px; font-weight: 700;
+      background: #2196f3; color: #fff; white-space: nowrap;
+    }
+    .ov-pill.dark { background: rgba(20,22,30,0.9); border: 1px solid rgba(255,255,255,0.2); }
+    .ov-selection {
+      border: 2.5px solid var(--m3-accent); border-radius: 12px;
+      padding: 12px; background: rgba(183, 164, 255, 0.08);
+      margin: 10px 4px; position: relative;
+    }
+    .ov-link-card {
+      background: rgba(18, 20, 28, 0.96); border: 1px solid rgba(183, 164, 255, 0.45);
+      border-radius: 16px; padding: 11px; display: flex; flex-direction: column; gap: 8px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+    }
+    .ov-action-bar {
+      display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
+      padding: 8px; border-radius: 18px; background: rgba(16,18,24,0.92);
+      border: 1px solid rgba(255,255,255,0.12);
+    }
+
+    /* Clickable i18n text tokens */
+    [data-i18n] {
+      cursor: pointer;
+      border-radius: 4px;
+      transition: outline 0.12s, background-color 0.12s;
+    }
+    [data-i18n]:hover { outline: 1.5px dashed #38bdf8; outline-offset: 2px; }
+    [data-i18n].i18n-selected { outline: 2px solid #2196f3 !important; outline-offset: 2px; }
+    .highlight-issues [data-i18n].i18n-warn { outline: 2px solid var(--warn); outline-offset: 1px; }
+    .highlight-issues [data-i18n].i18n-err { outline: 2px solid var(--err); outline-offset: 1px; }
+
+    /* Right Inspector */
+    .search-input {
+      width: 100%; padding: 8px 10px; border-radius: 9px;
+      border: 1px solid var(--border); background: #10121b; color: var(--text);
+      font-family: inherit; font-size: 12.5px;
+    }
+    .inspector-box {
+      background: #11131d; border: 1.5px solid rgba(33,150,243,0.5);
+      border-radius: 12px; padding: 11px; display: flex; flex-direction: column; gap: 7px;
+    }
+    .inspector-key { font-family: Consolas, monospace; font-size: 12px; color: var(--accent); font-weight: 700; }
+    .inspector-ref { font-size: 11.5px; color: var(--muted); line-height: 1.35; }
+    textarea.edit-area {
+      width: 100%; min-height: 68px; padding: 8px 10px; border-radius: 8px;
+      border: 1px solid #3c435e; background: #181b28; color: #fff;
+      font-family: inherit; font-size: 13px; resize: vertical;
+    }
+    .string-list { display: flex; flex-direction: column; gap: 6px; }
+    .str-item {
+      padding: 8px 10px; border-radius: 10px; border: 1px solid var(--border);
+      background: var(--bg-card); cursor: pointer; display: flex; flex-direction: column; gap: 3px;
+    }
+    .str-item:hover { border-color: #4b5578; }
+    .str-item.active { border-color: var(--blue); background: rgba(33,150,243,0.12); }
+    .str-item-top { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+    .str-key { font-family: Consolas, monospace; font-size: 11px; color: var(--accent); }
+    .tag { font-size: 10px; font-weight: 700; padding: 1px 6px; border-radius: 999px; }
+    .tag.ok { background: rgba(52,211,153,0.16); color: var(--ok); }
+    .tag.warn { background: rgba(251,191,36,0.16); color: var(--warn); }
+    .tag.err { background: rgba(248,113,113,0.18); color: var(--err); }
+    .tag.empty { background: rgba(148,163,184,0.16); color: var(--muted); }
+    .str-val { font-size: 12px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">◎</div>
+      <span>Bubble Translation Studio</span>
+      <span class="badge">v1.1.1 · 1:1 UI Previewer</span>
+      <span id="loadedSourceBadge" class="badge" style="background:rgba(52,211,153,0.14);color:#34d399;border-color:rgba(52,211,153,0.35);">Loaded: English (EN)</span>
+      <span id="autosaveBadge" class="badge" style="display:none;background:rgba(33,150,243,0.14);color:#7dd3fc;border-color:rgba(33,150,243,0.35);">Auto-saved ✓</span>
+    </div>
+    <div class="top-actions">
+      <a class="btn" id="btnDownloadTemplate" href="Bubble-v1.1.1-Translation-Template.xlsx" download>⬇ Excel Template (.xlsx)</a>
+      <button class="btn" id="btnExportCsv">Download .csv</button>
+      <button class="btn" id="btnExportXml">Export strings.xml</button>
+      <button class="btn primary" id="btnSubmitGuide">Submit to Issue #4</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <!-- LEFT SIDEBAR -->
+    <aside class="left">
+      <div class="panel-box">
+        <h3>1. Start New Language (No Coding)</h3>
+        <select class="lang-select" id="newLangSelect">
+          <option value="ja|Japanese|ltr">Japanese (ja)</option>
+          <option value="ko|Korean|ltr">Korean (ko)</option>
+          <option value="zh|Chinese|ltr">Chinese (zh)</option>
+          <option value="vi|Vietnamese|ltr">Vietnamese (vi)</option>
+          <option value="th|Thai|ltr">Thai (th)</option>
+          <option value="es|Spanish|ltr">Spanish (es)</option>
+          <option value="pt|Portuguese|ltr">Portuguese (pt)</option>
+          <option value="fr|French|ltr">French (fr)</option>
+          <option value="de|German|ltr">German (de)</option>
+          <option value="ru|Russian|ltr">Russian (ru)</option>
+          <option value="ar|Arabic|rtl">Arabic (ar) · RTL</option>
+          <option value="custom|Custom Language|ltr">Other / Custom ISO Code…</option>
+        </select>
+        <input class="lang-code-input" id="customLangInput" placeholder="ISO code, e.g. tr, pl, ms, hi" style="display:none;" />
+        <div class="chip-row">
+          <button class="btn primary" id="btnStartNewLang" style="flex:1;">Start Translating Here</button>
+          <button class="btn" id="btnClearDraft" title="Clear browser auto-save">Reset</button>
+        </div>
+      </div>
+
+      <div class="panel-box">
+        <h3>2. Or Load Excel / CSV / XML</h3>
+        <div class="dropzone" id="dropzone">
+          <strong>Drop .xlsx / .csv / .xml here</strong>
+          <span>or click to choose file (100% offline in browser)</span>
+          <input type="file" id="fileInput" accept=".xlsx,.csv,.xml" hidden />
+        </div>
+        <div class="chip-row">
+          <button class="btn active" id="presetEn">English (EN)</button>
+          <button class="btn" id="presetId">Indonesia (ID)</button>
+          <button class="btn" id="presetStress">Stress +35%</button>
+        </div>
+      </div>
+
+      <div class="panel-box">
+        <h3>3. Validation Status</h3>
+        <div class="stats-grid">
+          <div class="stat-card stat-ok"><div class="num" id="statCoverage">100%</div><div class="lbl">Coverage</div></div>
+          <div class="stat-card stat-err"><div class="num" id="statErrors">0</div><div class="lbl">PH Errors</div></div>
+          <div class="stat-card stat-warn"><div class="num" id="statWarnings">0</div><div class="lbl">Long Text</div></div>
+        </div>
+      </div>
+
+      <div class="panel-box">
+        <h3>4. Device Simulation</h3>
+        <div class="chip-row">
+          <button class="btn" id="width360">360dp (Compact)</button>
+          <button class="btn active" id="width412">412dp (Standard)</button>
+        </div>
+        <div class="chip-row">
+          <button class="btn active" id="themeAmoled">AMOLED</button>
+          <button class="btn" id="themeDark">Dark</button>
+          <button class="btn" id="themeLight">Light</button>
+        </div>
+        <div class="chip-row">
+          <button class="btn active" id="accLavender">Lavender</button>
+          <button class="btn" id="accBlue">Bubble Blue</button>
+          <button class="btn" id="accGreen">Green</button>
+        </div>
+        <div class="chip-row">
+          <button class="btn active" id="dirLtr">LTR</button>
+          <button class="btn" id="dirRtl">RTL (Arabic)</button>
+          <button class="btn active" id="toggleHighlight">Flag Issues</button>
+        </div>
+      </div>
+
+      <div class="panel-box">
+        <h3>5. Preview Screens (1:1)</h3>
+        <div class="screen-list" id="screenList"></div>
+      </div>
+    </aside>
+
+    <!-- CENTER 1:1 PHONE MOCKUP -->
+    <section class="stage">
+      <div class="stage-meta">
+        <span id="stageHint">Click any text inside the phone mockup to inspect &amp; edit live</span>
+      </div>
+      <div class="phone-frame" id="phoneFrame" style="width: 434px;">
+        <div class="phone-screen highlight-issues" id="phoneScreen" data-theme="amoled" data-accent="lavender" dir="ltr"></div>
+      </div>
+    </section>
+
+    <!-- RIGHT INSPECTOR -->
+    <aside class="right">
+      <div class="inspector-box" id="inspectorBox">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <span class="inspector-key" id="inspKey">btn_try_bubble</span>
+          <span class="tag ok" id="inspTag">OK</span>
+        </div>
+        <div class="inspector-ref" id="inspRefs"></div>
+        <textarea class="edit-area" id="inspTextarea" placeholder="Edit translation live..."></textarea>
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--muted);">
+          <span id="inspPh">Placeholders: none</span>
+          <span id="inspLen">0 / 24 chars</span>
+        </div>
+      </div>
+
+      <div class="panel-box" style="flex:1;min-height:0;">
+        <h3>Strings Explorer</h3>
+        <input class="search-input" id="searchInput" placeholder="Search key, EN, ID, or translation..." />
+        <div class="chip-row" id="filterRow">
+          <button class="btn active" data-filter="all">All</button>
+          <button class="btn" data-filter="screen">This Screen</button>
+          <button class="btn" data-filter="errors">Errors</button>
+          <button class="btn" data-filter="warnings">Long</button>
+          <button class="btn" data-filter="empty">Empty</button>
+        </div>
+        <div class="string-list" id="stringList" style="overflow-y:auto;flex:1;min-height:180px;"></div>
+      </div>
+    </aside>
+  </main>
+
+  <div class="modal-backdrop" id="submitModal">
+    <div class="modal-card">
+      <h2>🎉 Ready to Submit Your Translation!</h2>
+      <p style="margin:0;font-size:13px;color:var(--muted);">No coding, Git, or Pull Request required — just attach your exported file in a comment on Issue #4.</p>
+      <ol>
+        <li>Click <strong>Export strings.xml</strong> (or <strong>Download .csv</strong>) below to save your translation file.</li>
+        <li>Open <strong>GitHub Issue #4</strong> and drag-and-drop your downloaded file (or your <code>.xlsx</code> file) into a comment.</li>
+        <li>Mention your language name (e.g. <code>Japanese (ja)</code>) — we will review, test, and credit you as a contributor!</li>
+      </ol>
+      <div id="submitStatsNote" style="font-size:12px;padding:8px 10px;border-radius:10px;background:#10121c;border:1px solid var(--border);"></div>
+      <div class="chip-row" style="justify-content:flex-end;margin-top:4px;">
+        <button class="btn" id="modalExportXml">1. Download strings.xml</button>
+        <a class="btn primary" href="https://github.com/AprionoN-Officials/Bubble-Android/issues/4" target="_blank" rel="noopener">2. Open GitHub Issue #4 ↗</a>
+        <button class="btn" id="modalClose">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="default-data.js"></script>
+  <script>
+    (function () {
+      const DATA = window.BUBBLE_DEFAULT_I18N;
+      if (!DATA) {
+        alert("Missing default-data.js! Run: python tools/i18n/export_template.py");
+        return;
+      }
+
+      const PH_RE = /%\d+\$(?:\.\d+)?[sdf]|%[sdf]/g;
+      const entriesByKey = Object.fromEntries(DATA.entries.map((e) => [e.key, e]));
+
+      const state = {
+        modeName: "English (EN)",
+        langCode: "en",
+        translations: Object.fromEntries(DATA.entries.map((e) => [e.key, e.en])),
+        screen: "tab_general",
+        selectedKey: "btn_try_bubble",
+        filter: "all",
+        search: "",
+        highlight: true,
+      };
+
+      const SCREENS = [
+        { id: "tab_general", label: "01 · General Tab" },
+        { id: "tab_translation", label: "02 · Translation Tab" },
+        { id: "tab_search", label: "03 · Search Tab (Delay & AdBlock)" },
+        { id: "tab_selection", label: "04 · Selection Tab" },
+        { id: "tab_panel", label: "05 · Action Panel Tab" },
+        { id: "tab_appearance", label: "06 · Appearance & Theme Tab" },
+        { id: "tab_more", label: "07 · More, Updates & Safe Mode" },
+        { id: "ov_main", label: "08 · Overlay: Selection & Smart Link" },
+        { id: "ov_select_text", label: "09 · Overlay: Full-Screen Select Text" },
+        { id: "lang_mgr", label: "10 · Language Manager & Donation" },
+      ];
+
+      // Realistic preview sample values for Android printf placeholders
+      const SAMPLE_FMT = {
+        status_models_count: [2, "EN, ID"],
+        status_last_blocked_app: ["com.bca"],
+        btn_source_lang_fmt: ["AUTO"],
+        btn_target_lang_fmt: ["Indonesia"],
+        active_lang_pair_fmt: ["AUTO", "Indonesia"],
+        btn_fallback_lang_fmt: ["English"],
+        ocr_engine_mlkit_fmt: [2],
+        offline_storage_summary_fmt: [2, 60],
+        label_max_resolution_fmt: [1440],
+        label_compression_fmt: [86],
+        delay_seconds_fmt: ["5"],
+        delay_custom_value_fmt: ["3.5"],
+        web_adblocker_badge_fmt: [12],
+        slider_border_thickness_fmt: ["2.5"],
+        slider_corner_radius_fmt: ["16"],
+        slider_curvature_fmt: [40],
+        slider_fill_opacity_fmt: [12],
+        slider_outer_dim_fmt: [45],
+        slider_panel_scale_fmt: [100],
+        slider_panel_opacity_fmt: [96],
+        slider_btn_spacing_fmt: ["8"],
+        slider_btn_padding_fmt: ["12"],
+        slider_btn_radius_fmt: ["24"],
+        update_current_version_fmt: ["1.1.1", 10],
+        update_latest_version_fmt: ["v1.1.1"],
+        update_last_checked_fmt: ["Just now"],
+        btn_excluded_apps_fmt: [14],
+        overlay_select_text_count: [14],
+        overlay_link_more_fmt: ["x.com/BubbleAndroid", 1],
+        overlay_tap_text_header_fmt: [41],
+        overlay_selected_links_fmt: [3, 1],
+        overlay_engine_pill_fmt: ["Yandex Images"],
+        status_not_downloaded_fmt: ["Japanese"],
+        ocr_installed_header_fmt: [2],
+        ocr_active_label_fmt: ["jpn"],
+      };
+
+      function escHtml(s) {
+        return String(s)
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function formatSample(key, raw) {
+        const args = SAMPLE_FMT[key];
+        if (!args) return raw;
+        let out = raw;
+        args.forEach((v, i) => {
+          const idx = i + 1;
+          out = out.replace(new RegExp(`%${idx}\\$(?:\\.\\d+)?[sdf]`, "g"), String(v));
+        });
+        return out;
+      }
+
+      function checkKey(key) {
+        const meta = entriesByKey[key];
+        const val = (state.translations[key] || "").trim();
+        if (!val) return { level: "empty", msg: "Untranslated" };
+        if (meta.formatted) {
+          const exp = [...meta.placeholders].sort();
+          const got = [...(val.match(PH_RE) || [])].sort();
+          if (JSON.stringify(exp) !== JSON.stringify(got)) {
+            return { level: "err", msg: `Missing/changed placeholder: expected ${exp.join(", ")}` };
+          }
+        }
+        if (val.length > Math.round(meta.maxChars * 1.25)) {
+          return { level: "warn", msg: `Long text (${val.length}/${meta.maxChars} chars)` };
+        }
+        return { level: "ok", msg: "OK" };
+      }
+
+      function tSpan(key, extraClass = "") {
+        const val = state.translations[key] || entriesByKey[key]?.en || key;
+        const display = formatSample(key, val).replace(/\\n/g, "<br/>");
+        const chk = checkKey(key);
+        const sel = state.selectedKey === key ? "i18n-selected" : "";
+        const stCls = chk.level === "err" ? "i18n-err" : chk.level === "warn" ? "i18n-warn" : "";
+        return `<span data-i18n="${key}" class="${extraClass} ${sel} ${stCls}">${escHtml(display).replace(/&lt;br\/&gt;/g, "<br/>")}</span>`;
+      }
+
+      function renderAppHeader(activeTabId) {
+        const tabs = [
+          ["tab_general", "tab_general"],
+          ["tab_translation", "tab_translation"],
+          ["tab_search", "tab_search"],
+          ["tab_selection", "tab_selection"],
+          ["tab_panel", "tab_panel"],
+          ["tab_appearance", "tab_appearance"],
+          ["tab_more", "tab_more"],
+        ];
+        return `
+          <div class="status-bar">
+            <span>11:33</span>
+            <div class="punch-hole"></div>
+            <span>5G · 88%</span>
+          </div>
+          <div class="b-header">
+            <div class="b-logo">◎</div>
+            <div style="min-width:0;flex:1;">
+              <div class="b-title-row">
+                <span class="b-title">${tSpan("app_name")}</span>
+                <span class="b-ver">v1.1.1 · Preview</span>
+              </div>
+              <div class="b-tagline">${tSpan("app_tagline")}</div>
+            </div>
+          </div>
+          <div class="b-tabs-wrap">
+            <button type="button" class="b-tab-arrow" id="tabScrollLeft" title="Scroll tabs left">‹</button>
+            <div class="b-tabs" id="bTabsScroll">
+              ${tabs
+                .map(
+                  ([scr, key]) =>
+                    `<div class="b-tab ${activeTabId === scr ? "active" : ""}" data-nav-tab="${scr}">${tSpan(key)}</div>`
+                )
+                .join("")}
+            </div>
+            <button type="button" class="b-tab-arrow" id="tabScrollRight" title="Scroll tabs right">›</button>
+          </div>`;
+      }
+
+      function wrapBody(inner) {
+        return `<div class="b-body-scroll" id="bBodyScroll">${inner}</div>`;
+      }
+
+      function renderScreenHtml() {
+        const s = state.screen;
+        if (s === "tab_general") {
+          return `${renderAppHeader("tab_general")}
+          <div class="b-content">
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_status_activation")}</div>
+              <div class="m3-row"><span>${tSpan("status_assistant_label")}</span><strong style="color:var(--ok)">${tSpan("status_active_check")}</strong></div>
+              <div class="m3-row"><span>${tSpan("status_accessibility_label")}</span><strong style="color:var(--ok)">${tSpan("status_active_check")}</strong></div>
+              <div class="m3-row"><span>${tSpan("status_capture_label")}</span><span class="m3-sub" style="text-align:right">${tSpan("status_capture_assistant")}</span></div>
+              <div class="m3-row"><span>${tSpan("status_offline_langs_label")}</span><span class="m3-sub">${tSpan("status_models_count")}</span></div>
+              <div class="m3-pill filled">${tSpan("btn_try_bubble")}</div>
+              <div class="m3-btn-row">
+                <div class="m3-pill">${tSpan("btn_default_assistant")}</div>
+                <div class="m3-pill">${tSpan("btn_accessibility")}</div>
+              </div>
+            </div>
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_quick_settings")}</div>
+              <div class="m3-sub">${tSpan("label_app_language")}</div>
+              <div class="m3-chip-wrap">
+                <span class="m3-chip selected">${tSpan("app_lang_system")}</span>
+                <span class="m3-chip">${tSpan("app_lang_english")}</span>
+                <span class="m3-chip">${tSpan("app_lang_indonesian")}</span>
+              </div>
+              <div class="m3-sub">${tSpan("label_default_action")}</div>
+              <div class="m3-btn-row">
+                <div class="m3-pill tonal">${tSpan("action_translate")}</div>
+                <div class="m3-pill">${tSpan("action_visual_search")}</div>
+              </div>
+              <div class="m3-row"><span>${tSpan("switch_auto_qr")}</span><div class="m3-switch"></div></div>
+              <div class="m3-row"><span>${tSpan("switch_auto_link_detect")}</span><div class="m3-switch"></div></div>
+            </div>
+          </div>`;
+        }
+
+        if (s === "tab_translation") {
+          return `${renderAppHeader("tab_translation")}
+          <div class="b-content">
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_translation")}</div>
+              <div class="m3-btn-row">
+                <div class="m3-pill tonal">${tSpan("btn_source_lang_fmt")}</div>
+                <div class="m3-pill tonal">${tSpan("btn_target_lang_fmt")}</div>
+              </div>
+              <div class="m3-sub">${tSpan("active_lang_pair_fmt")}</div>
+              <div class="m3-row"><span>${tSpan("switch_auto_detect")}</span><div class="m3-switch"></div></div>
+              <div class="m3-row"><span>${tSpan("switch_auto_translate")}</span><div class="m3-switch"></div></div>
+              <div class="m3-row"><span>${tSpan("switch_translate_entire_screen")}</span><div class="m3-switch off"></div></div>
+            </div>
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_translation_quality")}</div>
+              <div class="m3-chip-wrap">
+                <span class="m3-chip">${tSpan("quality_fast")}</span>
+                <span class="m3-chip selected">${tSpan("quality_accurate")}</span>
+                <span class="m3-chip">${tSpan("quality_natural")}</span>
+              </div>
+              <div class="m3-sub">${tSpan("quality_desc_accurate")}</div>
+              <div class="m3-sub"><strong>${tSpan("label_context_profile")}</strong></div>
+              <div class="m3-chip-wrap">
+                <span class="m3-chip selected">${tSpan("context_general")}</span>
+                <span class="m3-chip">${tSpan("context_literal")}</span>
+                <span class="m3-chip">${tSpan("context_natural")}</span>
+                <span class="m3-chip">${tSpan("context_manga_game")}</span>
+              </div>
+            </div>
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_models_imports")}</div>
+              <div class="m3-sub">${tSpan("offline_storage_summary_fmt")}</div>
+              <div class="m3-btn-row">
+                <div class="m3-pill filled">${tSpan("btn_download_languages")}</div>
+                <div class="m3-pill">${tSpan("btn_import_ocr")}</div>
+              </div>
+              <div class="m3-pill">${tSpan("btn_delete_unused_models")}</div>
+            </div>
+          </div>`;
+        }
+
+        if (s === "tab_search") {
+          return `${renderAppHeader("tab_search")}
+          <div class="b-content">
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_visual_search")}</div>
+              <div class="m3-sub">${tSpan("visual_search_subtitle")}</div>
+              <div class="m3-row"><span>= &nbsp;${tSpan("engine_google_lens")}</span><span class="m3-chip selected">${tSpan("label_default_badge")}</span></div>
+              <div class="m3-row"><span>= &nbsp;${tSpan("engine_yandex")}</span><span class="m3-chip">${tSpan("btn_set_default")}</span></div>
+              <div class="m3-row"><span>= &nbsp;${tSpan("engine_tineye")}</span><span class="m3-chip">${tSpan("btn_set_default")}</span></div>
+              <div class="m3-pill tonal">+ ${tSpan("btn_add_custom_engine")}</div>
+            </div>
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_search_optimization")}</div>
+              <div class="m3-chip-wrap">
+                <span class="m3-chip">${tSpan("quality_original")}</span>
+                <span class="m3-chip selected">${tSpan("quality_balanced")}</span>
+                <span class="m3-chip">${tSpan("quality_data_saver")}</span>
+              </div>
+              <div class="m3-sub">${tSpan("label_max_resolution_fmt")}</div>
+              <div class="m3-slider-bar"></div>
+              <div class="m3-row"><span>${tSpan("switch_auto_visual_search")}</span><div class="m3-switch"></div></div>
+              <div class="m3-sub"><strong>${tSpan("label_visual_search_delay")}</strong></div>
+              <div class="m3-chip-wrap">
+                <span class="m3-chip">1s</span>
+                <span class="m3-chip selected">${tSpan("delay_seconds_fmt")}</span>
+                <span class="m3-chip">${tSpan("delay_custom")}</span>
+              </div>
+              <div class="m3-row"><span>${tSpan("switch_web_adblocker")}</span><div class="m3-switch"></div></div>
+              <div class="m3-sub">${tSpan("web_adblocker_subtitle")}</div>
+              <div class="m3-row"><span>${tSpan("switch_remember_last_engine")}</span><div class="m3-switch"></div></div>
+              <div class="m3-row"><span>${tSpan("switch_open_external_browser")}</span><div class="m3-switch off"></div></div>
+            </div>
+          </div>`;
+        }
+
+        if (s === "tab_selection") {
+          return `${renderAppHeader("tab_selection")}
+          <div class="b-content">
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_selection_preview")}</div>
+              <div class="m3-sub">${tSpan("selection_preview_hint")}</div>
+              <div style="border:2px dashed var(--m3-accent);border-radius:14px;padding:18px;text-align:center;background:var(--m3-surface-2);font-size:12px;">
+                Live Selection Preview Box
+              </div>
+            </div>
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_selection_shape")}</div>
+              <div class="m3-sub"><strong>${tSpan("label_default_shape")}</strong></div>
+              <div class="m3-chip-wrap">
+                <span class="m3-chip selected">${tSpan("shape_rectangle")}</span>
+                <span class="m3-chip">${tSpan("shape_rounded_rect")}</span>
+                <span class="m3-chip">${tSpan("shape_ellipse")}</span>
+                <span class="m3-chip">${tSpan("shape_freeform")}</span>
+                <span class="m3-chip">${tSpan("shape_custom_curved")}</span>
+              </div>
+              <div class="m3-sub"><strong>${tSpan("label_border_style")}</strong></div>
+              <div class="m3-chip-wrap">
+                <span class="m3-chip selected">${tSpan("border_solid")}</span>
+                <span class="m3-chip">${tSpan("border_dashed")}</span>
+                <span class="m3-chip">${tSpan("border_dotted")}</span>
+                <span class="m3-chip">${tSpan("border_dash_dot")}</span>
+              </div>
+            </div>
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_selection_appearance")}</div>
+              <div class="m3-chip-wrap">
+                <span class="m3-chip selected">${tSpan("color_mode_material_you")}</span>
+                <span class="m3-chip">${tSpan("color_mode_custom")}</span>
+              </div>
+              <div class="m3-sub">${tSpan("slider_border_thickness_fmt")}</div>
+              <div class="m3-slider-bar"></div>
+              <div class="m3-sub">${tSpan("slider_outer_dim_fmt")}</div>
+              <div class="m3-slider-bar"></div>
+              <div class="m3-row"><span>${tSpan("switch_show_handles")}</span><div class="m3-switch"></div></div>
+              <div class="m3-pill">${tSpan("btn_reset_default")}</div>
+            </div>
+          </div>`;
+        }
+
+        if (s === "tab_panel") {
+          return `${renderAppHeader("tab_panel")}
+          <div class="b-content">
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_panel_buttons")}</div>
+              <div class="m3-sub">${tSpan("panel_buttons_subtitle")}</div>
+              <div class="m3-row"><span>= &nbsp;${tSpan("action_translate")}</span><div class="m3-switch"></div></div>
+              <div class="m3-row"><span>= &nbsp;${tSpan("action_visual_search")}</span><div class="m3-switch"></div></div>
+              <div class="m3-row"><span>= &nbsp;${tSpan("panel_action_full_screen")}</span><div class="m3-switch"></div></div>
+              <div class="m3-row"><span>= &nbsp;${tSpan("panel_action_copy_image")}</span><div class="m3-switch off"></div></div>
+              <div class="m3-row"><span>= &nbsp;${tSpan("panel_action_save_image")}</span><div class="m3-switch off"></div></div>
+              <div class="m3-row"><span>= &nbsp;${tSpan("panel_action_share_image")}</span><div class="m3-switch off"></div></div>
+            </div>
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_panel_layout")}</div>
+              <div class="m3-sub"><strong>${tSpan("label_panel_position")}</strong></div>
+              <div class="m3-chip-wrap">
+                <span class="m3-chip selected">${tSpan("pos_bottom")}</span>
+                <span class="m3-chip">${tSpan("pos_top")}</span>
+                <span class="m3-chip">${tSpan("pos_left")}</span>
+                <span class="m3-chip">${tSpan("pos_right")}</span>
+                <span class="m3-chip">${tSpan("pos_custom")}</span>
+              </div>
+              <div class="m3-sub"><strong>${tSpan("label_panel_layout_mode")}</strong></div>
+              <div class="m3-chip-wrap">
+                <span class="m3-chip selected">${tSpan("layout_h_scroll")}</span>
+                <span class="m3-chip">${tSpan("layout_two_rows")}</span>
+                <span class="m3-chip">${tSpan("layout_icon_only")}</span>
+              </div>
+              <div class="m3-sub"><strong>${tSpan("label_button_size")}</strong></div>
+              <div class="m3-chip-wrap">
+                <span class="m3-chip">${tSpan("size_compact")}</span>
+                <span class="m3-chip selected">${tSpan("size_standard")}</span>
+                <span class="m3-chip">${tSpan("size_large")}</span>
+              </div>
+              <div class="m3-row"><span>${tSpan("switch_show_labels")}</span><div class="m3-switch"></div></div>
+              <div class="m3-row"><span>${tSpan("switch_show_engine_selector")}</span><div class="m3-switch"></div></div>
+            </div>
+          </div>`;
+        }
+
+        if (s === "tab_appearance") {
+          return `${renderAppHeader("tab_appearance")}
+          <div class="b-content">
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_theme_preview")}</div>
+              <div class="m3-chip-wrap">
+                <span class="m3-pill filled" style="min-height:32px">${tSpan("preview_primary_btn")}</span>
+                <span class="m3-pill tonal" style="min-height:32px">${tSpan("preview_tonal_btn")}</span>
+                <span class="m3-pill" style="min-height:32px">${tSpan("preview_outlined_btn")}</span>
+              </div>
+              <div class="m3-row"><span>${tSpan("preview_switch_label")}</span><div class="m3-switch"></div></div>
+            </div>
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_theme_mode")}</div>
+              <div class="m3-chip-wrap">
+                <span class="m3-chip">${tSpan("theme_follow_system")}</span>
+                <span class="m3-chip">${tSpan("theme_light")}</span>
+                <span class="m3-chip">${tSpan("theme_dark")}</span>
+                <span class="m3-chip selected">${tSpan("theme_amoled")}</span>
+              </div>
+              <div class="m3-row"><span>${tSpan("switch_dynamic_color")}</span><div class="m3-switch off"></div></div>
+            </div>
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_manual_palette")}</div>
+              <div class="m3-chip-wrap">
+                <span class="m3-chip">${tSpan("palette_bubble_blue")}</span>
+                <span class="m3-chip">${tSpan("palette_rose")}</span>
+                <span class="m3-chip selected">${tSpan("palette_lavender")}</span>
+                <span class="m3-chip">${tSpan("palette_blue")}</span>
+                <span class="m3-chip">${tSpan("palette_green")}</span>
+                <span class="m3-chip">${tSpan("palette_amber")}</span>
+                <span class="m3-chip">${tSpan("palette_mono")}</span>
+                <span class="m3-chip">${tSpan("palette_custom")}</span>
+              </div>
+            </div>
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_theme_scope")}</div>
+              <div class="m3-row"><span>${tSpan("scope_main_ui")}</span><div class="m3-switch"></div></div>
+              <div class="m3-row"><span>${tSpan("scope_overlay")}</span><div class="m3-switch"></div></div>
+              <div class="m3-row"><span>${tSpan("scope_selection")}</span><div class="m3-switch"></div></div>
+            </div>
+          </div>`;
+        }
+
+        if (s === "tab_more") {
+          return `${renderAppHeader("tab_more")}
+          <div class="b-content">
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_updates")}</div>
+              <div class="m3-sub">${tSpan("update_current_version_fmt")}</div>
+              <div class="m3-sub">${tSpan("update_latest_version_fmt")}</div>
+              <div class="m3-row"><span>${tSpan("switch_auto_update")}</span><div class="m3-switch"></div></div>
+              <div class="m3-row"><span>${tSpan("switch_update_wifi_only")}</span><div class="m3-switch off"></div></div>
+              <div class="m3-chip-wrap">
+                <span class="m3-chip">${tSpan("interval_6h")}</span>
+                <span class="m3-chip">${tSpan("interval_12h")}</span>
+                <span class="m3-chip selected">${tSpan("interval_24h")}</span>
+                <span class="m3-chip">${tSpan("interval_7d")}</span>
+              </div>
+              <div class="m3-btn-row">
+                <div class="m3-pill tonal">${tSpan("btn_check_updates")}</div>
+                <div class="m3-pill">${tSpan("btn_download_update")}</div>
+              </div>
+            </div>
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_privacy")}</div>
+              <div class="m3-row"><span>${tSpan("switch_safe_mode")}</span><div class="m3-switch"></div></div>
+              <div class="m3-sub">${tSpan("safe_mode_subtitle")}</div>
+              <div class="m3-btn-row">
+                <div class="m3-pill">${tSpan("btn_excluded_apps_fmt")}</div>
+                <div class="m3-pill">${tSpan("btn_clear_cache")}</div>
+              </div>
+            </div>
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_about")}</div>
+              <div class="m3-sub">${tSpan("about_summary")}</div>
+              <div class="m3-pill tonal">${tSpan("btn_view_github")}</div>
+            </div>
+          </div>`;
+        }
+
+        if (s === "ov_main") {
+          return `
+          <div class="status-bar" style="background:#151822;">
+            <span>14:30</span><div class="punch-hole"></div><span>5G · 92%</span>
+          </div>
+          <div class="overlay-bg">
+            <div>
+              <div class="overlay-topbar">
+                <span class="ov-pill">${tSpan("panel_action_full_screen")}</span>
+                <span class="ov-pill">${tSpan("overlay_select_text_count")}</span>
+                <span class="ov-pill dark">${tSpan("overlay_copy")}</span>
+                <span class="ov-pill dark">${tSpan("overlay_original")}</span>
+                <span class="ov-pill dark">${tSpan("overlay_tools")}</span>
+              </div>
+              <div style="margin-top:8px;font-size:11px;padding:6px 10px;border-radius:10px;background:rgba(0,0,0,0.65);color:#e2e8f0;">
+                ${tSpan("overlay_fullscreen_ready_hint")}
+              </div>
+              <div class="ov-selection">
+                <div style="font-size:12px;color:#cbd5e1;line-height:1.45;">
+                  <strong>Bubble Android v1.1.1</strong><br/>
+                  https://x.com/BubbleAndroid/status/111<br/>
+                  <span style="color:#94a3b8;font-size:11px;">${tSpan("overlay_engine_pill_fmt")}</span>
+                </div>
+              </div>
+            </div>
+
+            <div style="display:flex;flex-direction:column;gap:10px;">
+              <div class="ov-link-card">
+                <div style="font-size:10px;font-weight:800;letter-spacing:0.06em;color:#38bdf8;">🔗 ${tSpan("overlay_link_badge")}</div>
+                <div style="font-size:13.5px;font-weight:700;color:#fff;">${tSpan("overlay_link_found_title")}</div>
+                <div style="font-size:11.5px;color:#94a3b8;">${tSpan("overlay_link_more_fmt")}</div>
+                <div class="m3-btn-row">
+                  <div class="m3-pill filled" style="background:#2196f3;color:#fff;">${tSpan("overlay_open_link")}</div>
+                  <div class="m3-pill" style="color:#fff;border-color:#334155;">${tSpan("overlay_copy_link")}</div>
+                </div>
+              </div>
+              <div class="ov-action-bar">
+                <span class="m3-pill filled" style="min-height:34px;">${tSpan("action_translate")}</span>
+                <span class="m3-pill" style="min-height:34px;color:#fff;border-color:#334155;">${tSpan("action_visual_search")}</span>
+                <span class="m3-pill" style="min-height:34px;color:#fff;border-color:#334155;">${tSpan("panel_action_full_screen")}</span>
+              </div>
+            </div>
+          </div>`;
+        }
+
+        if (s === "ov_select_text") {
+          return `
+          <div class="status-bar" style="background:#151822;">
+            <span>14:32</span><div class="punch-hole"></div><span>5G · 91%</span>
+          </div>
+          <div class="overlay-bg">
+            <div>
+              <div class="overlay-topbar">
+                <span class="ov-pill">${tSpan("overlay_select_all")}</span>
+                <span class="ov-pill dark">${tSpan("overlay_done")}</span>
+              </div>
+              <div style="margin-top:10px;padding:10px;border-radius:12px;background:rgba(15,23,42,0.88);border:1px solid rgba(56,189,248,0.4);">
+                <div style="font-size:12px;font-weight:700;color:#38bdf8;">${tSpan("overlay_tap_text_header_fmt")}</div>
+                <div style="font-size:11.5px;color:#cbd5e1;margin-top:4px;">${tSpan("overlay_tap_text_hint")}</div>
+              </div>
+              <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;">
+                <div style="padding:8px 10px;border-radius:8px;background:rgba(33,150,243,0.28);border:1.5px solid #2196f3;font-size:12.5px;">Network &amp; Internet · Wi-Fi</div>
+                <div style="padding:8px 10px;border-radius:8px;background:rgba(56,189,248,0.24);border:1.5px solid #38bdf8;font-size:12.5px;text-decoration:underline;">https://x.com/BubbleAndroid</div>
+                <div style="padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px dashed rgba(255,255,255,0.25);font-size:12.5px;">Battery · 91%</div>
+              </div>
+            </div>
+            <div class="ov-link-card">
+              <div style="font-size:12px;color:#94a3b8;">${tSpan("overlay_selected_links_fmt")}</div>
+              <div class="m3-chip-wrap" style="justify-content:center;">
+                <span class="m3-pill filled" style="min-height:34px;">${tSpan("overlay_copy")}</span>
+                <span class="m3-pill tonal" style="min-height:34px;">${tSpan("action_translate")}</span>
+                <span class="m3-pill" style="min-height:34px;color:#fff;border-color:#334155;">${tSpan("overlay_web_search")}</span>
+                <span class="m3-pill" style="min-height:34px;color:#38bdf8;border-color:#38bdf8;">${tSpan("overlay_open_link")}</span>
+              </div>
+            </div>
+          </div>`;
+        }
+
+        // lang_mgr & donation dialog
+        return `
+          <div class="status-bar"><span>14:35</span><div class="punch-hole"></div><span>5G · 90%</span></div>
+          <div class="b-content">
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("lang_manager_title")}</div>
+              <div class="m3-btn-row">
+                <div class="m3-pill filled">${tSpan("tab_offline_translation")}</div>
+                <div class="m3-pill">${tSpan("tab_custom_ocr")}</div>
+              </div>
+              <div class="m3-sub">${tSpan("lang_manager_info")}</div>
+              <div class="m3-row">
+                <div><strong>Indonesian</strong><div class="m3-sub">${tSpan("status_downloaded_offline")}</div></div>
+                <span class="m3-chip">${tSpan("btn_delete")}</span>
+              </div>
+              <div class="m3-row">
+                <div><strong>Japanese</strong><div class="m3-sub">${tSpan("status_not_downloaded_fmt")}</div></div>
+                <span class="m3-chip selected">${tSpan("btn_download")}</span>
+              </div>
+              <div class="m3-sub"><strong>${tSpan("ocr_card_title")}</strong></div>
+              <div class="m3-row"><span>${tSpan("switch_use_tesseract")}</span><div class="m3-switch"></div></div>
+              <div class="m3-pill tonal">${tSpan("btn_import_traineddata")}</div>
+            </div>
+            <div class="m3-card" style="border-color:var(--m3-accent);">
+              <div class="m3-card-title">${tSpan("donation_title")}</div>
+              <div class="m3-sub">${tSpan("donation_description")}</div>
+              <div class="m3-sub" style="font-style:italic;">${tSpan("donation_supporting_text")}</div>
+              <div class="m3-btn-row">
+                <div class="m3-pill">${tSpan("donation_btn_continue")}</div>
+                <div class="m3-pill filled">${tSpan("donation_btn_donate")}</div>
+              </div>
+            </div>
+          </div>`;
+      }
+
+      function updateStatsAndList() {
+        let translated = 0, errors = 0, warnings = 0;
+        const screenKeys = new Set(
+          Array.from(document.querySelectorAll("#phoneScreen [data-i18n]")).map((el) => el.getAttribute("data-i18n"))
+        );
+
+        for (const e of DATA.entries) {
+          const chk = checkKey(e.key);
+          if (chk.level !== "empty") translated++;
+          if (chk.level === "err") errors++;
+          if (chk.level === "warn") warnings++;
+        }
+
+        document.getElementById("statCoverage").textContent = `${Math.round((translated / DATA.entries.length) * 100)}%`;
+        document.getElementById("statErrors").textContent = String(errors);
+        document.getElementById("statWarnings").textContent = String(warnings);
+
+        const q = state.search.trim().toLowerCase();
+        const filtered = DATA.entries.filter((e) => {
+          const chk = checkKey(e.key);
+          if (state.filter === "screen" && !screenKeys.has(e.key)) return false;
+          if (state.filter === "errors" && chk.level !== "err") return false;
+          if (state.filter === "warnings" && chk.level !== "warn") return false;
+          if (state.filter === "empty" && chk.level !== "empty") return false;
+          if (!q) return true;
+          const val = (state.translations[e.key] || "").toLowerCase();
+          return e.key.toLowerCase().includes(q) || e.en.toLowerCase().includes(q) || e.id.toLowerCase().includes(q) || val.includes(q);
+        });
+
+        const listEl = document.getElementById("stringList");
+        listEl.innerHTML = filtered
+          .slice(0, 120)
+          .map((e) => {
+            const chk = checkKey(e.key);
+            const val = state.translations[e.key] || "(empty)";
+            return `<div class="str-item ${state.selectedKey === e.key ? "active" : ""}" data-select-key="${e.key}">
+              <div class="str-item-top">
+                <span class="str-key">${e.key}</span>
+                <span class="tag ${chk.level}">${chk.level.toUpperCase()}</span>
+              </div>
+              <div class="str-val">${escHtml(val)}</div>
+            </div>`;
+          })
+          .join("");
+
+        listEl.querySelectorAll("[data-select-key]").forEach((el) => {
+          el.addEventListener("click", () => selectKey(el.getAttribute("data-select-key")));
+        });
+      }
+
+      function updateInspector() {
+        const meta = entriesByKey[state.selectedKey] || DATA.entries[0];
+        const val = state.translations[meta.key] || "";
+        const chk = checkKey(meta.key);
+        document.getElementById("inspKey").textContent = meta.key;
+        const tag = document.getElementById("inspTag");
+        tag.className = `tag ${chk.level}`;
+        tag.textContent = chk.msg;
+        document.getElementById("inspRefs").innerHTML =
+          `<div><strong>EN:</strong> ${escHtml(meta.en)}</div>` +
+          `<div><strong>ID:</strong> ${escHtml(meta.id)}</div>`;
+        const ta = document.getElementById("inspTextarea");
+        if (ta.value !== val) ta.value = val;
+        document.getElementById("inspPh").textContent =
+          meta.placeholders.length ? `Required placeholders: ${meta.placeholders.join(", ")}` : "Placeholders: none";
+        document.getElementById("inspLen").textContent = `${val.length} / ${meta.maxChars} chars`;
+      }
+
+      function selectKey(key) {
+        if (!entriesByKey[key]) return;
+        state.selectedKey = key;
+        renderAll();
+      }
+
+      let activeDrag = null;
+      window.addEventListener("mousemove", (ev) => {
+        if (!activeDrag) return;
+        const dx = ev.pageX - activeDrag.startX;
+        if (Math.abs(dx) > 4) activeDrag.moved = true;
+        activeDrag.el.scrollLeft = activeDrag.startLeft - dx;
+      });
+      window.addEventListener("mouseup", () => {
+        if (activeDrag && activeDrag.moved) {
+          const suppressEl = activeDrag.el;
+          setTimeout(() => { suppressEl.dataset.dragMoved = ""; }, 0);
+          suppressEl.dataset.dragMoved = "1";
+        }
+        activeDrag = null;
+      });
+
+      function enableHorizontalScroll(el) {
+        if (!el) return;
+        el.addEventListener(
+          "wheel",
+          (ev) => {
+            if (Math.abs(ev.deltaY) > Math.abs(ev.deltaX)) {
+              ev.preventDefault();
+              el.scrollLeft += ev.deltaY;
+            }
+          },
+          { passive: false }
+        );
+        el.addEventListener("mousedown", (ev) => {
+          activeDrag = { el, startX: ev.pageX, startLeft: el.scrollLeft, moved: false };
+        });
+        el.addEventListener("click", (ev) => {
+          if (el.dataset.dragMoved === "1") {
+            ev.stopPropagation();
+            ev.preventDefault();
+            el.dataset.dragMoved = "";
+          }
+        }, true);
+      }
+
+      function renderAll(resetScroll = false) {
+        const phone = document.getElementById("phoneScreen");
+        const prevBody = phone.querySelector(".b-content, .overlay-bg");
+        const prevTabs = phone.querySelector("#bTabsScroll");
+        const savedBodyTop = resetScroll ? 0 : (prevBody ? prevBody.scrollTop : 0);
+        const savedTabsLeft = prevTabs ? prevTabs.scrollLeft : 0;
+
+        phone.innerHTML = renderScreenHtml();
+        phone.classList.toggle("highlight-issues", state.highlight);
+
+        const nextBody = phone.querySelector(".b-content, .overlay-bg");
+        const nextTabs = phone.querySelector("#bTabsScroll");
+        if (nextBody) nextBody.scrollTop = savedBodyTop;
+        if (nextTabs) {
+          nextTabs.scrollLeft = savedTabsLeft;
+          enableHorizontalScroll(nextTabs);
+          if (resetScroll) {
+            const activeTab = nextTabs.querySelector(".b-tab.active");
+            if (activeTab) activeTab.scrollIntoView({ inline: "center", block: "nearest" });
+          }
+        }
+        enableHorizontalScroll(phone.querySelector(".overlay-topbar"));
+
+        const btnL = phone.querySelector("#tabScrollLeft");
+        const btnR = phone.querySelector("#tabScrollRight");
+        if (btnL && nextTabs) btnL.addEventListener("click", () => nextTabs.scrollBy({ left: -140, behavior: "smooth" }));
+        if (btnR && nextTabs) btnR.addEventListener("click", () => nextTabs.scrollBy({ left: 140, behavior: "smooth" }));
+
+        phone.querySelectorAll("[data-nav-tab]").forEach((el) => {
+          el.addEventListener("click", (ev) => {
+            ev.stopPropagation();
+            const targetScreen = el.getAttribute("data-nav-tab");
+            const tabKey = el.querySelector("[data-i18n]")?.getAttribute("data-i18n");
+            if (tabKey) state.selectedKey = tabKey;
+            if (state.screen !== targetScreen) {
+              state.screen = targetScreen;
+              renderScreenNav();
+              renderAll(true);
+            } else {
+              renderAll(false);
+            }
+          });
+        });
+
+        phone.querySelectorAll("[data-i18n]").forEach((el) => {
+          if (el.closest("[data-nav-tab]")) return;
+          el.addEventListener("click", (ev) => {
+            ev.stopPropagation();
+            selectKey(el.getAttribute("data-i18n"));
+          });
+        });
+
+        updateInspector();
+        updateStatsAndList();
+      }
+
+      function renderScreenNav() {
+        const el = document.getElementById("screenList");
+        el.innerHTML = SCREENS.map(
+          (sc) => `<button class="screen-btn ${state.screen === sc.id ? "active" : ""}" data-scr="${sc.id}"><span>${sc.label}</span></button>`
+        ).join("");
+        el.querySelectorAll("[data-scr]").forEach((btn) => {
+          btn.addEventListener("click", () => {
+            state.screen = btn.getAttribute("data-scr");
+            renderScreenNav();
+            renderAll(true);
+          });
+        });
+      }
+
+      const STORAGE_KEY = "bubble_i18n_studio_draft_v1";
+
+      function saveDraftToBrowser() {
+        try {
+          localStorage.setItem(
+            STORAGE_KEY,
+            JSON.stringify({
+              modeName: state.modeName,
+              langCode: state.langCode,
+              dir: document.getElementById("phoneScreen").dir || "ltr",
+              translations: state.translations,
+              savedAt: Date.now(),
+            })
+          );
+          const b = document.getElementById("autosaveBadge");
+          b.style.display = "inline-block";
+          b.textContent = "Auto-saved ✓";
+        } catch (_) {}
+      }
+
+      function restoreDraftFromBrowser() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!raw) return false;
+          const saved = JSON.parse(raw);
+          if (!saved || !saved.translations) return false;
+          state.modeName = saved.modeName || "Saved Draft";
+          state.langCode = saved.langCode || "custom";
+          state.translations = {};
+          for (const e of DATA.entries) state.translations[e.key] = saved.translations[e.key] || "";
+          document.getElementById("loadedSourceBadge").textContent = `Loaded: ${state.modeName}`;
+          const b = document.getElementById("autosaveBadge");
+          b.style.display = "inline-block";
+          b.textContent = "Restored draft ✓";
+          if (saved.dir === "rtl") {
+            document.getElementById("phoneScreen").dir = "rtl";
+            document.getElementById("dirRtl").classList.add("active");
+            document.getElementById("dirLtr").classList.remove("active");
+          }
+          setPresetBtn("");
+          return true;
+        } catch (_) {
+          return false;
+        }
+      }
+
+      // Live editing from right inspector
+      document.getElementById("inspTextarea").addEventListener("input", (ev) => {
+        state.translations[state.selectedKey] = ev.target.value;
+        saveDraftToBrowser();
+        renderAll(false);
+      });
+
+      // Pure-JS Offline XLSX Reader (ZIP + DecompressionStream('deflate-raw') + DOMParser)
+      async function unzipFiles(arrayBuffer) {
+        const view = new DataView(arrayBuffer);
+        const bytes = new Uint8Array(arrayBuffer);
+        // Find End of Central Directory (0x06054b50)
+        let eocd = -1;
+        for (let i = bytes.length - 22; i >= Math.max(0, bytes.length - 65558); i--) {
+          if (view.getUint32(i, true) === 0x06054b50) { eocd = i; break; }
+        }
+        if (eocd < 0) throw new Error("Not a valid ZIP / XLSX archive.");
+        const cdSize = view.getUint32(eocd + 12, true);
+        const cdOffset = view.getUint32(eocd + 16, true);
+        const dec = new TextDecoder("utf-8");
+        const out = {};
+        let pos = cdOffset;
+        while (pos < cdOffset + cdSize) {
+          if (view.getUint32(pos, true) !== 0x02014b50) break;
+          const method = view.getUint16(pos + 10, true);
+          const compSize = view.getUint32(pos + 20, true);
+          const nameLen = view.getUint16(pos + 28, true);
+          const extraLen = view.getUint16(pos + 30, true);
+          const cmtLen = view.getUint16(pos + 32, true);
+          const lfhOffset = view.getUint32(pos + 42, true);
+          const fname = dec.decode(bytes.subarray(pos + 46, pos + 46 + nameLen));
+          pos += 46 + nameLen + extraLen + cmtLen;
+
+          if (!fname.endsWith(".xml") && !fname.endsWith(".rels")) continue;
+          const lNameLen = view.getUint16(lfhOffset + 26, true);
+          const lExtraLen = view.getUint16(lfhOffset + 28, true);
+          const dataStart = lfhOffset + 30 + lNameLen + lExtraLen;
+          const slice = bytes.subarray(dataStart, dataStart + compSize);
+          if (method === 0) {
+            out[fname] = dec.decode(slice);
+          } else if (method === 8) {
+            const ds = new DecompressionStream("deflate-raw");
+            const stream = new Blob([slice]).stream().pipeThrough(ds);
+            out[fname] = await new Response(stream).text();
+          }
+        }
+        return out;
+      }
+
+      function colLettersToIndex(ref) {
+        const m = /^([A-Z]+)/.exec(ref);
+        if (!m) return -1;
+        let idx = 0;
+        for (const ch of m[1]) idx = idx * 26 + (ch.charCodeAt(0) - 64);
+        return idx - 1;
+      }
+
+      async function parseXlsxFile(file) {
+        const buf = await file.arrayBuffer();
+        const files = await unzipFiles(buf);
+        const parser = new DOMParser();
+
+        const sharedStrings = [];
+        if (files["xl/sharedStrings.xml"]) {
+          const ssDoc = parser.parseFromString(files["xl/sharedStrings.xml"], "application/xml");
+          ssDoc.querySelectorAll("si").forEach((si) => {
+            sharedStrings.push(Array.from(si.querySelectorAll("t")).map((t) => t.textContent).join(""));
+          });
+        }
+
+        const loaded = {};
+        let langCode = "";
+        let langName = "";
+        for (const [path, xml] of Object.entries(files)) {
+          if (!/^xl\/worksheets\/sheet\d+\.xml$/.test(path)) continue;
+          const doc = parser.parseFromString(xml, "application/xml");
+          const rows = Array.from(doc.querySelectorAll("sheetData > row"));
+          const grid = rows.map((row) => {
+            const arr = [];
+            row.querySelectorAll("c").forEach((c) => {
+              const colIdx = colLettersToIndex(c.getAttribute("r") || "");
+              const t = c.getAttribute("t");
+              let v = "";
+              if (t === "s") {
+                v = sharedStrings[Number(c.querySelector("v")?.textContent || 0)] || "";
+              } else if (t === "inlineStr") {
+                v = Array.from(c.querySelectorAll("t")).map((n) => n.textContent).join("");
+              } else {
+                v = c.querySelector("v")?.textContent || "";
+              }
+              if (colIdx >= 0) arr[colIdx] = v;
+            });
+            return arr;
+          });
+
+          if (!grid.length) continue;
+          const hdr = (grid[0] || []).map((x) => String(x || "").trim().toLowerCase());
+          const kIdx = hdr.indexOf("string_key");
+          if (kIdx >= 0) {
+            const vIdx = hdr.findIndex((h) => h.includes("translation"));
+            const targetCol = vIdx >= 0 ? vIdx : 6;
+            for (let r = 1; r < grid.length; r++) {
+              const k = String(grid[r]?.[kIdx] || "").trim();
+              const v = String(grid[r]?.[targetCol] || "").trim();
+              if (k && v) loaded[k] = v;
+            }
+          } else if (String(grid[0]?.[0] || "").includes("Bubble Android")) {
+            langCode = String(grid[2]?.[1] || "").trim();
+            langName = String(grid[3]?.[1] || "").trim();
+          }
+        }
+        return { loaded, langCode, langName };
+      }
+
+      function parseCsvText(text) {
+        const rows = [];
+        let row = [], cell = "", inQ = false;
+        for (let i = 0; i < text.length; i++) {
+          const ch = text[i];
+          if (inQ) {
+            if (ch === '"' && text[i + 1] === '"') { cell += '"'; i++; }
+            else if (ch === '"') inQ = false;
+            else cell += ch;
+          } else {
+            if (ch === '"') inQ = true;
+            else if (ch === ",") { row.push(cell); cell = ""; }
+            else if (ch === "\n" || ch === "\r") {
+              if (ch === "\r" && text[i + 1] === "\n") i++;
+              row.push(cell); rows.push(row); row = []; cell = "";
+            } else cell += ch;
+          }
+        }
+        if (cell.length || row.length) { row.push(cell); rows.push(row); }
+        const hdr = (rows[0] || []).map((h) => h.trim().toLowerCase());
+        const kIdx = hdr.indexOf("string_key") >= 0 ? hdr.indexOf("string_key") : 0;
+        const vIdx = hdr.findIndex((h) => h.includes("translation"));
+        const targetCol = vIdx >= 0 ? vIdx : hdr.length - 1;
+        const loaded = {};
+        for (let r = 1; r < rows.length; r++) {
+          const k = (rows[r][kIdx] || "").trim();
+          const v = (rows[r][targetCol] || "").trim();
+          if (k && v) loaded[k] = v;
+        }
+        return loaded;
+      }
+
+      function parseXmlText(text) {
+        const doc = new DOMParser().parseFromString(text, "application/xml");
+        const loaded = {};
+        doc.querySelectorAll("string[name]").forEach((node) => {
+          const k = node.getAttribute("name");
+          const raw = (node.textContent || "").replace(/\\'/g, "'").replace(/\\"/g, '"').replace(/%%/g, "%");
+          if (k) loaded[k] = raw;
+        });
+        return loaded;
+      }
+
+      async function handleFile(file) {
+        try {
+          const name = file.name.toLowerCase();
+          let loaded = {}, label = file.name, code = "custom";
+          if (name.endsWith(".xlsx")) {
+            const res = await parseXlsxFile(file);
+            loaded = res.loaded;
+            if (res.langName) label = `${res.langName} (${res.langCode || "xlsx"})`;
+            if (res.langCode) code = res.langCode;
+          } else if (name.endsWith(".csv")) {
+            loaded = parseCsvText(await file.text());
+          } else if (name.endsWith(".xml")) {
+            loaded = parseXmlText(await file.text());
+          } else {
+            alert("Unsupported file type. Please choose .xlsx, .csv, or .xml");
+            return;
+          }
+          state.translations = {};
+          for (const e of DATA.entries) state.translations[e.key] = loaded[e.key] || "";
+          state.modeName = label;
+          state.langCode = code;
+          document.getElementById("loadedSourceBadge").textContent = `Loaded: ${label}`;
+          saveDraftToBrowser();
+          setPresetBtn("");
+          renderAll();
+        } catch (err) {
+          alert(`Failed to read file: ${err.message}`);
+        }
+      }
+
+      function escapeAndroidXml(text, formatted) {
+        let s = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, '\\"').replace(/'/g, "\\'");
+        if (formatted) {
+          const phs = [];
+          s = s.replace(PH_RE, (m) => { phs.push(m); return `__PH_${phs.length - 1}__`; });
+          s = s.replace(/%/g, "%%");
+          phs.forEach((p, idx) => { s = s.replace(`__PH_${idx}__`, p); });
+        }
+        return s;
+      }
+
+      function downloadBlob(content, filename, mime) {
+        const blob = new Blob([content], { type: mime });
+        const a = document.createElement("a");
+        a.href = URL.createObjectURL(blob);
+        a.download = filename;
+        a.click();
+        setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+      }
+
+      function exportAndroidXmlNow() {
+        const lines = ['<?xml version="1.0" encoding="utf-8"?>', "<resources>"];
+        let lastSec = null;
+        for (const e of DATA.entries) {
+          const val = (state.translations[e.key] || "").trim();
+          if (!val) continue;
+          if (e.section !== lastSec) {
+            if (lastSec !== null) lines.push("");
+            lines.push(`    <!-- ${e.section} -->`);
+            lastSec = e.section;
+          }
+          const attr = e.formatted ? "" : ' formatted="false"';
+          lines.push(`    <string name="${e.key}"${attr}>${escapeAndroidXml(val, e.formatted)}</string>`);
+        }
+        lines.push("</resources>\n");
+        downloadBlob(lines.join("\n"), `strings-${state.langCode || "custom"}.xml`, "application/xml;charset=utf-8");
+      }
+
+      document.getElementById("btnExportXml").addEventListener("click", exportAndroidXmlNow);
+      document.getElementById("modalExportXml").addEventListener("click", exportAndroidXmlNow);
+
+      document.getElementById("btnSubmitGuide").addEventListener("click", () => {
+        const cov = document.getElementById("statCoverage").textContent;
+        const errs = document.getElementById("statErrors").textContent;
+        const warns = document.getElementById("statWarnings").textContent;
+        document.getElementById("submitStatsNote").innerHTML =
+          `<strong>Current Language:</strong> ${escHtml(state.modeName)} (<code>${escHtml(state.langCode)}</code>) · ` +
+          `<strong>Coverage:</strong> ${cov} · <strong>Placeholder Errors:</strong> ${errs} · <strong>Long Warnings:</strong> ${warns}`;
+        document.getElementById("submitModal").classList.add("open");
+      });
+      document.getElementById("modalClose").addEventListener("click", () => {
+        document.getElementById("submitModal").classList.remove("open");
+      });
+      document.getElementById("submitModal").addEventListener("click", (e) => {
+        if (e.target.id === "submitModal") e.target.classList.remove("open");
+      });
+
+      // Start New Language wizard
+      const selNewLang = document.getElementById("newLangSelect");
+      const inpCustomLang = document.getElementById("customLangInput");
+      selNewLang.addEventListener("change", () => {
+        inpCustomLang.style.display = selNewLang.value.startsWith("custom|") ? "block" : "none";
+      });
+      document.getElementById("btnStartNewLang").addEventListener("click", () => {
+        const [rawCode, rawName, dir] = selNewLang.value.split("|");
+        const code = rawCode === "custom" ? (inpCustomLang.value.trim().toLowerCase() || "custom") : rawCode;
+        const label = rawCode === "custom" ? `Custom (${code})` : `${rawName} (${code})`;
+        state.langCode = code;
+        state.modeName = label;
+        state.translations = Object.fromEntries(DATA.entries.map((e) => [e.key, ""]));
+        document.getElementById("loadedSourceBadge").textContent = `New: ${label}`;
+        const isRtl = dir === "rtl" || ["ar", "he", "fa", "ur"].includes(code);
+        document.getElementById("phoneScreen").dir = isRtl ? "rtl" : "ltr";
+        document.getElementById("dirRtl").classList.toggle("active", isRtl);
+        document.getElementById("dirLtr").classList.toggle("active", !isRtl);
+        setPresetBtn("");
+        saveDraftToBrowser();
+        renderAll(false);
+      });
+      document.getElementById("btnClearDraft").addEventListener("click", () => {
+        try { localStorage.removeItem(STORAGE_KEY); } catch (_) {}
+        document.getElementById("autosaveBadge").style.display = "none";
+        setPresetBtn("presetEn");
+        state.langCode = "en";
+        state.modeName = "English (EN)";
+        state.translations = Object.fromEntries(DATA.entries.map((e) => [e.key, e.en]));
+        document.getElementById("loadedSourceBadge").textContent = "Loaded: English (EN)";
+        document.getElementById("phoneScreen").dir = "ltr";
+        document.getElementById("dirLtr").classList.add("active");
+        document.getElementById("dirRtl").classList.remove("active");
+        renderAll(false);
+      });
+
+      // Resolve Excel template download link for both local file:// and GitHub Pages
+      if (window.location.protocol === "file:") {
+        document.getElementById("btnDownloadTemplate").href = "../templates/Bubble-v1.1.1-Translation-Template.xlsx";
+      }
+
+      document.getElementById("btnExportCsv").addEventListener("click", () => {
+        const q = (s) => `"${String(s || "").replace(/"/g, '""')}"`;
+        const rows = [["string_key", "Section", "English (EN)", "Indonesian (ID)", "Your Translation"].join(",")];
+        for (const e of DATA.entries) {
+          rows.push([q(e.key), q(e.section), q(e.en), q(e.id), q(state.translations[e.key] || "")].join(","));
+        }
+        downloadBlob("\uFEFF" + rows.join("\r\n"), `Bubble-v1.1.1-${state.langCode || "custom"}.csv`, "text/csv;charset=utf-8");
+      });
+
+      // Dropzone & file picker
+      const dz = document.getElementById("dropzone");
+      const fi = document.getElementById("fileInput");
+      dz.addEventListener("click", () => fi.click());
+      dz.addEventListener("dragover", (e) => { e.preventDefault(); dz.classList.add("dragover"); });
+      dz.addEventListener("dragleave", () => dz.classList.remove("dragover"));
+      dz.addEventListener("drop", (e) => {
+        e.preventDefault(); dz.classList.remove("dragover");
+        if (e.dataTransfer.files[0]) handleFile(e.dataTransfer.files[0]);
+      });
+      fi.addEventListener("change", () => { if (fi.files[0]) handleFile(fi.files[0]); });
+
+      // Presets
+      function setPresetBtn(activeId) {
+        ["presetEn", "presetId", "presetStress"].forEach((id) =>
+          document.getElementById(id).classList.toggle("active", id === activeId)
+        );
+      }
+      document.getElementById("presetEn").addEventListener("click", () => {
+        setPresetBtn("presetEn");
+        state.langCode = "en";
+        state.translations = Object.fromEntries(DATA.entries.map((e) => [e.key, e.en]));
+        document.getElementById("loadedSourceBadge").textContent = "Loaded: English (EN)";
+        renderAll();
+      });
+      document.getElementById("presetId").addEventListener("click", () => {
+        setPresetBtn("presetId");
+        state.langCode = "id";
+        state.translations = Object.fromEntries(DATA.entries.map((e) => [e.key, e.id]));
+        document.getElementById("loadedSourceBadge").textContent = "Loaded: Bahasa Indonesia (ID)";
+        renderAll();
+      });
+      document.getElementById("presetStress").addEventListener("click", () => {
+        setPresetBtn("presetStress");
+        state.langCode = "pseudo";
+        state.translations = Object.fromEntries(
+          DATA.entries.map((e) => [e.key, `[${e.en} ··· long]`])
+        );
+        document.getElementById("loadedSourceBadge").textContent = "Loaded: Stress +35% Pseudo-Locale";
+        renderAll();
+      });
+
+      // Device controls
+      document.getElementById("width360").addEventListener("click", () => {
+        document.getElementById("phoneFrame").style.width = "382px";
+        document.getElementById("width360").classList.add("active");
+        document.getElementById("width412").classList.remove("active");
+      });
+      document.getElementById("width412").addEventListener("click", () => {
+        document.getElementById("phoneFrame").style.width = "434px";
+        document.getElementById("width412").classList.add("active");
+        document.getElementById("width360").classList.remove("active");
+      });
+
+      [["themeAmoled", "amoled"], ["themeDark", "dark"], ["themeLight", "light"]].forEach(([id, val]) => {
+        document.getElementById(id).addEventListener("click", () => {
+          document.getElementById("phoneScreen").dataset.theme = val;
+          ["themeAmoled", "themeDark", "themeLight"].forEach((x) =>
+            document.getElementById(x).classList.toggle("active", x === id)
+          );
+        });
+      });
+
+      [["accLavender", "lavender"], ["accBlue", "blue"], ["accGreen", "green"]].forEach(([id, val]) => {
+        document.getElementById(id).addEventListener("click", () => {
+          document.getElementById("phoneScreen").dataset.accent = val;
+          ["accLavender", "accBlue", "accGreen"].forEach((x) =>
+            document.getElementById(x).classList.toggle("active", x === id)
+          );
+        });
+      });
+
+      document.getElementById("dirLtr").addEventListener("click", () => {
+        document.getElementById("phoneScreen").dir = "ltr";
+        document.getElementById("dirLtr").classList.add("active");
+        document.getElementById("dirRtl").classList.remove("active");
+      });
+      document.getElementById("dirRtl").addEventListener("click", () => {
+        document.getElementById("phoneScreen").dir = "rtl";
+        document.getElementById("dirRtl").classList.add("active");
+        document.getElementById("dirLtr").classList.remove("active");
+      });
+      document.getElementById("toggleHighlight").addEventListener("click", (e) => {
+        state.highlight = !state.highlight;
+        e.target.classList.toggle("active", state.highlight);
+        renderAll();
+      });
+
+      document.getElementById("searchInput").addEventListener("input", (e) => {
+        state.search = e.target.value;
+        updateStatsAndList();
+      });
+      document.querySelectorAll("#filterRow button").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          state.filter = btn.dataset.filter;
+          document.querySelectorAll("#filterRow button").forEach((b) => b.classList.toggle("active", b === btn));
+          updateStatsAndList();
+        });
+      });
+
+      restoreDraftFromBrowser();
+      renderScreenNav();
+      renderAll();
+    })();
+  </script>
+</body>
+</html>
