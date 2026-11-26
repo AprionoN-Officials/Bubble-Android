@@ -1,21 +1,27 @@
 # Bubble — Technical Architecture (`com.bubble.screentools`)
 
-This document describes the verified runtime architecture of **Bubble v1.0.0** (`versionCode = 7`, `minSdk = 24`, `targetSdk = 35`, `compileSdk = 35`) directly audited from the source code.
+This document describes the verified runtime architecture of **Bubble v1.1.1** (`versionCode = 10`, `minSdk = 24`, `targetSdk = 35`, `compileSdk = 35`) directly audited from the source code.
 
 ---
 
 ## 1. High-Level Architecture
 
-Bubble follows a **lightweight, modular, single-module Android architecture** written in Kotlin using Android Views, Material 3 (`Theme.Material3.DayNight.NoActionBar`), and Kotlin Coroutines—without heavy DI or UI frameworks—to keep memory overhead and APK size compact.
+Bubble follows a **lightweight, modular, single-module Android architecture** written in Kotlin using Android Views, Material 3 Expressive (`Theme.Material3.DayNight.NoActionBar` + Android 12+ Material You `DynamicColors`), and Kotlin Coroutines—without heavy DI, Compose, or generative LLM frameworks—to keep memory overhead and APK size compact.
 
 ```mermaid
 flowchart TD
-    subgraph ModeA["Mode A — Companion App & Settings"]
-        MA["MainActivity\n(Segmented Material 3 Dashboard)"]
+    subgraph ModeA["Mode A — Companion App & 7-Segment Personalization Hub"]
+        MA["MainActivity\n(Top Scrollable 7-Tab Material 3 Expressive UI)"]
+        TABS["7 Tab Builders\nGeneral | Translation | Search | Selection | Panel | Appearance | More"]
         LM["LanguageManagerActivity\n(31 ML Kit Languages + Tesseract 5 OCR)"]
-        PREFS["BubblePreferences\n(SharedPreferences)"]
+        DON["DonationReminderManager + DonationReminderDialog\n(72h Cooldown Gate on Personalization Only)"]
+        UPD["UpdateManager + UpdateCheckJobService\n(GitHub Releases API + JobScheduler -> Browser Release Handoff)"]
+        PREFS["BubblePreferences\n(SharedPreferences + JSON Registries)"]
+        MA --> TABS
         MA --> LM
-        MA <--> PREFS
+        MA --> DON
+        MA --> UPD
+        TABS <--> PREFS
         LM <--> PREFS
     end
 
@@ -33,18 +39,20 @@ flowchart TD
     subgraph ModeB["Mode B — Interactive Screen Session"]
         BAA["BubbleAssistantActivity\n(Fullscreen Session via SessionSnapshotStore)"]
         BOC["BubbleOverlayController\n(TYPE_ACCESSIBILITY_OVERLAY / WindowManager)"]
-        UI["Shared Overlay Views\nSelectionOverlayView | SelectableTextOverlayView\nTranslationOverlayRenderer | OverlayLanguageBarHelper"]
+        UI["Shared Overlay Views\nSelectionOverlayView + SelectionPathBuilder\nActionPanelView (2-Button Default / 6 Real Tools)\nSelectableTextOverlayView (Link-Aware) | TranslationOverlayRenderer"]
         BAA --> UI
         BOC --> UI
     end
 
     subgraph Engines["Processing Engines"]
-        CAP["ScreenCaptureManager + BitmapCropHelper\n(A11y takeScreenshot / Voice Session / Legacy MediaProjection)"]
+        CAP["ScreenCaptureManager + BitmapCropHelper + OcrImagePreprocessor\n(All 5 Selection Shapes + Quality-Aware Preprocessing)"]
         OCR["OCRManager\n(Optional Tesseract 5 -> ML Kit Play Services OCR)"]
         A11Y["ScreenTextExtractor / AssistStructure\n(Fallback, skips password nodes)"]
-        TR["TranslationManager + LanguageDetectionManager\n(ML Kit On-Device Translate + 256-entry LruCache)"]
+        TR["TranslationManager + TranslationContextProcessor\n(Fast/Accurate/Natural + Vertical CJK)"]
         QR["QrCodeScanner + QrCodeParser + QrActionHelper\n(ML Kit Barcode -> QRIS/EMVCo/Wi-Fi/URL/vCard)"]
-        VS["LensIntegrationManager + TemporaryImageProvider\n+ VisualSearchWebActivity\n(Google Lens / Yandex / TinEye / Open With)"]
+        LNK["ScreenLinkDetector\n(Safe HTTP/HTTPS & Public-TLD URL Extraction)"]
+        VS["SearchEngineRegistry + LensIntegrationManager + VisualSearchWebActivity\n(Google Lens / Yandex / TinEye / Bing / SauceNAO / trace.moe / Custom)"]
+        EXT["OverlayExtraActionsHelper\n(Copy/Save/Share Image)"]
     end
 
     DA --> SM
@@ -61,6 +69,7 @@ flowchart TD
     A11Y --> TR
     CAP --> QR
     CAP --> VS
+    CAP --> EXT
 ```
 
 ---
@@ -69,19 +78,21 @@ flowchart TD
 
 | Package | Key Classes | Responsibility |
 | --- | --- | --- |
-| `com.bubble.screentools` | `BubbleApp` | Applies saved app locale (`LocaleHelper.applyAppLocale`) at startup. |
-| `ui.main` | `MainActivity`, `LanguageManagerActivity` | Material 3 segmented settings dashboard, permission status checks, bidirectional language picker, offline ML Kit model downloader/deleter, and custom Tesseract `.traineddata` import/download UI. |
-| `ui.overlay` | `BubbleAssistantActivity`, `BubbleOverlayController`, `OverlayLanguageBarHelper`, `OverlayRootFrameLayout`, `SelectionOverlayView`, `SelectionGestureHandler`, `SelectableTextOverlayView`, `TranslationOverlayRenderer` | Full-screen Assistant session UI & Accessibility overlay lifecycle, rectangle/ellipse/freeform selection canvas with corner handles, full-screen live tap-to-select text canvas, adaptive translation box rendering, QR result card, and auto-hiding bottom controls. |
-| `service` | `BubbleVoiceInteractionService`, `BubbleVoiceInteractionSessionService`, `BubbleVoiceInteractionSession`, `BubbleRecognitionService`, `BubbleAccessibilityService`, `BubbleTileService`, `OverlayTriggerActivity`, `MediaProjectionService` | OS integration entry points. Includes `BubbleRecognitionService` so Android `RoleManager` lists Bubble in *Default Digital Assistant* settings; `BubbleTileService` uses `startActivityAndCollapse()` via `OverlayTriggerActivity` to remain Android 12–15 compliant. |
-| `capture` | `ScreenCaptureManager`, `BitmapCropHelper`, `SessionSnapshotStore`, `MediaProjectionConsentActivity` | In-memory screenshot acquisition, aspect-accurate view-to-bitmap cropping with optional 2× upscaling + 16 px white padding for OCR, and one-shot in-memory snapshot handoff (`SessionSnapshotStore`). |
-| `ocr` | `OCRManager`, `TesseractOcrManager`, `ScreenTextExtractor` | Hybrid OCR-first text extraction (optional Tesseract 5 `.traineddata` in `filesDir/tesseract/tessdata/`, default unbundled ML Kit Play Services Latin OCR) with Accessibility/AssistStructure fallback. |
-| `translation` | `TranslationManager`, `LanguageDetectionManager`, `SupportedLanguages` | ML Kit Language ID, on-device ML Kit translation across 31 curated languages, 256-entry in-memory `LruCache`, bidirectional swap helper, and model download/delete management. |
-| `qr` | `QrCodeScanner`, `QrCodeParser`, `QrActionHelper` | Unbundled ML Kit Barcode Scanning (QR format), pure-Kotlin payload parser (Indonesian QRIS / EMVCo TLV, PayNow, DuitNow, PromptPay, UPI/e-wallet URIs, Wi-Fi, URL, vCard/MECARD, Email, Phone, SMS), and native Android action dispatcher (`ACTION_VIEW`, installed payment app picker, Android 11+ `ACTION_WIFI_ADD_NETWORKS`). |
-| `lens` | `LensIntegrationManager`, `TemporaryImageProvider`, `VisualSearchWebActivity` | Targeted `ACTION_SEND` handoff to Google Lens (`com.google.ar.lens`) or Google App (`com.google.android.googlequicksearchbox`), in-app WebView reverse image search for Yandex Images & TinEye with `DataTransfer` injection, native `ACTION_VIEW` ("Open With") chooser, and `FileProvider` serving `cacheDir/lens_temp/`. |
-| `security` | `SafeModeManager` | Evaluates foreground package against the user-editable excluded list (14 default banking/e-wallet/authenticator/ID apps) and checks protected windows to halt scanning fail-safely. |
-| `data` | `BubblePreferences` | Consolidated `SharedPreferences` (`bubble_preferences`) backing all user settings and excluded package list. |
-| `model` | `BubbleState` | Strongly-typed enums and state models (`SelectionShape`, `ActionMode`, `VisualSearchEngine`, `TranslationOverlayStyle`, `SelectionRegion`, `TextBlockResult`, `TranslatedBlock`, `BubbleOverlayState`). |
-| `util` | `CompatibilityHelper`, `LocaleHelper`, `PerformanceManager` | API-level compatibility guards (API 24–35), per-app locale application (`AppCompatDelegate` + `Context.createConfigurationContext` for services), debounce timings (650 ms translate / 1800 ms visual search), and volatile cache cleanup. |
+| `com.bubble.screentools` | `BubbleApp` | Applies saved locale, applies saved `ThemeMode`, records initial usage baseline timestamp, and purges stale temp cache on startup. |
+| `ui.main` & `ui.main.tabs` | `MainActivity`, `UiKit`, `LanguageManagerActivity`, `GeneralTabBuilder`, `TranslationTabBuilder`, `SearchTabBuilder`, `SelectionTabBuilder`, `PanelTabBuilder`, `AppearanceTabBuilder`, `MoreTabBuilder` | Material 3 Expressive 7-tab top scrollable settings hub with General core settings (Language, Default Mode, Auto-QR, Auto-Link), vector `=` drag-to-reorder handles, live Selection, Action Panel, Theme, and Translation pipeline previews, offline model management, and update UI. |
+| `ui.overlay` | `BubbleAssistantActivity`, `BubbleOverlayController`, `ActionPanelView`, `OverlayExtraActionsHelper`, `OverlayLanguageBarHelper`, `OverlayRootFrameLayout`, `SelectionOverlayView`, `SelectionPathBuilder`, `SelectionGestureHandler`, `SelectableTextOverlayView`, `TranslationOverlayRenderer` | Full-screen Assistant & Accessibility overlay runtime sharing `ActionPanelView` and `SelectionOverlayView` with settings previews. Supports 5 selection shapes, 4 border styles, 6 working overlay tools, non-blocking Auto-QR & Auto-Link cards, link-aware `Select Text`, and customizable panel docking. |
+| `theme` | `ThemeManager`, `ThemePaletteGenerator` | Follow System / Light / Dark / AMOLED Black modes, Android 12+ Material You `DynamicColors`, pure-Kotlin WCAG-compliant tonal seed palette synthesis, Theme Scope isolation, and reduced-motion detection. |
+| `service` | `BubbleVoiceInteractionService`, `BubbleVoiceInteractionSessionService`, `BubbleVoiceInteractionSession`, `BubbleRecognitionService`, `BubbleAccessibilityService`, `BubbleTileService`, `OverlayTriggerActivity`, `MediaProjectionService` | OS integration entry points (Default Digital Assistant, Accessibility Service, Quick Settings Tile, legacy Android 7–10 MediaProjection fallback). |
+| `capture` | `ScreenCaptureManager`, `BitmapCropHelper`, `SessionSnapshotStore`, `MediaProjectionConsentActivity` | In-memory screenshot acquisition, non-rectangular shape masking (transparent for Visual Search, backdrop-filled for OCR), and quality-mode OCR preprocessing. |
+| `ocr` | `OCRManager`, `OcrImagePreprocessor`, `TesseractOcrManager`, `ScreenTextExtractor` | Hybrid OCR-first extraction with contrast preprocessing for Accurate/Natural modes, strictly validated `.traineddata` imports, and Accessibility/AssistStructure fallback. |
+| `translation` | `TranslationManager`, `TranslationContextProcessor`, `LanguageDetectionManager`, `SupportedLanguages` | Quality-mode aware context reconstruction (spatial paragraph & manga speech-bubble merging, vertical CJK right-to-left columns, de-hyphenation), Preferred/Fallback/Recent languages, and ML Kit on-device translation. |
+| `qr` | `QrCodeScanner`, `QrCodeParser`, `QrActionHelper` | Unbundled ML Kit Barcode Scanning (QR format), pure-Kotlin payload parser (QRIS/EMVCo TLV, Wi-Fi, URL, vCard/MECARD, UPI), and native Android action dispatch. |
+| `lens` | `SearchEngineRegistry`, `LensIntegrationManager`, `TemporaryImageProvider`, `VisualSearchWebActivity` | Separated Visual & Text search engine registry (Google Lens, Yandex, TinEye, Bing Visual, SauceNAO, trace.moe, Open With, plus custom engines), image quality/format pipeline (`Original`/`Balanced`/`Data Saver`), confirm-before-upload, and `FileProvider` serving `cacheDir/lens_temp/`. |
+| `update` | `SemVer`, `GitHubReleaseParser`, `UpdateAssetSelector`, `UpdateManager`, `UpdateCheckJobService` | GitHub Releases API checker with SemVer comparison, ETag caching, rate-limit handling, ABI matching, lightweight `JobScheduler` scheduling, and direct browser handoff to GitHub Releases (zero `REQUEST_INSTALL_PACKAGES` permission). |
+| `donation` | `DonationConfig`, `DonationReminderManager`, `DonationReminderDialog` | Voluntary reminder triggered once on fresh install in customization menus (`Search`, `Selection`, `Panel`, `Appearance`) with a shared 72-hour global cooldown after Continue (never during overlay triggers), injectable clock for testing, and lifecycle-aware 5-second silent Continue delay. |
+| `security` | `SafeModeManager` | Evaluates foreground package against editable excluded list (14 default banking/e-wallet/authenticator/ID apps) and checks protected windows to halt scanning fail-safely. |
+| `data` & `model` | `BubblePreferences`, `BubbleState` | Backward-compatible `SharedPreferences` repository and strongly-typed configuration models. |
+| `util` | `CompatibilityHelper`, `LocaleHelper`, `PerformanceManager`, `ScreenLinkDetector` | API 24–35 compatibility guards, per-app single-tag locale switching, debounce timings, volatile cache cleanup, and safe URL extraction/launch. |
 
 ---
 
