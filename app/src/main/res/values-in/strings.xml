@@ -176,4 +176,41 @@
     <string name="menu_open_in_app">Buka di App</string>
     <string name="toast_image_not_found">Gambar tidak ditemukan.</string>
     <string name="toast_lens_not_installed">Aplikasi Google Lens tidak terpasang di perangkat ini.</string>
+
+    <!-- Material You Expressive UI -->
+    <string name="status_ready_pill">Siap</string>
+    <string name="status_setup_pill">Perlu diatur</string>
+    <string name="btn_dismiss">Tutup</string>
+
+    <string name="models_downloaded_count_fmt">%1$d offline</string>
+    <string name="models_empty_search">Tidak ada bahasa yang cocok.</string>
+    <string name="tab_models_translation_short">Terjemahan</string>
+    <string name="tab_models_ocr_short">Model OCR</string>
+    <string name="lang_search_hint_short">Cari bahasa…</string>
+
+    <string name="version_label_fmt">v%1$s</string>
+    <string name="jump_overlay_qr">Overlay &amp; QR</string>
+
+    <string name="section_appearance">Tampilan</string>
+    <string name="appearance_theme_mode">Mode tema</string>
+    <string name="theme_auto">Otomatis</string>
+    <string name="theme_light">Terang</string>
+    <string name="theme_dark">Gelap</string>
+    <string name="theme_desc_auto">Ikuti pengaturan sistem</string>
+    <string name="theme_desc_light">Tema terang aktif</string>
+    <string name="theme_desc_dark">Tema gelap aktif</string>
+    <string name="appearance_pure_black">Hitam pekat</string>
+    <string name="appearance_pure_black_desc">Latar belakang hitam murni pada mode gelap</string>
+    <string name="appearance_accent_color">Palet warna</string>
+    <string name="accent_wallpaper">Warna dinamis Material You dari wallpaper</string>
+    <string name="palette_preset_desc">Palet preset Material 3 Expressive</string>
+    <string name="palette_wallpaper">Wallpaper</string>
+    <string name="palette_blue">Bubble</string>
+    <string name="palette_lagoon">Lagoon</string>
+    <string name="palette_lavender">Lavender</string>
+    <string name="palette_coral">Coral</string>
+
+    <string name="privacy_excluded_desc">Kelola daftar aplikasi perbankan, e-wallet, dan sensitif</string>
+    <string name="privacy_clear_cache_desc">Bersihkan cache terjemahan sementara dan potongan gambar Lens</string>
+    <string name="dialog_excluded_empty">Belum ada aplikasi yang dikecualikan.</string>
 </resources>

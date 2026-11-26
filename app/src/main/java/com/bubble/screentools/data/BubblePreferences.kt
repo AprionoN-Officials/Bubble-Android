@@ -83,6 +83,19 @@ class BubblePreferences(context: Context) {
         get() = prefs.getString(KEY_APP_LANGUAGE, "system") ?: "system"
         set(value) = prefs.edit().putString(KEY_APP_LANGUAGE, value).apply()
 
+    // --- Material You Expressive Theme settings ---
+    var themeMode: String
+        get() = prefs.getString(KEY_THEME_MODE, "system") ?: "system"
+        set(value) = prefs.edit().putString(KEY_THEME_MODE, value).apply()
+
+    var pureBlack: Boolean
+        get() = prefs.getBoolean(KEY_PURE_BLACK, false)
+        set(value) = prefs.edit().putBoolean(KEY_PURE_BLACK, value).apply()
+
+    var themePalette: String
+        get() = prefs.getString(KEY_THEME_PALETTE, DEFAULT_THEME_PALETTE) ?: DEFAULT_THEME_PALETTE
+        set(value) = prefs.edit().putString(KEY_THEME_PALETTE, value).apply()
+
     var defaultSelectionShape: SelectionShape
         get() = runCatching {
             SelectionShape.valueOf(
@@ -160,7 +173,12 @@ class BubblePreferences(context: Context) {
         private const val KEY_AUTO_SEARCH = "auto_search"
         private const val KEY_AUTO_QR_SCAN = "auto_qr_scan"
         private const val KEY_APP_LANGUAGE = "app_language"
+        private const val KEY_THEME_MODE = "theme_mode"
+        private const val KEY_PURE_BLACK = "pure_black"
+        private const val KEY_THEME_PALETTE = "theme_palette"
         private const val KEY_DEFAULT_SHAPE = "default_shape"
+
+        const val DEFAULT_THEME_PALETTE = "wallpaper"
         private const val KEY_BORDER_COLOR = "border_color"
         private const val KEY_BORDER_THICKNESS_DP = "border_thickness_dp"
         private const val KEY_OVERLAY_OPACITY = "overlay_opacity"
