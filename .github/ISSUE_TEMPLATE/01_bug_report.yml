@@ -1,0 +1,130 @@
+name: "🐛 Bug Report"
+description: Report a bug or unexpected behavior in Bubble.
+title: "[Bug]: "
+labels: ["bug"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping improve Bubble!
+        Please provide as much information as possible.
+        Do not include sensitive or personal information.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Before submitting
+      options:
+        - label: I have checked for existing issues.
+          required: true
+        - label: I have tested the latest available version of Bubble.
+          required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: Clearly describe the issue you encountered.
+    validations:
+      required: true
+
+  - type: dropdown
+    id: feature
+    attributes:
+      label: Affected Feature
+      options:
+        - Screen Translation
+        - Search with Image
+        - Text Selection / OCR
+        - QR Code Scanner
+        - Screen Selection
+        - Accessibility Service
+        - Gesture / Shortcut
+        - User Interface
+        - Performance
+        - Installation
+        - Other
+    validations:
+      required: true
+
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      placeholder: |
+        1. Open Bubble...
+        2. Activate...
+        3. Select...
+        4. See the error...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual Behavior
+      description: What happened instead?
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Bubble Version
+      placeholder: "e.g. v1.0.0"
+    validations:
+      required: true
+
+  - type: input
+    id: device
+    attributes:
+      label: Device Model
+      placeholder: "e.g. Samsung Galaxy S24"
+    validations:
+      required: true
+
+  - type: input
+    id: android
+    attributes:
+      label: Android Version
+      placeholder: "e.g. Android 15"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: frequency
+    attributes:
+      label: How often does this happen?
+      options:
+        - Every time
+        - Frequently
+        - Occasionally
+        - Only once
+
+  - type: textarea
+    id: screenshots
+    attributes:
+      label: Screenshots or Screen Recordings
+      description: Attach media demonstrating the issue.
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Error Logs
+      description: Include relevant logs if available.
+      render: shell
+
+  - type: textarea
+    id: additional
+    attributes:
+      label: Additional Information
+      description: Anything else that may help us investigate.
