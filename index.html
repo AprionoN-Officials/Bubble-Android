@@ -198,19 +198,21 @@
     }
     .phone-screen {
       --m3-bg: #000000;
-      --m3-surface: #121318;
-      --m3-surface-2: #1c1e26;
-      --m3-outline: #2e3140;
-      --m3-text: #f4f4f6;
-      --m3-sub: #a0a4b4;
-      --m3-accent: #b7a4ff;
-      --m3-on-accent: #191230;
-      --m3-tonal: #2d2450;
-      --m3-on-tonal: #e4dcff;
+      --m3-surface: #0a0a0d;
+      --m3-surface-2: #14141a;
+      --m3-outline: #2b2933;
+      --m3-text: #f3eff7;
+      --m3-sub: #a8a4b2;
+      --m3-accent: #9b6dff;
+      --m3-accent-bright: #b48cff;
+      --m3-on-accent: #180933;
+      --m3-tonal: #2d1b56;
+      --m3-on-tonal: #e9ddff;
+      --m3-divider: rgba(255,255,255,0.09);
       border-radius: 26px;
       background: var(--m3-bg);
       color: var(--m3-text);
-      height: min(760px, calc(100vh - 135px));
+      height: min(780px, calc(100vh - 135px));
       min-height: 540px;
       overflow: hidden;
       position: relative;
@@ -219,178 +221,242 @@
       flex-direction: column;
     }
     .phone-screen[data-theme="light"] {
-      --m3-bg: #f6f6fa;
-      --m3-surface: #ffffff;
-      --m3-surface-2: #eef0f6;
-      --m3-outline: #d5d8e2;
-      --m3-text: #14151a;
-      --m3-sub: #595e6e;
-      --m3-accent: #6750a4;
+      --m3-bg: #faf9fd;
+      --m3-surface: #f2f2f7;
+      --m3-surface-2: #ffffff;
+      --m3-outline: #cbc8d4;
+      --m3-text: #1a1b1f;
+      --m3-sub: #545660;
+      --m3-accent: #445e91;
+      --m3-accent-bright: #445e91;
       --m3-on-accent: #ffffff;
-      --m3-tonal: #eaddff;
-      --m3-on-tonal: #21005d;
+      --m3-tonal: #d8e2ff;
+      --m3-on-tonal: #16294f;
+      --m3-divider: rgba(0,0,0,0.10);
     }
     .phone-screen[data-theme="dark"] {
-      --m3-bg: #111217;
-      --m3-surface: #1a1c24;
-      --m3-surface-2: #242733;
-      --m3-outline: #35394a;
-      --m3-text: #f2f2f7;
-      --m3-sub: #a4a8b8;
+      --m3-bg: #121216;
+      --m3-surface: #1b1b22;
+      --m3-surface-2: #24242d;
+      --m3-outline: #393846;
+      --m3-text: #f1eff7;
+      --m3-sub: #aca9b8;
     }
     .phone-screen[data-accent="blue"] {
-      --m3-accent: #2196f3; --m3-on-accent: #ffffff;
-      --m3-tonal: rgba(33,150,243,0.22); --m3-on-tonal: #90caf9;
+      --m3-accent: #2196f3; --m3-accent-bright: #64b5f6; --m3-on-accent: #ffffff;
+      --m3-tonal: #143352; --m3-on-tonal: #cde7ff;
     }
     .phone-screen[data-theme="light"][data-accent="blue"] {
-      --m3-tonal: #dbeeff; --m3-on-tonal: #0b4a83;
+      --m3-accent: #1976d2; --m3-accent-bright: #1976d2; --m3-on-accent: #ffffff;
+      --m3-tonal: #d7ebff; --m3-on-tonal: #0a3c70;
     }
     .phone-screen[data-accent="green"] {
-      --m3-accent: #2e9d5b; --m3-on-accent: #ffffff;
-      --m3-tonal: rgba(46,157,91,0.22); --m3-on-tonal: #8be0ad;
+      --m3-accent: #22b554; --m3-accent-bright: #34d36a; --m3-on-accent: #052611;
+      --m3-tonal: #103b20; --m3-on-tonal: #b9f5cb;
     }
     .phone-screen[data-theme="light"][data-accent="green"] {
-      --m3-tonal: #d7f5e3; --m3-on-tonal: #0c4d27;
+      --m3-accent: #1b8f43; --m3-accent-bright: #1b8f43; --m3-on-accent: #ffffff;
+      --m3-tonal: #d4f5df; --m3-on-tonal: #09451e;
     }
 
     .status-bar {
       display: flex; justify-content: space-between; align-items: center;
-      padding: 8px 18px 4px; font-size: 11px; color: var(--m3-sub); font-weight: 600;
-      flex-shrink: 0;
+      padding: 8px 18px 4px; font-size: 11px; color: var(--m3-text); font-weight: 500;
+      flex-shrink: 0; opacity: 0.85;
     }
     .punch-hole {
       width: 10px; height: 10px; border-radius: 50%; background: #090a0d;
       border: 1px solid rgba(255,255,255,0.12);
     }
 
-    /* Bubble Android Authentic Header */
+    /* 1:1 Authentic Bubble Android Header */
     .b-header {
-      padding: 8px 14px 6px; display: flex; gap: 10px; align-items: center; flex-shrink: 0;
+      padding: 10px 16px 8px; display: flex; gap: 12px; align-items: center; flex-shrink: 0;
     }
-    .b-logo {
-      width: 38px; height: 38px; border-radius: 12px; background: #2196f3;
-      display: grid; place-items: center; flex-shrink: 0; color: #fff; font-weight: 900; font-size: 18px;
-    }
-    .b-title-row { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
-    .b-title { font-size: 19px; font-weight: 800; }
+    .b-logo-svg { width: 42px; height: 42px; flex-shrink: 0; display: block; }
+    .b-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .b-title { font-size: 21px; font-weight: 700; letter-spacing: -0.01em; color: var(--m3-text); }
     .b-ver {
-      font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px;
+      font-size: 10.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px;
       background: var(--m3-tonal); color: var(--m3-on-tonal);
     }
-    .b-tagline { font-size: 11px; color: var(--m3-sub); margin-top: 2px; line-height: 1.3; }
+    .b-tagline { font-size: 11.5px; color: var(--m3-sub); margin-top: 3px; line-height: 1.32; }
 
-    /* Top Scrollable 7-Tab Bar with horizontal drag/wheel + scroll arrows */
-    .b-tabs-wrap {
-      display: flex; align-items: center;
-      border-bottom: 1px solid var(--m3-outline);
-      flex-shrink: 0;
-      background: var(--m3-bg);
-    }
-    .b-tab-arrow {
-      border: none; background: transparent; color: var(--m3-sub);
-      width: 24px; height: 34px; cursor: pointer; font-size: 16px; font-weight: 700;
-      display: grid; place-items: center; flex-shrink: 0;
-    }
-    .b-tab-arrow:hover { color: var(--m3-accent); background: rgba(183,164,255,0.1); }
+    /* 1:1 Authentic Material 3 Scrollable 7-Tab Bar */
     .b-tabs {
-      display: flex; gap: 2px; overflow-x: auto; padding: 4px 4px 2px;
-      flex: 1; min-width: 0; scroll-behavior: smooth;
-      scrollbar-width: thin;
-      cursor: grab;
+      display: flex; gap: 0; overflow-x: auto; padding: 2px 10px 0;
+      border-bottom: 1px solid var(--m3-divider); flex-shrink: 0;
+      background: var(--m3-bg); cursor: grab;
     }
     .b-tabs:active { cursor: grabbing; }
     .b-tab {
-      padding: 7px 11px; font-size: 12.5px; font-weight: 600; white-space: nowrap;
-      color: var(--m3-sub); border-bottom: 2.5px solid transparent; cursor: pointer;
-      user-select: none;
+      padding: 10px 14px 9px; font-size: 13px; font-weight: 600; white-space: nowrap;
+      color: var(--m3-sub); position: relative; cursor: pointer; user-select: none;
     }
-    .b-tab.active { color: var(--m3-accent); border-bottom-color: var(--m3-accent); }
+    .b-tab.active { color: var(--m3-accent-bright); }
+    .b-tab.active::after {
+      content: ""; position: absolute; left: 16px; right: 16px; bottom: 0; height: 3px;
+      border-radius: 3px 3px 0 0; background: var(--m3-accent-bright);
+    }
 
-    /* Bubble Material 3 Cards — vertical scroll container inside phone */
+    /* 1:1 Bubble Material 3 Expressive Cards & Controls */
     .b-content {
-      flex: 1;
-      min-height: 0;
-      overflow-y: auto;
-      overflow-x: hidden;
-      padding: 12px 12px 28px;
-      display: flex;
-      flex-direction: column;
-      gap: 11px;
-    }
-    .h-scroll-row {
-      display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px;
-      scrollbar-width: thin;
+      flex: 1; min-height: 0; overflow-y: auto; overflow-x: hidden;
+      padding: 14px 14px 32px; display: flex; flex-direction: column; gap: 14px;
     }
     .m3-card {
       background: var(--m3-surface); border: 1px solid var(--m3-outline);
-      border-radius: 18px; padding: 13px; display: flex; flex-direction: column; gap: 9px;
+      border-radius: 20px; padding: 16px; display: flex; flex-direction: column; gap: 10px;
     }
-    .m3-card-title { font-size: 13.5px; font-weight: 700; color: var(--m3-accent); }
-    .m3-sub { font-size: 11.5px; color: var(--m3-sub); line-height: 1.38; }
-    .m3-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12.5px; }
-    .m3-btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .m3-card-title { font-size: 15px; font-weight: 700; color: var(--m3-accent-bright); margin-bottom: 2px; }
+    .m3-label-bold { font-size: 12.5px; font-weight: 700; color: var(--m3-text); margin-top: 2px; }
+    .m3-sub { font-size: 12px; color: var(--m3-sub); line-height: 1.4; }
+    .m3-status-list { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; line-height: 1.38; }
+    .m3-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 13px; color: var(--m3-text); }
+    .m3-divider { height: 1px; background: var(--m3-divider); margin: 4px 0; }
+    .m3-btn-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .m3-btn-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
     .m3-pill {
-      display: inline-flex; align-items: center; justify-content: center; text-align: center;
-      min-height: 38px; padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 700;
-      border: 1px solid var(--m3-outline); background: transparent; color: var(--m3-text);
+      display: inline-flex; align-items: center; justify-content: center; text-align: center; gap: 6px;
+      min-height: 42px; padding: 8px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
+      border: 1.2px solid var(--m3-outline); background: transparent; color: var(--m3-accent-bright);
       line-height: 1.2;
     }
     .m3-pill.filled { background: var(--m3-accent); color: var(--m3-on-accent); border-color: transparent; }
     .m3-pill.tonal { background: var(--m3-tonal); color: var(--m3-on-tonal); border-color: transparent; }
-    .m3-chip-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+    .m3-pill.text-btn { border: none; background: transparent; justify-content: flex-start; padding: 4px 2px; min-height: 30px; }
+    .m3-chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; }
+    .m3-chip-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 4px; }
     .m3-chip {
-      padding: 5px 10px; border-radius: 999px; font-size: 11.5px; font-weight: 600;
-      border: 1px solid var(--m3-outline); background: var(--m3-surface-2); color: var(--m3-text);
+      padding: 6px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 600; white-space: nowrap;
+      border: 1.2px solid var(--m3-outline); background: var(--m3-surface-2); color: var(--m3-text);
     }
-    .m3-chip.selected { background: var(--m3-tonal); color: var(--m3-on-tonal); border-color: var(--m3-accent); }
+    .m3-chip.rect { border-radius: 10px; }
+    .m3-chip.selected { background: var(--m3-tonal); color: var(--m3-on-tonal); border-color: var(--m3-accent-bright); }
+    /* Authentic Material 3 Expressive Switch */
     .m3-switch {
-      width: 38px; height: 22px; border-radius: 999px; background: var(--m3-accent);
+      width: 48px; height: 28px; border-radius: 999px; background: var(--m3-accent);
       position: relative; flex-shrink: 0;
     }
     .m3-switch::after {
-      content: ""; position: absolute; width: 16px; height: 16px; border-radius: 50%;
-      background: var(--m3-on-accent); top: 3px; right: 3px;
+      content: ""; position: absolute; width: 20px; height: 20px; border-radius: 50%;
+      background: var(--m3-on-accent); top: 4px; right: 4px;
     }
-    .m3-switch.off { background: var(--m3-surface-2); border: 1px solid var(--m3-outline); }
-    .m3-switch.off::after { background: var(--m3-sub); left: 3px; right: auto; top: 2px; }
-    .m3-slider-bar {
-      height: 6px; border-radius: 999px; background: var(--m3-surface-2); position: relative; margin: 4px 0 2px;
+    .m3-switch.off { background: var(--m3-surface-2); border: 2px solid var(--m3-sub); }
+    .m3-switch.off::after { width: 14px; height: 14px; background: var(--m3-sub); left: 5px; right: auto; top: 5px; }
+
+    /* Authentic Material 3 Expressive Ticked Slider with vertical handle */
+    .m3-slider-wrap { display: flex; align-items: center; gap: 4px; margin: 2px 0 4px; }
+    .m3-slider-active {
+      height: 12px; border-radius: 999px 4px 4px 999px; background: var(--m3-accent);
+      background-image: radial-gradient(circle, rgba(255,255,255,0.65) 1.5px, transparent 1.6px);
+      background-size: 18px 12px; background-position: center;
     }
-    .m3-slider-bar::before {
-      content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: 64%;
-      border-radius: 999px; background: var(--m3-accent);
+    .m3-slider-thumb { width: 4px; height: 26px; border-radius: 4px; background: var(--m3-accent); flex-shrink: 0; }
+    .m3-slider-inactive {
+      flex: 1; height: 12px; border-radius: 4px 999px 999px 4px; background: var(--m3-outline);
+      background-image: radial-gradient(circle, rgba(160,164,180,0.65) 1.5px, transparent 1.6px);
+      background-size: 18px 12px; background-position: center;
     }
 
-    /* Overlay Mockup */
+    /* Engine & Panel Reorder Row matching screenshot 03 & 05 */
+    .m3-engine-row { display: flex; align-items: center; gap: 12px; padding: 6px 0; }
+    .drag-handle {
+      width: 22px; flex-shrink: 0; display: flex; flex-direction: column; gap: 4px; align-items: center; opacity: 0.65;
+    }
+    .drag-handle i { display: block; width: 16px; height: 2.2px; background: var(--m3-text); border-radius: 2px; }
+
+    /* Kyoto Live Selection Preview Card (matching 04-tab-selection.png) */
+    .kyoto-preview {
+      position: relative; border-radius: 16px; overflow: hidden; background: #8e9199;
+      padding: 16px 14px; color: #16181d; min-height: 168px;
+    }
+    .kyoto-cutout {
+      position: relative; background: #f4f6fa; border: 2.5px solid var(--m3-accent);
+      border-radius: 16px; padding: 12px 14px; margin: 10px 14px 4px;
+      box-shadow: 0 0 0 999px rgba(72, 75, 82, 0.45);
+    }
+    .kyoto-handle {
+      position: absolute; width: 13px; height: 13px; border-radius: 50%;
+      background: #fff; border: 2.2px solid var(--m3-accent);
+    }
+
+    /* Live Action Panel Preview Box (matching 05-tab-panel.png) */
+    .panel-stage-box {
+      border-radius: 16px; border: 1px solid var(--m3-outline); background: var(--m3-surface-2);
+      padding: 18px 14px 14px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+    }
+    .panel-sel-rect {
+      width: 100%; height: 92px; border: 2px solid var(--m3-accent); border-radius: 12px;
+      display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px;
+    }
+    .engine-chip-dark {
+      background: #2b2c32; color: #f1f2f6; font-size: 11px; font-weight: 600;
+      padding: 4px 12px; border-radius: 999px;
+    }
+
+    /* Overlay Mockups (matching 11, 12, 15 screenshots) */
     .overlay-bg {
       flex: 1; min-height: 0; overflow-y: auto;
-      background: linear-gradient(180deg, #1b1e28 0%, #12141b 100%);
+      background: #14161c; color: #f2f4f8;
       padding: 10px 10px 22px; display: flex; flex-direction: column; justify-content: space-between;
       gap: 12px; position: relative;
     }
     .overlay-topbar {
-      display: flex; gap: 5px; align-items: center; overflow-x: auto; padding-bottom: 4px;
-      scrollbar-width: thin;
+      display: flex; gap: 6px; align-items: center; overflow-x: auto; padding-bottom: 4px;
     }
     .ov-pill {
-      padding: 5px 9px; border-radius: 999px; font-size: 11px; font-weight: 700;
+      padding: 6px 11px; border-radius: 999px; font-size: 11.5px; font-weight: 700;
       background: #2196f3; color: #fff; white-space: nowrap;
     }
-    .ov-pill.dark { background: rgba(20,22,30,0.9); border: 1px solid rgba(255,255,255,0.2); }
+    .ov-pill.close-x {
+      width: 28px; height: 28px; padding: 0; display: grid; place-items: center;
+      background: #262934; color: #fff; border: 1px solid rgba(255,255,255,0.2); flex-shrink: 0;
+    }
     .ov-selection {
-      border: 2.5px solid var(--m3-accent); border-radius: 12px;
-      padding: 12px; background: rgba(183, 164, 255, 0.08);
-      margin: 10px 4px; position: relative;
+      border: 2.5px solid var(--m3-accent); border-radius: 6px;
+      padding: 12px; background: rgba(15, 17, 24, 0.72);
+      margin: 6px 2px; position: relative;
     }
     .ov-link-card {
-      background: rgba(18, 20, 28, 0.96); border: 1px solid rgba(183, 164, 255, 0.45);
-      border-radius: 16px; padding: 11px; display: flex; flex-direction: column; gap: 8px;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+      background: rgba(16, 18, 25, 0.96); border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 18px; padding: 12px; display: flex; flex-direction: column; gap: 8px;
+      box-shadow: 0 12px 32px rgba(0,0,0,0.5);
+    }
+    .ov-lang-bar {
+      display: inline-flex; align-items: center; gap: 10px; align-self: center;
+      background: rgba(20, 22, 28, 0.92); border: 1px solid rgba(255,255,255,0.14);
+      padding: 4px 12px; border-radius: 999px; font-size: 11.5px; font-weight: 700; color: #fff;
+    }
+    .ov-swap-dot {
+      width: 24px; height: 24px; border-radius: 50%; background: #2196f3; color: #fff;
+      display: grid; place-items: center; font-size: 12px;
     }
     .ov-action-bar {
-      display: flex; gap: 6px; flex-wrap: wrap; justify-content: center;
-      padding: 8px; border-radius: 18px; background: rgba(16,18,24,0.92);
-      border: 1px solid rgba(255,255,255,0.12);
+      display: flex; gap: 8px; justify-content: center; align-items: center; flex-wrap: wrap;
+    }
+    .ov-action-btn {
+      display: inline-flex; align-items: center; gap: 6px; padding: 9px 16px; border-radius: 999px;
+      font-size: 12.5px; font-weight: 700; background: #1e2028; color: #fff;
+      border: 1px solid rgba(255,255,255,0.18);
+    }
+    .ov-action-btn.primary { background: var(--m3-accent); color: var(--m3-on-accent); border-color: transparent; }
+
+    /* Real Android Light Settings backdrop for Live Translation 1:1 (matching 11-overlay-live-translation.png) */
+    .android-settings-mock {
+      background: #f3f4f6; color: #1f2329; border-radius: 12px; padding: 12px;
+      border: 2.5px solid #22b554; display: flex; flex-direction: column; gap: 10px;
+    }
+    .tr-box {
+      background: rgba(24, 26, 31, 0.92); color: #ffffff; border-radius: 6px;
+      padding: 6px 8px; font-size: 11.5px; line-height: 1.3;
+    }
+
+    /* Dialog Card (matching 09-safe-mode-excluded.png) */
+    .android-dialog {
+      background: #23242a; color: #f2f3f7; border-radius: 24px; padding: 18px;
+      border: 1px solid rgba(255,255,255,0.12); display: flex; flex-direction: column; gap: 10px;
+      box-shadow: 0 18px 48px rgba(0,0,0,0.55);
     }
 
     /* Clickable i18n text tokens */
@@ -536,7 +602,9 @@
     <!-- CENTER 1:1 PHONE MOCKUP -->
     <section class="stage">
       <div class="stage-meta">
-        <span id="stageHint">Click any text inside the phone mockup to inspect &amp; edit live</span>
+        <button class="btn" id="stageTabLeft" style="padding:3px 9px;font-size:11px;">‹ Scroll Tabs</button>
+        <span id="stageHint">1:1 Bubble v1.1.1 Mockup · Click any text to edit live</span>
+        <button class="btn" id="stageTabRight" style="padding:3px 9px;font-size:11px;">Scroll Tabs ›</button>
       </div>
       <div class="phone-frame" id="phoneFrame" style="width: 434px;">
         <div class="phone-screen highlight-issues" id="phoneScreen" data-theme="amoled" data-accent="lavender" dir="ltr"></div>
@@ -617,29 +685,31 @@
       const SCREENS = [
         { id: "tab_general", label: "01 · General Tab" },
         { id: "tab_translation", label: "02 · Translation Tab" },
-        { id: "tab_search", label: "03 · Search Tab (Delay & AdBlock)" },
-        { id: "tab_selection", label: "04 · Selection Tab" },
+        { id: "tab_search", label: "03 · Search Tab (Engines, Delay, AdBlock)" },
+        { id: "tab_selection", label: "04 · Selection Tab (Kyoto Live Preview)" },
         { id: "tab_panel", label: "05 · Action Panel Tab" },
         { id: "tab_appearance", label: "06 · Appearance & Theme Tab" },
         { id: "tab_more", label: "07 · More, Updates & Safe Mode" },
-        { id: "ov_main", label: "08 · Overlay: Selection & Smart Link" },
-        { id: "ov_select_text", label: "09 · Overlay: Full-Screen Select Text" },
-        { id: "lang_mgr", label: "10 · Language Manager & Donation" },
+        { id: "ov_translate", label: "08 · Overlay: Live Translation" },
+        { id: "ov_main", label: "09 · Overlay: Smart Link (X.com) & Panel" },
+        { id: "ov_select_text", label: "10 · Overlay: Full-Screen Select Text" },
+        { id: "lang_mgr", label: "11 · Offline Languages & OCR Manager" },
+        { id: "dialogs", label: "12 · Dialogs (Safe Mode, Guide, Donation)" },
       ];
 
       // Realistic preview sample values for Android printf placeholders
       const SAMPLE_FMT = {
-        status_models_count: [2, "EN, ID"],
+        status_models_count: [2, "en, id"],
         status_last_blocked_app: ["com.bca"],
         btn_source_lang_fmt: ["AUTO"],
-        btn_target_lang_fmt: ["Indonesia"],
-        active_lang_pair_fmt: ["AUTO", "Indonesia"],
+        btn_target_lang_fmt: ["ID"],
+        active_lang_pair_fmt: ["Auto-Detect", "Indonesian"],
         btn_fallback_lang_fmt: ["English"],
         ocr_engine_mlkit_fmt: [2],
         offline_storage_summary_fmt: [2, 60],
         label_max_resolution_fmt: [1440],
         label_compression_fmt: [86],
-        delay_seconds_fmt: ["5"],
+        delay_seconds_fmt: ["2"],
         delay_custom_value_fmt: ["3.5"],
         web_adblocker_badge_fmt: [12],
         slider_border_thickness_fmt: ["2.5"],
@@ -647,21 +717,25 @@
         slider_curvature_fmt: [40],
         slider_fill_opacity_fmt: [12],
         slider_outer_dim_fmt: [45],
+        slider_handle_size_fmt: ["14.0"],
+        slider_min_selection_fmt: ["48"],
         slider_panel_scale_fmt: [100],
         slider_panel_opacity_fmt: [96],
         slider_btn_spacing_fmt: ["8"],
         slider_btn_padding_fmt: ["12"],
         slider_btn_radius_fmt: ["24"],
+        slider_margin_h_fmt: ["16"],
+        slider_margin_v_fmt: ["24"],
         update_current_version_fmt: ["1.1.1", 10],
         update_latest_version_fmt: ["v1.1.1"],
         update_last_checked_fmt: ["Just now"],
         btn_excluded_apps_fmt: [14],
         overlay_select_text_count: [14],
-        overlay_link_more_fmt: ["x.com/BubbleAndroid", 1],
+        overlay_link_more_fmt: ["X.com", 1],
         overlay_tap_text_header_fmt: [41],
         overlay_selected_links_fmt: [3, 1],
-        overlay_engine_pill_fmt: ["Yandex Images"],
-        status_not_downloaded_fmt: ["Japanese"],
+        overlay_engine_pill_fmt: ["Google Lens"],
+        status_not_downloaded_fmt: ["KO"],
         ocr_installed_header_fmt: [2],
         ocr_active_label_fmt: ["jpn"],
       };
@@ -711,6 +785,21 @@
         return `<span data-i18n="${key}" class="${extraClass} ${sel} ${stCls}">${escHtml(display).replace(/&lt;br\/&gt;/g, "<br/>")}</span>`;
       }
 
+      const BUBBLE_LOGO_SVG = `<svg class="b-logo-svg" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+        <path fill="#2196F3" d="M24,4C12.95,4 4,12.95 4,24s8.95,20 20,20 20,-8.95 20,-20S35.05,4 24,4z"/>
+        <path fill="none" stroke="#FFFFFF" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" d="M16,15h16a3,3 0 0,1 3,3v12a3,3 0 0,1 -3,3H16a3,3 0 0,1 -3,-3V18a3,3 0 0,1 3,-3z"/>
+        <path fill="#FFFFFF" d="M24,20a4,4 0 1,0 0,8 4,4 0 0,0 0,-8z"/>
+      </svg>`;
+
+      const ICON_TRANSLATE = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12.87 15.07l-2.54-2.51.03-.03A17.52 17.52 0 0014.07 6H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z"/></svg>`;
+      const ICON_SEARCH = `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>`;
+      const ICON_SWAP = `<svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg>`;
+      const DRAG_HANDLE = `<span class="drag-handle"><i></i><i></i></span>`;
+
+      function sliderHtml(pct) {
+        return `<div class="m3-slider-wrap"><div class="m3-slider-active" style="width:${pct}%;"></div><div class="m3-slider-thumb"></div><div class="m3-slider-inactive"></div></div>`;
+      }
+
       function renderAppHeader(activeTabId) {
         const tabs = [
           ["tab_general", "tab_general"],
@@ -721,38 +810,32 @@
           ["tab_appearance", "tab_appearance"],
           ["tab_more", "tab_more"],
         ];
+        const phone = document.getElementById("phoneScreen");
+        const themeLbl = phone?.dataset.theme === "light" ? "Material You" : (phone?.dataset.theme === "amoled" ? "Lavender • AMOLED" : "Lavender");
         return `
           <div class="status-bar">
-            <span>11:33</span>
+            <span>1:23</span>
             <div class="punch-hole"></div>
-            <span>5G · 88%</span>
+            <span>5G · 92%</span>
           </div>
           <div class="b-header">
-            <div class="b-logo">◎</div>
+            ${BUBBLE_LOGO_SVG}
             <div style="min-width:0;flex:1;">
               <div class="b-title-row">
                 <span class="b-title">${tSpan("app_name")}</span>
-                <span class="b-ver">v1.1.1 · Preview</span>
+                <span class="b-ver">v1.1.1 • ${themeLbl}</span>
               </div>
               <div class="b-tagline">${tSpan("app_tagline")}</div>
             </div>
           </div>
-          <div class="b-tabs-wrap">
-            <button type="button" class="b-tab-arrow" id="tabScrollLeft" title="Scroll tabs left">‹</button>
-            <div class="b-tabs" id="bTabsScroll">
-              ${tabs
-                .map(
-                  ([scr, key]) =>
-                    `<div class="b-tab ${activeTabId === scr ? "active" : ""}" data-nav-tab="${scr}">${tSpan(key)}</div>`
-                )
-                .join("")}
-            </div>
-            <button type="button" class="b-tab-arrow" id="tabScrollRight" title="Scroll tabs right">›</button>
+          <div class="b-tabs" id="bTabsScroll">
+            ${tabs
+              .map(
+                ([scr, key]) =>
+                  `<div class="b-tab ${activeTabId === scr ? "active" : ""}" data-nav-tab="${scr}">${tSpan(key)}</div>`
+              )
+              .join("")}
           </div>`;
-      }
-
-      function wrapBody(inner) {
-        return `<div class="b-body-scroll" id="bBodyScroll">${inner}</div>`;
       }
 
       function renderScreenHtml() {
@@ -762,31 +845,61 @@
           <div class="b-content">
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_status_activation")}</div>
-              <div class="m3-row"><span>${tSpan("status_assistant_label")}</span><strong style="color:var(--ok)">${tSpan("status_active_check")}</strong></div>
-              <div class="m3-row"><span>${tSpan("status_accessibility_label")}</span><strong style="color:var(--ok)">${tSpan("status_active_check")}</strong></div>
-              <div class="m3-row"><span>${tSpan("status_capture_label")}</span><span class="m3-sub" style="text-align:right">${tSpan("status_capture_assistant")}</span></div>
-              <div class="m3-row"><span>${tSpan("status_offline_langs_label")}</span><span class="m3-sub">${tSpan("status_models_count")}</span></div>
-              <div class="m3-pill filled">${tSpan("btn_try_bubble")}</div>
+              <div class="m3-status-list">
+                <div>${tSpan("status_assistant_label")}: ${tSpan("status_active_check")}</div>
+                <div>${tSpan("status_accessibility_label")}: ${tSpan("status_active_check")}</div>
+                <div>${tSpan("status_capture_label")}: ${tSpan("status_capture_both")}</div>
+                <div>${tSpan("status_visual_search_label")}: ${tSpan("status_google_app_ready")}</div>
+                <div>${tSpan("status_default_engine_label")}: ${tSpan("engine_google_lens")}</div>
+                <div>${tSpan("status_offline_langs_label")}: ${tSpan("status_models_count")}</div>
+                <div>${tSpan("status_overlay_perm_label")}: ${tSpan("status_granted_check")}</div>
+              </div>
+              <div class="m3-pill filled" style="margin-top:4px;">${tSpan("btn_try_bubble")}</div>
               <div class="m3-btn-row">
-                <div class="m3-pill">${tSpan("btn_default_assistant")}</div>
+                <div class="m3-pill tonal">${tSpan("btn_default_assistant")}</div>
                 <div class="m3-pill">${tSpan("btn_accessibility")}</div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;">
+                <span class="m3-pill text-btn">${tSpan("btn_overlay_optional")}</span>
               </div>
             </div>
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_quick_settings")}</div>
-              <div class="m3-sub">${tSpan("label_app_language")}</div>
+              <div class="m3-label-bold">${tSpan("label_app_language")}</div>
               <div class="m3-chip-wrap">
-                <span class="m3-chip selected">${tSpan("app_lang_system")}</span>
-                <span class="m3-chip">${tSpan("app_lang_english")}</span>
+                <span class="m3-chip">${tSpan("app_lang_system")}</span>
+                <span class="m3-chip selected">${tSpan("app_lang_english")}</span>
                 <span class="m3-chip">${tSpan("app_lang_indonesian")}</span>
               </div>
-              <div class="m3-sub">${tSpan("label_default_action")}</div>
-              <div class="m3-btn-row">
-                <div class="m3-pill tonal">${tSpan("action_translate")}</div>
-                <div class="m3-pill">${tSpan("action_visual_search")}</div>
+              <div class="m3-label-bold">${tSpan("label_default_action")}</div>
+              <div class="m3-chip-wrap">
+                <span class="m3-chip selected">${tSpan("action_translate")}</span>
+                <span class="m3-chip">${tSpan("action_visual_search")}</span>
               </div>
+              <div class="m3-divider"></div>
               <div class="m3-row"><span>${tSpan("switch_auto_qr")}</span><div class="m3-switch"></div></div>
+              <div class="m3-sub">${tSpan("auto_qr_subtitle")}</div>
               <div class="m3-row"><span>${tSpan("switch_auto_link_detect")}</span><div class="m3-switch"></div></div>
+              <div class="m3-sub">${tSpan("auto_link_detect_subtitle")}</div>
+              <div class="m3-divider"></div>
+              <div class="m3-btn-row">
+                <div class="m3-pill">${tSpan("quick_translation_langs")}</div>
+                <div class="m3-pill">${tSpan("quick_default_search")}</div>
+              </div>
+              <div class="m3-btn-row">
+                <div class="m3-pill">${tSpan("quick_permissions")}</div>
+                <div class="m3-pill">${tSpan("quick_usage_guide")}</div>
+              </div>
+            </div>
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_bubble_preview")}</div>
+              <div class="m3-sub">${tSpan("bubble_preview_subtitle")}</div>
+              <div class="panel-stage-box" style="padding:12px;">
+                <div class="ov-action-bar">
+                  <span class="ov-action-btn primary">${ICON_TRANSLATE} ${tSpan("action_translate")}</span>
+                  <span class="ov-action-btn">${ICON_SEARCH} ${tSpan("action_visual_search")}</span>
+                </div>
+              </div>
             </div>
           </div>`;
         }
@@ -796,14 +909,37 @@
           <div class="b-content">
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_translation")}</div>
-              <div class="m3-btn-row">
-                <div class="m3-pill tonal">${tSpan("btn_source_lang_fmt")}</div>
-                <div class="m3-pill tonal">${tSpan("btn_target_lang_fmt")}</div>
+              <div style="display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;">
+                <div class="m3-pill">${tSpan("btn_source_lang_fmt")}</div>
+                <div class="m3-pill filled" style="padding:0 16px;">${ICON_SWAP}</div>
+                <div class="m3-pill">${tSpan("btn_target_lang_fmt")}</div>
               </div>
               <div class="m3-sub">${tSpan("active_lang_pair_fmt")}</div>
+              <div class="m3-label-bold">${tSpan("label_recent_langs")}</div>
+              <div class="m3-chip-scroll">
+                <span class="m3-chip rect">EN • English</span>
+                <span class="m3-chip rect">ID • Indonesian</span>
+                <span class="m3-chip rect">JA • Japanese</span>
+              </div>
+              <div class="m3-label-bold">${tSpan("label_preferred_sources")}</div>
+              <div class="m3-chip-scroll">
+                <span class="m3-chip rect selected">EN</span>
+                <span class="m3-chip rect selected">JA</span>
+                <span class="m3-chip rect selected">KO</span>
+                <span class="m3-chip rect selected">ZH</span>
+                <span class="m3-chip rect">ID</span>
+                <span class="m3-chip rect">AR</span>
+              </div>
+              <span class="m3-pill text-btn">${tSpan("btn_fallback_lang_fmt")}</span>
+              <div class="m3-divider"></div>
               <div class="m3-row"><span>${tSpan("switch_auto_detect")}</span><div class="m3-switch"></div></div>
               <div class="m3-row"><span>${tSpan("switch_auto_translate")}</span><div class="m3-switch"></div></div>
               <div class="m3-row"><span>${tSpan("switch_translate_entire_screen")}</span><div class="m3-switch off"></div></div>
+              <div class="m3-label-bold">${tSpan("label_overlay_style")}</div>
+              <div class="m3-chip-wrap">
+                <span class="m3-chip selected">${tSpan("overlay_style_adaptive")}</span>
+                <span class="m3-chip">${tSpan("overlay_style_semi")}</span>
+              </div>
             </div>
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_translation_quality")}</div>
@@ -813,22 +949,33 @@
                 <span class="m3-chip">${tSpan("quality_natural")}</span>
               </div>
               <div class="m3-sub">${tSpan("quality_desc_accurate")}</div>
-              <div class="m3-sub"><strong>${tSpan("label_context_profile")}</strong></div>
+              <div class="m3-label-bold">${tSpan("label_context_profile")}</div>
               <div class="m3-chip-wrap">
                 <span class="m3-chip selected">${tSpan("context_general")}</span>
                 <span class="m3-chip">${tSpan("context_literal")}</span>
                 <span class="m3-chip">${tSpan("context_natural")}</span>
                 <span class="m3-chip">${tSpan("context_manga_game")}</span>
               </div>
+              <div class="m3-sub">${tSpan("translation_engine_limitation_note")}</div>
             </div>
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_models_imports")}</div>
+              <div class="m3-sub">${tSpan("models_separation_note")}</div>
+              <div class="m3-sub">${tSpan("ocr_engine_mlkit_fmt")}</div>
               <div class="m3-sub">${tSpan("offline_storage_summary_fmt")}</div>
               <div class="m3-btn-row">
                 <div class="m3-pill filled">${tSpan("btn_download_languages")}</div>
                 <div class="m3-pill">${tSpan("btn_import_ocr")}</div>
               </div>
               <div class="m3-pill">${tSpan("btn_delete_unused_models")}</div>
+            </div>
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_translation_preview")}</div>
+              <div class="m3-sub">${tSpan("translation_preview_badge")}</div>
+              <div class="m3-label-bold">${tSpan("translation_preview_input_label")}</div>
+              <div class="m3-sub">Ex-ploring Au-tumn Temples</div>
+              <div class="m3-label-bold">${tSpan("translation_preview_output_label")}</div>
+              <div class="m3-sub">Exploring Autumn Temples</div>
             </div>
           </div>`;
         }
@@ -839,31 +986,75 @@
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_visual_search")}</div>
               <div class="m3-sub">${tSpan("visual_search_subtitle")}</div>
-              <div class="m3-row"><span>= &nbsp;${tSpan("engine_google_lens")}</span><span class="m3-chip selected">${tSpan("label_default_badge")}</span></div>
-              <div class="m3-row"><span>= &nbsp;${tSpan("engine_yandex")}</span><span class="m3-chip">${tSpan("btn_set_default")}</span></div>
-              <div class="m3-row"><span>= &nbsp;${tSpan("engine_tineye")}</span><span class="m3-chip">${tSpan("btn_set_default")}</span></div>
+              <div class="m3-engine-row">
+                ${DRAG_HANDLE}
+                <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+                  <div style="font-size:13.5px;font-weight:600;">${tSpan("engine_google_lens")} ★</div>
+                  <div class="m3-sub">Native App Intent (Fallback: ${tSpan("engine_pick_app")})</div>
+                  <div><span class="m3-pill tonal" style="min-height:32px;padding:4px 14px;font-size:12px;">${tSpan("label_default_badge")}</span></div>
+                </div>
+                <div class="m3-switch"></div>
+              </div>
+              <div class="m3-divider"></div>
+              <div class="m3-engine-row">
+                ${DRAG_HANDLE}
+                <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+                  <div style="font-size:13.5px;font-weight:600;">${tSpan("engine_yandex")} Images</div>
+                  <div class="m3-sub">https://yandex.com/images/</div>
+                  <div><span class="m3-pill" style="min-height:32px;padding:4px 14px;font-size:12px;">${tSpan("btn_set_default")}</span></div>
+                </div>
+                <div class="m3-switch"></div>
+              </div>
+              <div class="m3-divider"></div>
+              <div class="m3-engine-row">
+                ${DRAG_HANDLE}
+                <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
+                  <div style="font-size:13.5px;font-weight:600;">${tSpan("engine_tineye")}</div>
+                  <div class="m3-sub">https://tineye.com/</div>
+                  <div><span class="m3-pill" style="min-height:32px;padding:4px 14px;font-size:12px;">${tSpan("btn_set_default")}</span></div>
+                </div>
+                <div class="m3-switch"></div>
+              </div>
               <div class="m3-pill tonal">+ ${tSpan("btn_add_custom_engine")}</div>
             </div>
             <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_text_search")}</div>
+              <div class="m3-sub">${tSpan("text_search_subtitle")}</div>
+              <div class="m3-row"><span>Google · DuckDuckGo · Bing · Wikipedia</span><span class="m3-pill tonal" style="min-height:30px;padding:3px 10px;font-size:11.5px;">${tSpan("btn_edit")}</span></div>
+            </div>
+            <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_search_optimization")}</div>
+              <div class="m3-label-bold">${tSpan("label_image_quality")}</div>
               <div class="m3-chip-wrap">
                 <span class="m3-chip">${tSpan("quality_original")}</span>
                 <span class="m3-chip selected">${tSpan("quality_balanced")}</span>
                 <span class="m3-chip">${tSpan("quality_data_saver")}</span>
               </div>
-              <div class="m3-sub">${tSpan("label_max_resolution_fmt")}</div>
-              <div class="m3-slider-bar"></div>
+              <div class="m3-label-bold">${tSpan("label_image_format")}</div>
+              <div class="m3-chip-scroll">
+                <span class="m3-chip selected">Auto</span><span class="m3-chip">PNG</span><span class="m3-chip">JPEG</span><span class="m3-chip">WebP</span>
+              </div>
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("label_max_resolution_fmt")}</div>
+              ${sliderHtml(50)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("label_compression_fmt")}</div>
+              ${sliderHtml(70)}
+              <div class="m3-divider"></div>
               <div class="m3-row"><span>${tSpan("switch_auto_visual_search")}</span><div class="m3-switch"></div></div>
-              <div class="m3-sub"><strong>${tSpan("label_visual_search_delay")}</strong></div>
-              <div class="m3-chip-wrap">
+              <div class="m3-label-bold">${tSpan("label_visual_search_delay")}</div>
+              <div class="m3-chip-scroll">
                 <span class="m3-chip">1s</span>
                 <span class="m3-chip selected">${tSpan("delay_seconds_fmt")}</span>
+                <span class="m3-chip">5s</span>
+                <span class="m3-chip">7s</span>
+                <span class="m3-chip">10s</span>
                 <span class="m3-chip">${tSpan("delay_custom")}</span>
               </div>
+              <div class="m3-row"><span>${tSpan("switch_remember_last_engine")}</span><div class="m3-switch"></div></div>
+              <div class="m3-row"><span>${tSpan("switch_confirm_upload")}</span><div class="m3-switch off"></div></div>
+              <div class="m3-row"><span>${tSpan("switch_open_external_browser")}</span><div class="m3-switch off"></div></div>
               <div class="m3-row"><span>${tSpan("switch_web_adblocker")}</span><div class="m3-switch"></div></div>
               <div class="m3-sub">${tSpan("web_adblocker_subtitle")}</div>
-              <div class="m3-row"><span>${tSpan("switch_remember_last_engine")}</span><div class="m3-switch"></div></div>
-              <div class="m3-row"><span>${tSpan("switch_open_external_browser")}</span><div class="m3-switch off"></div></div>
+              <span class="m3-pill text-btn">${tSpan("btn_reset_default")}</span>
             </div>
           </div>`;
         }
@@ -874,22 +1065,31 @@
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_selection_preview")}</div>
               <div class="m3-sub">${tSpan("selection_preview_hint")}</div>
-              <div style="border:2px dashed var(--m3-accent);border-radius:14px;padding:18px;text-align:center;background:var(--m3-surface-2);font-size:12px;">
-                Live Selection Preview Box
+              <div class="kyoto-preview">
+                <div style="font-size:9.5px;font-weight:800;letter-spacing:0.05em;color:#2c3a57;">KYOTO TRAVEL GUIDE</div>
+                <div class="kyoto-cutout">
+                  <div style="font-size:14px;font-weight:800;margin-bottom:4px;">Exploring Autumn Temples</div>
+                  <div style="font-size:10.5px;color:#3f4450;line-height:1.35;">Morning walks through ancient cedar forests offer quiet paths and vibrant red maple leaves.</div>
+                  <div style="font-size:10.5px;color:#272a33;margin-top:6px;">京都の秋は美しい紅葉と静かな寺院が魅力です。</div>
+                  <span class="kyoto-handle" style="top:-7px;left:50%;transform:translateX(-50%);"></span>
+                  <span class="kyoto-handle" style="bottom:-7px;left:50%;transform:translateX(-50%);"></span>
+                  <span class="kyoto-handle" style="left:-7px;top:50%;transform:translateY(-50%);"></span>
+                  <span class="kyoto-handle" style="right:-7px;top:50%;transform:translateY(-50%);"></span>
+                </div>
               </div>
             </div>
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_selection_shape")}</div>
-              <div class="m3-sub"><strong>${tSpan("label_default_shape")}</strong></div>
-              <div class="m3-chip-wrap">
-                <span class="m3-chip selected">${tSpan("shape_rectangle")}</span>
-                <span class="m3-chip">${tSpan("shape_rounded_rect")}</span>
+              <div class="m3-label-bold">${tSpan("label_default_shape")}</div>
+              <div class="m3-chip-scroll">
+                <span class="m3-chip">${tSpan("shape_rectangle")}</span>
+                <span class="m3-chip selected">${tSpan("shape_rounded_rect")}</span>
                 <span class="m3-chip">${tSpan("shape_ellipse")}</span>
                 <span class="m3-chip">${tSpan("shape_freeform")}</span>
                 <span class="m3-chip">${tSpan("shape_custom_curved")}</span>
               </div>
-              <div class="m3-sub"><strong>${tSpan("label_border_style")}</strong></div>
-              <div class="m3-chip-wrap">
+              <div class="m3-label-bold">${tSpan("label_border_style")}</div>
+              <div class="m3-chip-scroll">
                 <span class="m3-chip selected">${tSpan("border_solid")}</span>
                 <span class="m3-chip">${tSpan("border_dashed")}</span>
                 <span class="m3-chip">${tSpan("border_dotted")}</span>
@@ -898,16 +1098,27 @@
             </div>
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_selection_appearance")}</div>
+              <div class="m3-label-bold">${tSpan("label_border_color_mode")}</div>
               <div class="m3-chip-wrap">
                 <span class="m3-chip selected">${tSpan("color_mode_material_you")}</span>
                 <span class="m3-chip">${tSpan("color_mode_custom")}</span>
               </div>
-              <div class="m3-sub">${tSpan("slider_border_thickness_fmt")}</div>
-              <div class="m3-slider-bar"></div>
-              <div class="m3-sub">${tSpan("slider_outer_dim_fmt")}</div>
-              <div class="m3-slider-bar"></div>
+              <span class="m3-pill text-btn">${tSpan("btn_pick_custom_hex")}</span>
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_border_thickness_fmt")}</div>${sliderHtml(45)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_corner_radius_fmt")}</div>${sliderHtml(52)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_curvature_fmt")}</div>${sliderHtml(40)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_fill_opacity_fmt")}</div>${sliderHtml(25)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_outer_dim_fmt")}</div>${sliderHtml(55)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_handle_size_fmt")}</div>${sliderHtml(50)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_min_selection_fmt")}</div>${sliderHtml(35)}
+            </div>
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_selection_advanced")}</div>
               <div class="m3-row"><span>${tSpan("switch_show_handles")}</span><div class="m3-switch"></div></div>
-              <div class="m3-pill">${tSpan("btn_reset_default")}</div>
+              <div class="m3-row"><span>${tSpan("switch_smooth_freeform")}</span><div class="m3-switch"></div></div>
+              <div class="m3-row"><span>${tSpan("switch_edge_smoothing")}</span><div class="m3-switch"></div></div>
+              <div class="m3-row"><span>${tSpan("switch_selection_animation")}</span><div class="m3-switch off"></div></div>
+              <span class="m3-pill text-btn">${tSpan("btn_reset_default")}</span>
             </div>
           </div>`;
         }
@@ -916,32 +1127,53 @@
           return `${renderAppHeader("tab_panel")}
           <div class="b-content">
             <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_panel_preview")}</div>
+              <div class="m3-sub">${tSpan("panel_preview_hint")}</div>
+              <div class="panel-stage-box">
+                <div class="panel-sel-rect">
+                  <span class="engine-chip-dark">${tSpan("overlay_engine_pill_fmt")}</span>
+                </div>
+                <div class="ov-action-bar">
+                  <span class="ov-action-btn primary">${ICON_TRANSLATE} ${tSpan("action_translate")}</span>
+                  <span class="ov-action-btn">${ICON_SEARCH} ${tSpan("action_visual_search")}</span>
+                </div>
+              </div>
+              <span class="m3-pill text-btn">${tSpan("btn_reset_position")}</span>
+            </div>
+            <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_panel_buttons")}</div>
               <div class="m3-sub">${tSpan("panel_buttons_subtitle")}</div>
-              <div class="m3-row"><span>= &nbsp;${tSpan("action_translate")}</span><div class="m3-switch"></div></div>
-              <div class="m3-row"><span>= &nbsp;${tSpan("action_visual_search")}</span><div class="m3-switch"></div></div>
-              <div class="m3-row"><span>= &nbsp;${tSpan("panel_action_full_screen")}</span><div class="m3-switch"></div></div>
-              <div class="m3-row"><span>= &nbsp;${tSpan("panel_action_copy_image")}</span><div class="m3-switch off"></div></div>
-              <div class="m3-row"><span>= &nbsp;${tSpan("panel_action_save_image")}</span><div class="m3-switch off"></div></div>
-              <div class="m3-row"><span>= &nbsp;${tSpan("panel_action_share_image")}</span><div class="m3-switch off"></div></div>
+              <div class="m3-engine-row">${DRAG_HANDLE}<span style="flex:1;font-size:13px;">#1 &nbsp;${tSpan("action_translate")}</span><div class="m3-switch"></div></div>
+              <div class="m3-divider"></div>
+              <div class="m3-engine-row">${DRAG_HANDLE}<span style="flex:1;font-size:13px;">#2 &nbsp;${tSpan("action_visual_search")}</span><div class="m3-switch"></div></div>
+              <div class="m3-divider"></div>
+              <div class="m3-row"><span>${tSpan("panel_action_full_screen")}</span><div class="m3-switch off"></div></div>
+              <div class="m3-divider"></div>
+              <div class="m3-row"><span>${tSpan("overlay_select_text")}</span><div class="m3-switch off"></div></div>
+              <div class="m3-divider"></div>
+              <div class="m3-row"><span>${tSpan("panel_action_copy_image")}</span><div class="m3-switch off"></div></div>
+              <div class="m3-divider"></div>
+              <div class="m3-row"><span>${tSpan("panel_action_save_image")}</span><div class="m3-switch off"></div></div>
+              <div class="m3-divider"></div>
+              <div class="m3-row"><span>${tSpan("panel_action_share_image")}</span><div class="m3-switch off"></div></div>
             </div>
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_panel_layout")}</div>
-              <div class="m3-sub"><strong>${tSpan("label_panel_position")}</strong></div>
-              <div class="m3-chip-wrap">
+              <div class="m3-label-bold">${tSpan("label_panel_position")}</div>
+              <div class="m3-chip-scroll">
                 <span class="m3-chip selected">${tSpan("pos_bottom")}</span>
                 <span class="m3-chip">${tSpan("pos_top")}</span>
                 <span class="m3-chip">${tSpan("pos_left")}</span>
                 <span class="m3-chip">${tSpan("pos_right")}</span>
                 <span class="m3-chip">${tSpan("pos_custom")}</span>
               </div>
-              <div class="m3-sub"><strong>${tSpan("label_panel_layout_mode")}</strong></div>
-              <div class="m3-chip-wrap">
+              <div class="m3-label-bold">${tSpan("label_panel_layout_mode")}</div>
+              <div class="m3-chip-scroll">
                 <span class="m3-chip selected">${tSpan("layout_h_scroll")}</span>
                 <span class="m3-chip">${tSpan("layout_two_rows")}</span>
                 <span class="m3-chip">${tSpan("layout_icon_only")}</span>
               </div>
-              <div class="m3-sub"><strong>${tSpan("label_button_size")}</strong></div>
+              <div class="m3-label-bold">${tSpan("label_button_size")}</div>
               <div class="m3-chip-wrap">
                 <span class="m3-chip">${tSpan("size_compact")}</span>
                 <span class="m3-chip selected">${tSpan("size_standard")}</span>
@@ -949,6 +1181,17 @@
               </div>
               <div class="m3-row"><span>${tSpan("switch_show_labels")}</span><div class="m3-switch"></div></div>
               <div class="m3-row"><span>${tSpan("switch_show_engine_selector")}</span><div class="m3-switch"></div></div>
+            </div>
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("section_panel_appearance")}</div>
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_panel_scale_fmt")}</div>${sliderHtml(50)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_panel_opacity_fmt")}</div>${sliderHtml(92)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_btn_spacing_fmt")}</div>${sliderHtml(35)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_btn_padding_fmt")}</div>${sliderHtml(45)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_btn_radius_fmt")}</div>${sliderHtml(70)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_margin_h_fmt")}</div>${sliderHtml(40)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_margin_v_fmt")}</div>${sliderHtml(50)}
+              <span class="m3-pill text-btn">${tSpan("btn_reset_default")}</span>
             </div>
           </div>`;
         }
@@ -958,12 +1201,22 @@
           <div class="b-content">
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_theme_preview")}</div>
-              <div class="m3-chip-wrap">
-                <span class="m3-pill filled" style="min-height:32px">${tSpan("preview_primary_btn")}</span>
-                <span class="m3-pill tonal" style="min-height:32px">${tSpan("preview_tonal_btn")}</span>
-                <span class="m3-pill" style="min-height:32px">${tSpan("preview_outlined_btn")}</span>
+              <div style="border:1px solid var(--m3-outline);border-radius:16px;padding:12px;display:flex;flex-direction:column;gap:12px;background:var(--m3-bg);">
+                <div class="m3-btn-row-3">
+                  <span class="m3-pill filled" style="min-height:36px;">${tSpan("preview_primary_btn")}</span>
+                  <span class="m3-pill tonal" style="min-height:36px;">${tSpan("preview_tonal_btn")}</span>
+                  <span class="m3-pill" style="min-height:36px;">${tSpan("preview_outlined_btn")}</span>
+                </div>
+                <div class="m3-row"><span>${tSpan("preview_switch_label")}</span><div class="m3-switch"></div></div>
+                <div style="border:1.8px solid var(--m3-accent);border-radius:12px;padding:10px;">
+                  <div style="font-size:13px;font-weight:700;">${tSpan("app_name")}</div>
+                  <div class="m3-sub" style="margin-top:2px;">${tSpan("app_tagline")}</div>
+                </div>
+                <div class="m3-btn-row">
+                  <span class="m3-pill filled" style="min-height:38px;">${ICON_TRANSLATE} ${tSpan("action_translate")}</span>
+                  <span class="m3-pill" style="min-height:38px;color:var(--m3-text);">${ICON_SEARCH} ${tSpan("action_visual_search")}</span>
+                </div>
               </div>
-              <div class="m3-row"><span>${tSpan("preview_switch_label")}</span><div class="m3-switch"></div></div>
             </div>
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_theme_mode")}</div>
@@ -1002,19 +1255,25 @@
           <div class="b-content">
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_updates")}</div>
-              <div class="m3-sub">${tSpan("update_current_version_fmt")}</div>
-              <div class="m3-sub">${tSpan("update_latest_version_fmt")}</div>
+              <div class="m3-status-list">
+                <div>${tSpan("update_current_version_fmt")}</div>
+                <div>${tSpan("update_latest_version_fmt")}</div>
+                <div class="m3-sub">${tSpan("update_last_checked_fmt")}</div>
+              </div>
+              <div class="m3-btn-row">
+                <div class="m3-pill tonal">${tSpan("btn_check_updates")}</div>
+                <div class="m3-pill">${tSpan("btn_download_update")}</div>
+              </div>
               <div class="m3-row"><span>${tSpan("switch_auto_update")}</span><div class="m3-switch"></div></div>
+              <div class="m3-row"><span>${tSpan("switch_update_on_launch")}</span><div class="m3-switch"></div></div>
               <div class="m3-row"><span>${tSpan("switch_update_wifi_only")}</span><div class="m3-switch off"></div></div>
+              <div class="m3-row"><span>${tSpan("switch_update_prerelease")}</span><div class="m3-switch off"></div></div>
+              <div class="m3-label-bold">${tSpan("label_update_interval")}</div>
               <div class="m3-chip-wrap">
                 <span class="m3-chip">${tSpan("interval_6h")}</span>
                 <span class="m3-chip">${tSpan("interval_12h")}</span>
                 <span class="m3-chip selected">${tSpan("interval_24h")}</span>
                 <span class="m3-chip">${tSpan("interval_7d")}</span>
-              </div>
-              <div class="m3-btn-row">
-                <div class="m3-pill tonal">${tSpan("btn_check_updates")}</div>
-                <div class="m3-pill">${tSpan("btn_download_update")}</div>
               </div>
             </div>
             <div class="m3-card">
@@ -1025,55 +1284,94 @@
                 <div class="m3-pill">${tSpan("btn_excluded_apps_fmt")}</div>
                 <div class="m3-pill">${tSpan("btn_clear_cache")}</div>
               </div>
+              <span class="m3-pill text-btn">${tSpan("btn_legacy_capture")}</span>
             </div>
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_about")}</div>
               <div class="m3-sub">${tSpan("about_summary")}</div>
-              <div class="m3-pill tonal">${tSpan("btn_view_github")}</div>
+              <div style="display:flex;">
+                <span class="m3-pill tonal" style="padding:8px 20px;">${tSpan("btn_view_github")}</span>
+              </div>
+            </div>
+          </div>`;
+        }
+
+        if (s === "ov_translate") {
+          return `
+          <div class="status-bar" style="background:#54565c;color:#fff;">
+            <span>2:19</span><div class="punch-hole"></div><span>5G · 94%</span>
+          </div>
+          <div class="overlay-bg" style="background:#6c6f77;">
+            <div>
+              <div class="overlay-topbar">
+                <span class="ov-pill">${tSpan("panel_action_full_screen")}</span>
+                <span class="ov-pill">${tSpan("overlay_select_text_count")}</span>
+                <span class="ov-pill">${tSpan("overlay_copy")}</span>
+                <span class="ov-pill">${tSpan("overlay_original")}</span>
+                <span class="ov-pill">${tSpan("overlay_tools")}</span>
+                <span class="ov-pill close-x">✕</span>
+              </div>
+              <div class="android-settings-mock" style="margin-top:8px;">
+                <div class="tr-box">Pengaturan · Cari pengaturan</div>
+                <div class="tr-box">Jaringan &amp; Internet<br/>Seluler, Wi-Fi, Hotspot</div>
+                <div class="tr-box">Perangkat yang terhubung<br/>Bluetooth, berpasangan</div>
+                <div class="tr-box">Aplikasi · Asisten &amp; Default</div>
+                <div class="tr-box">Baterai · 100%</div>
+              </div>
+            </div>
+            <div style="text-align:center;font-size:11.5px;color:#e5e7eb;background:rgba(0,0,0,0.65);padding:8px 12px;border-radius:12px;">
+              ${tSpan("overlay_translating_fmt")} · ${tSpan("overlay_translated")}
             </div>
           </div>`;
         }
 
         if (s === "ov_main") {
           return `
-          <div class="status-bar" style="background:#151822;">
-            <span>14:30</span><div class="punch-hole"></div><span>5G · 92%</span>
+          <div class="status-bar" style="background:#1c1e24;color:#fff;">
+            <span>1:43</span><div class="punch-hole"></div><span>5G · 92%</span>
           </div>
           <div class="overlay-bg">
             <div>
               <div class="overlay-topbar">
                 <span class="ov-pill">${tSpan("panel_action_full_screen")}</span>
                 <span class="ov-pill">${tSpan("overlay_select_text_count")}</span>
-                <span class="ov-pill dark">${tSpan("overlay_copy")}</span>
-                <span class="ov-pill dark">${tSpan("overlay_original")}</span>
-                <span class="ov-pill dark">${tSpan("overlay_tools")}</span>
-              </div>
-              <div style="margin-top:8px;font-size:11px;padding:6px 10px;border-radius:10px;background:rgba(0,0,0,0.65);color:#e2e8f0;">
-                ${tSpan("overlay_fullscreen_ready_hint")}
+                <span class="ov-pill close-x">✕</span>
               </div>
               <div class="ov-selection">
-                <div style="font-size:12px;color:#cbd5e1;line-height:1.45;">
-                  <strong>Bubble Android v1.1.1</strong><br/>
-                  https://x.com/BubbleAndroid/status/111<br/>
-                  <span style="color:#94a3b8;font-size:11px;">${tSpan("overlay_engine_pill_fmt")}</span>
+                <div style="font-size:12.5px;color:#e2e8f0;line-height:1.45;">
+                  <strong>Android Open Source Community</strong><br/>
+                  Check out the new Bubble Android v1.1.1 release thread on X — Material 3 Expressive UI, Full Screen selection, and offline WebView AdBlocker!
                 </div>
+                <div style="margin-top:10px;padding:12px;border-radius:10px;background:#101828;border:1px solid #24304a;text-align:center;">
+                  <div style="font-size:26px;font-weight:900;color:#fff;">𝕏</div>
+                  <div style="font-size:11px;color:#60a5fa;margin-top:6px;">https://x.com/BubbleAndroid/status/111</div>
+                </div>
+                <div style="margin-top:8px;font-size:11px;color:#cbd5e1;">${tSpan("overlay_fullscreen_ready_hint")}</div>
               </div>
             </div>
 
             <div style="display:flex;flex-direction:column;gap:10px;">
               <div class="ov-link-card">
-                <div style="font-size:10px;font-weight:800;letter-spacing:0.06em;color:#38bdf8;">🔗 ${tSpan("overlay_link_badge")}</div>
+                <div style="display:flex;justify-content:space-between;align-items:center;">
+                  <span style="font-size:10px;font-weight:800;letter-spacing:0.05em;color:#38bdf8;">🔗 ${tSpan("overlay_link_badge")}</span>
+                  <span style="color:#94a3b8;font-size:12px;">✕</span>
+                </div>
                 <div style="font-size:13.5px;font-weight:700;color:#fff;">${tSpan("overlay_link_found_title")}</div>
                 <div style="font-size:11.5px;color:#94a3b8;">${tSpan("overlay_link_more_fmt")}</div>
                 <div class="m3-btn-row">
-                  <div class="m3-pill filled" style="background:#2196f3;color:#fff;">${tSpan("overlay_open_link")}</div>
-                  <div class="m3-pill" style="color:#fff;border-color:#334155;">${tSpan("overlay_copy_link")}</div>
+                  <div class="m3-pill filled" style="background:#2196f3;color:#fff;min-height:36px;">${tSpan("overlay_open_link")}</div>
+                  <div class="m3-pill" style="color:#fff;border-color:#3a4154;min-height:36px;">${tSpan("overlay_copy_link")}</div>
                 </div>
               </div>
+              <div class="ov-lang-bar">
+                <span>AUTO</span>
+                <span class="ov-swap-dot">${ICON_SWAP}</span>
+                <span>ID</span>
+              </div>
               <div class="ov-action-bar">
-                <span class="m3-pill filled" style="min-height:34px;">${tSpan("action_translate")}</span>
-                <span class="m3-pill" style="min-height:34px;color:#fff;border-color:#334155;">${tSpan("action_visual_search")}</span>
-                <span class="m3-pill" style="min-height:34px;color:#fff;border-color:#334155;">${tSpan("panel_action_full_screen")}</span>
+                <span class="ov-action-btn primary">${ICON_TRANSLATE} ${tSpan("action_translate")}</span>
+                <span class="ov-action-btn">${ICON_SEARCH} ${tSpan("action_visual_search")}</span>
+                <span class="ov-action-btn">${tSpan("panel_action_full_screen")}</span>
               </div>
             </div>
           </div>`;
@@ -1081,68 +1379,113 @@
 
         if (s === "ov_select_text") {
           return `
-          <div class="status-bar" style="background:#151822;">
-            <span>14:32</span><div class="punch-hole"></div><span>5G · 91%</span>
+          <div class="status-bar" style="background:#151822;color:#fff;">
+            <span>2:24</span><div class="punch-hole"></div><span>5G · 91%</span>
           </div>
           <div class="overlay-bg">
             <div>
               <div class="overlay-topbar">
                 <span class="ov-pill">${tSpan("overlay_select_all")}</span>
-                <span class="ov-pill dark">${tSpan("overlay_done")}</span>
+                <span class="ov-pill" style="background:#262934;">${tSpan("overlay_done")}</span>
+                <span class="ov-pill close-x">✕</span>
               </div>
-              <div style="margin-top:10px;padding:10px;border-radius:12px;background:rgba(15,23,42,0.88);border:1px solid rgba(56,189,248,0.4);">
-                <div style="font-size:12px;font-weight:700;color:#38bdf8;">${tSpan("overlay_tap_text_header_fmt")}</div>
+              <div style="margin-top:10px;padding:11px;border-radius:14px;background:rgba(15,23,42,0.92);border:1px solid rgba(56,189,248,0.45);">
+                <div style="font-size:12.5px;font-weight:700;color:#38bdf8;">${tSpan("overlay_tap_text_header_fmt")}</div>
                 <div style="font-size:11.5px;color:#cbd5e1;margin-top:4px;">${tSpan("overlay_tap_text_hint")}</div>
               </div>
-              <div style="margin-top:14px;display:flex;flex-direction:column;gap:8px;">
-                <div style="padding:8px 10px;border-radius:8px;background:rgba(33,150,243,0.28);border:1.5px solid #2196f3;font-size:12.5px;">Network &amp; Internet · Wi-Fi</div>
-                <div style="padding:8px 10px;border-radius:8px;background:rgba(56,189,248,0.24);border:1.5px solid #38bdf8;font-size:12.5px;text-decoration:underline;">https://x.com/BubbleAndroid</div>
-                <div style="padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px dashed rgba(255,255,255,0.25);font-size:12.5px;">Battery · 91%</div>
+              <div style="margin-top:12px;display:flex;flex-direction:column;gap:8px;">
+                <div style="padding:8px 10px;border-radius:8px;background:rgba(33,150,243,0.28);border:1.5px solid #2196f3;font-size:12.5px;">Network &amp; Internet · Mobile, Wi-Fi, Hotspot</div>
+                <div style="padding:8px 10px;border-radius:8px;background:rgba(56,189,248,0.24);border:1.5px solid #38bdf8;font-size:12.5px;text-decoration:underline;">https://x.com/BubbleAndroid/status/111</div>
+                <div style="padding:8px 10px;border-radius:8px;background:rgba(255,255,255,0.08);border:1px dashed rgba(255,255,255,0.25);font-size:12.5px;">Connected devices · Bluetooth, pairing</div>
               </div>
             </div>
             <div class="ov-link-card">
               <div style="font-size:12px;color:#94a3b8;">${tSpan("overlay_selected_links_fmt")}</div>
               <div class="m3-chip-wrap" style="justify-content:center;">
-                <span class="m3-pill filled" style="min-height:34px;">${tSpan("overlay_copy")}</span>
-                <span class="m3-pill tonal" style="min-height:34px;">${tSpan("action_translate")}</span>
-                <span class="m3-pill" style="min-height:34px;color:#fff;border-color:#334155;">${tSpan("overlay_web_search")}</span>
-                <span class="m3-pill" style="min-height:34px;color:#38bdf8;border-color:#38bdf8;">${tSpan("overlay_open_link")}</span>
+                <span class="ov-action-btn primary" style="padding:7px 14px;">${tSpan("overlay_copy")}</span>
+                <span class="ov-action-btn" style="padding:7px 14px;">${tSpan("action_translate")}</span>
+                <span class="ov-action-btn" style="padding:7px 14px;">${tSpan("overlay_web_search")}</span>
+                <span class="ov-action-btn" style="padding:7px 14px;border-color:#38bdf8;color:#38bdf8;">${tSpan("overlay_open_link")}</span>
               </div>
             </div>
           </div>`;
         }
 
-        // lang_mgr & donation dialog
-        return `
-          <div class="status-bar"><span>14:35</span><div class="punch-hole"></div><span>5G · 90%</span></div>
+        if (s === "lang_mgr") {
+          return `
+          <div class="status-bar"><span>1:58</span><div class="punch-hole"></div><span>5G · 90%</span></div>
+          <div class="b-header" style="padding-bottom:4px;">
+            <span style="font-size:20px;color:var(--m3-sub);">↩</span>
+            <span style="font-size:17px;font-weight:700;">${tSpan("lang_manager_title")}</span>
+          </div>
+          <div class="b-tabs" style="justify-content:space-around;">
+            <div class="b-tab active">${tSpan("tab_offline_translation")}</div>
+            <div class="b-tab">${tSpan("tab_custom_ocr")}</div>
+          </div>
           <div class="b-content">
-            <div class="m3-card">
-              <div class="m3-card-title">${tSpan("lang_manager_title")}</div>
-              <div class="m3-btn-row">
-                <div class="m3-pill filled">${tSpan("tab_offline_translation")}</div>
-                <div class="m3-pill">${tSpan("tab_custom_ocr")}</div>
-              </div>
-              <div class="m3-sub">${tSpan("lang_manager_info")}</div>
+            <div class="m3-sub">${tSpan("lang_manager_info")}</div>
+            <div style="border-bottom:1.5px solid var(--m3-outline);padding:6px 2px;font-size:13px;color:var(--m3-sub);">${tSpan("lang_search_hint")}</div>
+            <div class="m3-card" style="padding:12px 14px;">
               <div class="m3-row">
                 <div><strong>Indonesian</strong><div class="m3-sub">${tSpan("status_downloaded_offline")}</div></div>
-                <span class="m3-chip">${tSpan("btn_delete")}</span>
+                <span class="m3-pill" style="min-height:34px;padding:4px 16px;">${tSpan("btn_delete")}</span>
               </div>
-              <div class="m3-row">
-                <div><strong>Japanese</strong><div class="m3-sub">${tSpan("status_not_downloaded_fmt")}</div></div>
-                <span class="m3-chip selected">${tSpan("btn_download")}</span>
-              </div>
-              <div class="m3-sub"><strong>${tSpan("ocr_card_title")}</strong></div>
-              <div class="m3-row"><span>${tSpan("switch_use_tesseract")}</span><div class="m3-switch"></div></div>
-              <div class="m3-pill tonal">${tSpan("btn_import_traineddata")}</div>
             </div>
-            <div class="m3-card" style="border-color:var(--m3-accent);">
-              <div class="m3-card-title">${tSpan("donation_title")}</div>
-              <div class="m3-sub">${tSpan("donation_description")}</div>
-              <div class="m3-sub" style="font-style:italic;">${tSpan("donation_supporting_text")}</div>
-              <div class="m3-btn-row">
-                <div class="m3-pill">${tSpan("donation_btn_continue")}</div>
+            <div class="m3-card" style="padding:12px 14px;">
+              <div class="m3-row">
+                <div><strong>Korean</strong><div class="m3-sub">${tSpan("status_not_downloaded_fmt")}</div></div>
+                <span class="m3-pill filled" style="min-height:34px;padding:4px 16px;background:#2196f3;color:#fff;">${tSpan("btn_download")}</span>
+              </div>
+            </div>
+            <div class="m3-card">
+              <div class="m3-card-title">${tSpan("ocr_card_title")}</div>
+              <div class="m3-sub">${tSpan("ocr_card_desc")}</div>
+              <div class="m3-row"><span>${tSpan("switch_use_tesseract")}</span><div class="m3-switch"></div></div>
+              <div class="m3-pill filled" style="background:#2196f3;color:#fff;">${tSpan("btn_import_traineddata")}</div>
+              <div class="m3-label-bold">${tSpan("ocr_installed_header_fmt")}</div>
+              <div class="m3-row"><span>${tSpan("ocr_active_label_fmt")}</span><span class="m3-pill" style="min-height:30px;padding:3px 12px;">${tSpan("btn_use")}</span></div>
+              <div class="m3-label-bold">${tSpan("ocr_quick_download_header")}</div>
+            </div>
+          </div>`;
+        }
+
+        // 12 · Dialogs (Safe Mode Excluded Apps, Usage Guide, Donation, Custom Delay)
+        return `
+          <div class="status-bar"><span>1:24</span><div class="punch-hole"></div><span>5G · 90%</span></div>
+          <div class="b-content" style="background:rgba(0,0,0,0.45);">
+            <div class="android-dialog">
+              <div style="font-size:16px;font-weight:700;">${tSpan("dialog_excluded_title")}</div>
+              <div style="font-size:12px;color:#cbd5e1;display:flex;flex-direction:column;gap:6px;padding:4px 0;">
+                <div>com.authy.authy</div>
+                <div>com.bca</div>
+                <div>com.gojek.gopay</div>
+                <div>id.bmri.livin</div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;gap:14px;font-size:13px;font-weight:700;color:var(--m3-accent-bright);">
+                <span>${tSpan("btn_close")}</span>
+                <span>${tSpan("btn_add_package")}</span>
+              </div>
+            </div>
+            <div class="android-dialog">
+              <div style="font-size:16px;font-weight:700;">${tSpan("donation_title")}</div>
+              <div style="font-size:12.5px;color:#d4d8e3;line-height:1.45;">${tSpan("donation_description")}</div>
+              <div style="font-size:11.5px;color:#9aa0b4;font-style:italic;">${tSpan("donation_supporting_text")}</div>
+              <div class="m3-btn-row" style="margin-top:4px;">
+                <div class="m3-pill" style="color:#fff;border-color:#4b5064;">${tSpan("donation_btn_continue")}</div>
                 <div class="m3-pill filled">${tSpan("donation_btn_donate")}</div>
               </div>
+            </div>
+            <div class="android-dialog">
+              <div style="font-size:16px;font-weight:700;">${tSpan("dialog_custom_delay_title")}</div>
+              <div style="border-bottom:1.5px solid var(--m3-accent);padding:6px 2px;font-size:12.5px;color:#9aa0b4;">${tSpan("dialog_custom_delay_hint")}</div>
+              <div style="display:flex;justify-content:flex-end;gap:14px;font-size:13px;font-weight:700;color:var(--m3-accent-bright);">
+                <span>${tSpan("btn_cancel")}</span>
+                <span>${tSpan("btn_save")}</span>
+              </div>
+            </div>
+            <div class="android-dialog">
+              <div style="font-size:16px;font-weight:700;">${tSpan("guide_title")}</div>
+              <div style="font-size:12px;color:#d4d8e3;line-height:1.45;">${tSpan("guide_body")}</div>
             </div>
           </div>`;
       }
@@ -1283,11 +1626,7 @@
           }
         }
         enableHorizontalScroll(phone.querySelector(".overlay-topbar"));
-
-        const btnL = phone.querySelector("#tabScrollLeft");
-        const btnR = phone.querySelector("#tabScrollRight");
-        if (btnL && nextTabs) btnL.addEventListener("click", () => nextTabs.scrollBy({ left: -140, behavior: "smooth" }));
-        if (btnR && nextTabs) btnR.addEventListener("click", () => nextTabs.scrollBy({ left: 140, behavior: "smooth" }));
+        phone.querySelectorAll(".m3-chip-scroll").forEach(enableHorizontalScroll);
 
         phone.querySelectorAll("[data-nav-tab]").forEach((el) => {
           el.addEventListener("click", (ev) => {
@@ -1725,12 +2064,22 @@
         document.getElementById("width360").classList.remove("active");
       });
 
+      // Stage-level tab scroll buttons (outside phone screen so phone UI stays 100% authentic 1:1)
+      document.getElementById("stageTabLeft").addEventListener("click", () => {
+        document.getElementById("bTabsScroll")?.scrollBy({ left: -150, behavior: "smooth" });
+      });
+      document.getElementById("stageTabRight").addEventListener("click", () => {
+        document.getElementById("bTabsScroll")?.scrollBy({ left: 150, behavior: "smooth" });
+      });
+
+      // Theme switching also re-renders header badge cleanly
       [["themeAmoled", "amoled"], ["themeDark", "dark"], ["themeLight", "light"]].forEach(([id, val]) => {
         document.getElementById(id).addEventListener("click", () => {
           document.getElementById("phoneScreen").dataset.theme = val;
           ["themeAmoled", "themeDark", "themeLight"].forEach((x) =>
             document.getElementById(x).classList.toggle("active", x === id)
           );
+          renderAll(false);
         });
       });
 
@@ -1772,8 +2121,15 @@
       });
 
       restoreDraftFromBrowser();
+      const params = new URLSearchParams(window.location.search);
+      const qScr = params.get("screen");
+      if (qScr && SCREENS.some((s) => s.id === qScr)) state.screen = qScr;
+      const qTheme = params.get("theme");
+      if (qTheme && ["amoled", "dark", "light"].includes(qTheme)) {
+        document.getElementById("phoneScreen").dataset.theme = qTheme;
+      }
       renderScreenNav();
-      renderAll();
+      renderAll(true);
     })();
   </script>
 </body>
