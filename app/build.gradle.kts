@@ -1,18 +1,21 @@
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.plugin.compose")
+    id("org.jetbrains.kotlin.android")
 }
 
 android {
     namespace = "com.bubble.screentools"
-    compileSdk = 37
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.bubble.screentools"
         minSdk = 24
-        targetSdk = 36
-        versionCode = 9
-        versionName = "1.1.0"
+        targetSdk = 35
+        versionCode = 10
+        versionName = "1.1.1"
+
+        val donationUrl = System.getenv("BUBBLE_DONATION_URL") ?: "https://trakteer.id/apriononurhakim"
+        buildConfigField("String", "DONATION_URL", "\"$donationUrl\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         resourceConfigurations += listOf("id", "in", "en")
@@ -37,7 +40,7 @@ android {
         abi {
             isEnable = true
             reset()
-            include("arm64-v8a", "armeabi-v7a", "x86_64")
+            include("arm64-v8a", "armeabi-v7a")
             isUniversalApk = false
         }
     }
@@ -58,7 +61,6 @@ android {
         debug {
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
         }
     }
 
@@ -72,14 +74,11 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
-    kotlin {
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-        }
+    kotlinOptions {
+        jvmTarget = "17"
     }
 
     buildFeatures {
-        compose = true
         viewBinding = false
         buildConfig = true
     }
@@ -110,39 +109,28 @@ android {
 }
 
 dependencies {
-    // Official AndroidX Jetpack Compose + Material 3 Expressive
-    val composeBom = platform("androidx.compose:compose-bom:2026.01.01")
-    implementation(composeBom)
-    implementation("androidx.compose.material3:material3:1.5.0-alpha25")
-    implementation("androidx.compose.ui:ui")
-    implementation("androidx.compose.ui:ui-tooling-preview")
-    implementation("androidx.compose.material:material-icons-extended")
-    debugImplementation("androidx.compose.ui:ui-tooling")
-
-    // Core Android + AppCompat (required for per-app LocaleHelper on API < 33 and overlay styling)
     implementation("androidx.core:core-ktx:1.15.0")
     implementation("androidx.appcompat:appcompat:1.7.0")
     implementation("com.google.android.material:material:1.12.0")
-    implementation("androidx.activity:activity-ktx:1.13.0")
-    implementation("androidx.activity:activity-compose:1.13.0")
+    implementation("androidx.activity:activity-ktx:1.9.3")
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.8.7")
-    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.9.0")
 
-    // Unbundled ML Kit OCR via Google Play Services
+    // Unbundled ML Kit OCR via Google Play Services (~300 KB in APK vs ~15 MB bundled)
     implementation("com.google.android.gms:play-services-mlkit-text-recognition:19.0.1")
 
-    // Unbundled ML Kit Barcode / QR Code Scanning via Google Play Services
+    // Unbundled ML Kit Barcode / QR Code Scanning via Google Play Services (~200 KB in APK, best accuracy)
     implementation("com.google.android.gms:play-services-mlkit-barcode-scanning:18.3.1")
 
-    // ML Kit On-Device Language Identification & Translation
+    // ML Kit On-Device Language Identification & Translation (59 languages downloaded on demand)
     implementation("com.google.mlkit:language-id:17.0.6")
     implementation("com.google.mlkit:translate:17.0.3")
 
-    // Tesseract 5 OCR for custom user-imported .traineddata language models
+    // Tesseract 5 OCR for custom user-imported .traineddata language models (16 KB page aligned)
     implementation("cz.adaptech.tesseract4android:tesseract4android:4.8.0")
 
     testImplementation("junit:junit:4.13.2")
+    testImplementation("org.json:json:20240303")
     androidTestImplementation("androidx.test.ext:junit:1.2.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.6.1")
 }

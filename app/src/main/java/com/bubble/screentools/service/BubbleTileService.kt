@@ -1,14 +1,13 @@
 package com.bubble.screentools.service
 
+import android.annotation.SuppressLint
 import android.app.PendingIntent
 import android.content.Intent
 import android.os.Build
 import android.service.quicksettings.Tile
 import android.service.quicksettings.TileService
-import androidx.annotation.RequiresApi
 import com.bubble.screentools.ui.main.MainActivity
 
-@RequiresApi(Build.VERSION_CODES.N)
 class BubbleTileService : TileService() {
 
     override fun onStartListening() {
@@ -44,8 +43,13 @@ class BubbleTileService : TileService() {
             )
             startActivityAndCollapse(pendingIntent)
         } else {
-            @Suppress("DEPRECATION")
-            startActivityAndCollapse(targetIntent)
+            launchLegacyCollapsed(targetIntent)
         }
+    }
+
+    @SuppressLint("StartActivityAndCollapseDeprecated")
+    @Suppress("DEPRECATION")
+    private fun launchLegacyCollapsed(targetIntent: Intent) {
+        startActivityAndCollapse(targetIntent)
     }
 }

@@ -1,0 +1,89 @@
+name: "🌍 Submit Translation"
+description: Submit a new UI language translation (strings.xml, .xlsx, or .csv) — no coding or Pull Request required.
+title: "[Translation]: "
+labels: ["type: feature", "status: under review", "area: translation", "area: UI/UX"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping translate **Bubble** into your language! 🎉
+        No coding, Git, or Pull Request is required — each language submission gets its own clean review ticket linked under our Master Localization Tracker (**#4**).
+
+        **Quick Tools (100% Free & Beginner-Friendly):**
+        - 🌐 **[Bubble Translation Studio (Live 1:1 Previewer)](https://apriononurhakim.store/Bubble-Android/)** — Translate directly in your browser with a live 1:1 Android mockup and export `strings.xml` in one click.
+        - 📊 **[Excel Translation Template (.xlsx)](https://apriononurhakim.store/Bubble-Android/Bubble-v1.1.1-Translation-Template.xlsx)** — Translate offline in Excel / Google Sheets and attach the `.xlsx` file here.
+
+  - type: input
+    id: language_name
+    attributes:
+      label: Language Name
+      description: Write the language name in English and native form (e.g. Japanese / 日本語, Spanish / Español, Arabic / العربية).
+      placeholder: "e.g. Japanese / 日本語"
+    validations:
+      required: true
+
+  - type: input
+    id: iso_code
+    attributes:
+      label: ISO 639-1 Language Code
+      description: 2-letter code (or regional code like pt-BR, zh-TW).
+      placeholder: "e.g. ja, ko, vi, es, pt-BR, ar"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: text_direction
+    attributes:
+      label: Text Direction
+      options:
+        - LTR (Left-to-Right — e.g. Japanese, Spanish, Vietnamese, Korean)
+        - RTL (Right-to-Left — e.g. Arabic, Hebrew, Persian, Urdu)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: method
+    attributes:
+      label: How did you translate?
+      options:
+        - Bubble Translation Studio (Web 1:1 Previewer)
+        - Excel / Google Sheets Template (.xlsx)
+        - CSV Export (.csv)
+        - Edited strings.xml directly
+    validations:
+      required: true
+
+  - type: textarea
+    id: attachment
+    attributes:
+      label: Attach Your Translation File
+      description: Drag and drop your exported `strings-<lang>.xml`, `.xlsx`, or `.csv` file into this box (or paste a link / XML snippet).
+      placeholder: "Drag & drop your strings-ja.xml or Bubble-v1.1.1-Translation-Template.xlsx here..."
+    validations:
+      required: true
+
+  - type: input
+    id: credit
+    attributes:
+      label: Contributor Credit Name (Optional)
+      description: How would you like to be credited in Bubble's README and Release Notes?
+      placeholder: "e.g. @yourhandle or Your Name"
+
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional Notes (Optional)
+      description: Mention any long labels, RTL layout observations, or terms you want reviewed.
+
+  - type: checkboxes
+    id: checklist
+    attributes:
+      label: Pre-submission checklist
+      options:
+        - label: I checked placeholder tokens (e.g. `%1$s`, `%1$d`, `%2$s`) and kept them intact.
+          required: true
+        - label: I previewed the UI in Bubble Translation Studio (or verified text fits cleanly on buttons/tabs).
+          required: false
+        - label: I understand this ticket will be linked as a sub-issue under Master Localization Tracker #4.
+          required: true

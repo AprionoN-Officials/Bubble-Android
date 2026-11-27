@@ -15,6 +15,7 @@
 -keep public class * extends android.service.voice.VoiceInteractionSessionService
 -keep public class * extends android.speech.RecognitionService
 -keep public class * extends android.app.Service
+-keep public class * extends android.app.job.JobService
 -keep public class * extends androidx.core.content.FileProvider
 
 # Strip verbose debug logs in release APK

@@ -18,8 +18,8 @@ class PerformanceManager(private val preferences: BubblePreferences) {
     /** Comfortable pause after lifting finger before translating so user can adjust handles */
     fun getTranslateDebounceMs(): Long = 650L
 
-    /** Longer pause before launching external Visual Search (Google Lens / Yandex / TinEye) */
-    fun getVisualSearchDebounceMs(): Long = 1800L
+    /** Configurable pause before launching Visual Search (defaults to 2s, supports 0s–60s) */
+    fun getVisualSearchDebounceMs(): Long = preferences.visualSearchDelayMs.coerceIn(0L, 60_000L)
 
     companion object {
         fun clearVolatileCaches(context: Context) {

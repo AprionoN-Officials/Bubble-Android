@@ -207,36 +207,98 @@ class TesseractOcrManager(private val context: Context) {
             return !file.exists() || file.delete()
         }
 
-        suspend fun importFromUri(context: Context, uri: Uri): Result<String> =
+        const val MIN_TRAINEDDATA_BYTES = 16 * 1024L // 16 KB minimum for a valid Tesseract model
+        const val MAX_TRAINEDDATA_BYTES = 150 * 1024 * 1024L // 150 MB safety cap
+
+        /**
+         * Validates a candidate `.traineddata` byte header & size (pure-Kotlin, unit-testable).
+         * Rejects empty/oversized files and misnamed text/JSON/HTML/CSV files.
+         */
+        fun validateTrainedDataPayload(fileName: String, sizeBytes: Long, headerBytes: ByteArray): Result<String> =
+            runCatching {
+                require(fileName.endsWith(".traineddata", ignoreCase = true)) {
+                    "File must have .traineddata extension (example: jpn.traineddata)."
+                }
+                val rawCode = fileName.removeSuffix(".traineddata").trim()
+                val safeCode = rawCode.replace(Regex("[^a-zA-Z0-9_-]"), "")
+                require(safeCode.length in 2..24) {
+                    "Invalid language identifier '$rawCode'. Use standard codes like jpn, kor, chi_sim."
+                }
+                require(sizeBytes >= MIN_TRAINEDDATA_BYTES) {
+                    "File .traineddata is too small or corrupted (${sizeBytes} B)."
+                }
+                require(sizeBytes <= MAX_TRAINEDDATA_BYTES) {
+                    "File .traineddata exceeds maximum allowed size (150 MB)."
+                }
+                // Reject obvious plain text / JSON / HTML / CSV files renamed to .traineddata
+                val headText = String(headerBytes.take(64).toByteArray(), Charsets.UTF_8).trimStart()
+                if (headText.startsWith("{") || headText.startsWith("[") ||
+                    headText.startsWith("<html", ignoreCase = true) ||
+                    headText.startsWith("<!DOCTYPE", ignoreCase = true) ||
+                    headText.startsWith("source,target", ignoreCase = true)
+                ) {
+                    throw IllegalArgumentException(
+                        "File appears to be JSON/HTML/CSV text rather than a binary Tesseract .traineddata model."
+                    )
+                }
+                safeCode
+            }
+
+        suspend fun importFromUri(
+            context: Context,
+            uri: Uri,
+            allowOverwrite: Boolean = true
+        ): Result<String> =
             withContext(Dispatchers.IO) {
                 runCatching {
                     val displayName = resolveFileName(context, uri)
-                        ?: throw IllegalArgumentException("Nama file tidak terbaca.")
+                        ?: throw IllegalArgumentException("Unable to read file name.")
                     if (!displayName.endsWith(".traineddata", ignoreCase = true)) {
                         throw IllegalArgumentException(
-                            "File harus berformat .traineddata (contoh: jpn.traineddata atau kor.traineddata)."
+                            "File must be a Tesseract .traineddata OCR model (e.g., jpn.traineddata)."
                         )
                     }
                     val safeFileName = displayName.replace(Regex("[^a-zA-Z0-9_.-]"), "_")
                     val dest = File(getTessdataDir(context), safeFileName)
+                    if (!allowOverwrite && dest.exists()) {
+                        throw IllegalStateException("OCR model '$safeFileName' is already installed.")
+                    }
                     val temp = File(getTessdataDir(context), "$safeFileName.tmp")
 
                     context.contentResolver.openInputStream(uri)?.use { input ->
                         FileOutputStream(temp).use { output ->
-                            input.copyTo(output, bufferSize = 16 * 1024)
+                            val buffer = ByteArray(16 * 1024)
+                            var total = 0L
+                            while (true) {
+                                val read = input.read(buffer)
+                                if (read <= 0) break
+                                total += read
+                                if (total > MAX_TRAINEDDATA_BYTES) {
+                                    throw IllegalArgumentException("File exceeds 150 MB limit.")
+                                }
+                                output.write(buffer, 0, read)
+                            }
                         }
-                    } ?: throw IllegalStateException("Gagal membuka file dari penyimpanan.")
+                    } ?: throw IllegalStateException("Failed to open file via Storage Access Framework.")
 
-                    if (temp.length() < 1024) {
-                        temp.delete()
-                        throw IllegalArgumentException("File .traineddata kosong atau rusak.")
+                    val header = temp.inputStream().use { stream ->
+                        val buf = ByteArray(64)
+                        val count = stream.read(buf).coerceAtLeast(0)
+                        buf.copyOf(count)
                     }
-                    if (dest.exists()) dest.delete()
-                    if (!temp.renameTo(dest)) {
-                        temp.copyTo(dest, overwrite = true)
+                    val validatedCode = validateTrainedDataPayload(safeFileName, temp.length(), header)
+                        .getOrElse { err ->
+                            temp.delete()
+                            throw err
+                        }
+
+                    val finalDest = File(getTessdataDir(context), "$validatedCode.traineddata")
+                    if (finalDest.exists()) finalDest.delete()
+                    if (!temp.renameTo(finalDest)) {
+                        temp.copyTo(finalDest, overwrite = true)
                         temp.delete()
                     }
-                    safeFileName.removeSuffix(".traineddata")
+                    validatedCode
                 }
             }
 

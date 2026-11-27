@@ -408,7 +408,7 @@ object QrActionHelper {
 
     private fun createCleanQrBitmap(detected: DetectedQrResult, source: Bitmap?): Bitmap? {
         if (source == null || source.isRecycled) return null
-        val safeSource = if (source.config == Bitmap.Config.HARDWARE) {
+        val safeSource = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && source.config == Bitmap.Config.HARDWARE) {
             source.copy(Bitmap.Config.ARGB_8888, false)
         } else {
             source

@@ -14,14 +14,37 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
-    <!-- Query installed packages so Google Lens & payment app availability work on API 30+ -->
-    <uses-permission
-        android:name="android.permission.QUERY_ALL_PACKAGES"
-        tools:ignore="QueryAllPackagesPermission" />
-
+    <!-- Explicit package visibility queries (no QUERY_ALL_PACKAGES or REQUEST_INSTALL_PACKAGES) -->
     <queries>
         <package android:name="com.google.ar.lens" />
         <package android:name="com.google.android.googlequicksearchbox" />
+        <!-- Supported e-wallet & mobile banking apps for QRIS Open-With picker -->
+        <package android:name="id.dana" />
+        <package android:name="com.gojek.gopay" />
+        <package android:name="com.gojek.app" />
+        <package android:name="ovo.id" />
+        <package android:name="com.shopee.id" />
+        <package android:name="com.shopeepay.id" />
+        <package android:name="com.telkom.mwallet" />
+        <package android:name="com.bca" />
+        <package android:name="com.bca.mybca.omni.android" />
+        <package android:name="id.co.bri.brimo" />
+        <package android:name="id.bmri.livin" />
+        <package android:name="src.com.bni" />
+        <package android:name="id.bni.wondr" />
+        <package android:name="com.bsm.activity2" />
+        <package android:name="id.co.bankbkemobile.digitalbank" />
+        <package android:name="com.jago.digitalBanking" />
+        <package android:name="com.bcadigital.blu" />
+        <package android:name="com.btpn.dc" />
+        <package android:name="com.cimbniaga.octo" />
+        <package android:name="com.permata.mobile" />
+        <package android:name="com.flip.id" />
+        <package android:name="com.astrapay.app" />
+        <package android:name="com.mnc.motionpay" />
+        <package android:name="com.allobank.app" />
+        <package android:name="com.bnc.finance" />
+        <package android:name="com.kredivo.android" />
         <intent>
             <action android:name="android.intent.action.SEND" />
             <data android:mimeType="image/*" />
@@ -30,14 +53,22 @@
             <action android:name="android.intent.action.VIEW" />
             <data android:scheme="https" />
         </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:scheme="http" />
+        </intent>
+        <intent>
+            <action android:name="android.intent.action.VIEW" />
+            <data android:mimeType="image/*" />
+        </intent>
     </queries>
 
     <application
         android:name=".BubbleApp"
         android:allowBackup="false"
-        android:icon="@drawable/ic_launcher_icon"
+        android:icon="@drawable/ic_bubble_logo"
         android:label="@string/app_name"
-        android:roundIcon="@drawable/ic_launcher_icon"
+        android:roundIcon="@drawable/ic_bubble_logo"
         android:supportsRtl="true"
         android:theme="@style/Theme.Bubble">
 
@@ -58,10 +89,12 @@
             android:exported="false"
             android:label="@string/lang_manager_title" />
 
-        <!-- In-App Multi-Engine Visual Search (Bing, Yandex, TinEye, Google Lens Web) -->
+        <!-- In-App Multi-Engine Visual Search (isolated task so closing returns to previous app, not MainActivity) -->
         <activity
             android:name=".lens.VisualSearchWebActivity"
             android:exported="false"
+            android:taskAffinity=""
+            android:excludeFromRecents="true"
             android:configChanges="orientation|screenSize|keyboardHidden"
             android:label="Visual Search" />
 
@@ -90,6 +123,7 @@
         <activity
             android:name=".ui.overlay.BubbleAssistantActivity"
             android:exported="false"
+            android:taskAffinity=""
             android:excludeFromRecents="true"
             android:launchMode="singleTop"
             android:theme="@style/Theme.Bubble.OverlayFullscreen" />
@@ -156,7 +190,13 @@
             android:exported="false"
             android:foregroundServiceType="mediaProjection" />
 
-        <!-- FileProvider for temporary cache image handoff to Google Lens / Payment Apps / Sharesheet -->
+        <!-- Lightweight periodic GitHub Releases update checker (JobScheduler, zero foreground service) -->
+        <service
+            android:name=".update.UpdateCheckJobService"
+            android:exported="false"
+            android:permission="android.permission.BIND_JOB_SERVICE" />
+
+        <!-- FileProvider for temporary cache image handoff -->
         <provider
             android:name=".lens.TemporaryImageProvider"
             android:authorities="${applicationId}.fileprovider"

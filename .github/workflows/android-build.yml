@@ -27,9 +27,8 @@ jobs:
       - name: Install Android SDK platforms
         run: |
           SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
-          yes | "$SDKMANAGER" --channel=2 --licenses >/dev/null || true
-          "$SDKMANAGER" "platform-tools" "platforms;android-36" "build-tools;36.0.0"
-          "$SDKMANAGER" --channel=2 "platforms;android-37.0"
+          yes | "$SDKMANAGER" --licenses >/dev/null || true
+          "$SDKMANAGER" "platform-tools" "platforms;android-35" "build-tools;35.0.0"
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
@@ -37,15 +36,7 @@ jobs:
       - name: Run unit tests and build APKs
         run: |
           chmod +x gradlew
-          ./gradlew testDebugUnitTest assembleDebug assembleRelease --no-daemon
-
-      - name: Upload Debug APK (x86_64)
-        uses: actions/upload-artifact@v5
-        with:
-          name: bubble-debug-x86_64
-          path: app/build/outputs/apk/debug/app-x86_64-debug.apk
-          if-no-files-found: error
-          retention-days: 7
+          ./gradlew testDebugUnitTest testReleaseUnitTest assembleDebug assembleRelease --no-daemon
 
       - name: Upload Debug APKs (ARM)
         uses: actions/upload-artifact@v5

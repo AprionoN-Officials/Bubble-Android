@@ -63,6 +63,9 @@ object SelectionGestureHandler {
         rect: BoundsF,
         touchRadiusPx: Float
     ): HandleType {
+        if (!x.isFinite() || !y.isFinite() || !touchRadiusPx.isFinite() || touchRadiusPx < 0f) {
+            return HandleType.NONE
+        }
         if (rect.width() <= 0f || rect.height() <= 0f) return HandleType.NONE
 
         val handles = listOf(
@@ -113,33 +116,74 @@ object SelectionGestureHandler {
         boundsWidth: Float,
         boundsHeight: Float
     ) {
+        if (!dx.isFinite() || !dy.isFinite() || !minSizePx.isFinite() ||
+            !boundsWidth.isFinite() || !boundsHeight.isFinite() ||
+            boundsWidth <= 0f || boundsHeight <= 0f
+        ) {
+            return
+        }
+
+        val safeMinW = minSizePx.coerceIn(1f, boundsWidth)
+        val safeMinH = minSizePx.coerceIn(1f, boundsHeight)
+
+        // Normalize rect within current bounds first so degenerate/out-of-bounds rects can never invert
+        val normLeft = minOf(rect.left, rect.right).coerceIn(0f, boundsWidth)
+        val normRight = maxOf(rect.left, rect.right).coerceIn(normLeft, boundsWidth)
+        val normTop = minOf(rect.top, rect.bottom).coerceIn(0f, boundsHeight)
+        val normBottom = maxOf(rect.top, rect.bottom).coerceIn(normTop, boundsHeight)
+        rect.set(normLeft, normTop, normRight, normBottom)
+
+        fun safeClamp(value: Float, minVal: Float, maxVal: Float): Float {
+            return if (minVal <= maxVal) value.coerceIn(minVal, maxVal) else minVal
+        }
+
         when (handle) {
             HandleType.INSIDE_MOVE -> {
-                val w = rect.width()
-                val h = rect.height()
-                val newLeft = (rect.left + dx).coerceIn(0f, (boundsWidth - w).coerceAtLeast(0f))
-                val newTop = (rect.top + dy).coerceIn(0f, (boundsHeight - h).coerceAtLeast(0f))
+                val w = rect.width().coerceIn(0f, boundsWidth)
+                val h = rect.height().coerceIn(0f, boundsHeight)
+                val newLeft = safeClamp(rect.left + dx, 0f, (boundsWidth - w).coerceAtLeast(0f))
+                val newTop = safeClamp(rect.top + dy, 0f, (boundsHeight - h).coerceAtLeast(0f))
                 rect.set(newLeft, newTop, newLeft + w, newTop + h)
             }
-            HandleType.LEFT -> rect.left = (rect.left + dx).coerceIn(0f, rect.right - minSizePx)
-            HandleType.RIGHT -> rect.right = (rect.right + dx).coerceIn(rect.left + minSizePx, boundsWidth)
-            HandleType.TOP -> rect.top = (rect.top + dy).coerceIn(0f, rect.bottom - minSizePx)
-            HandleType.BOTTOM -> rect.bottom = (rect.bottom + dy).coerceIn(rect.top + minSizePx, boundsHeight)
+            HandleType.LEFT -> {
+                val maxLeft = (rect.right - safeMinW).coerceIn(0f, boundsWidth)
+                rect.left = safeClamp(rect.left + dx, 0f, maxLeft)
+            }
+            HandleType.RIGHT -> {
+                val minRight = (rect.left + safeMinW).coerceIn(0f, boundsWidth)
+                rect.right = safeClamp(rect.right + dx, minRight, boundsWidth)
+            }
+            HandleType.TOP -> {
+                val maxTop = (rect.bottom - safeMinH).coerceIn(0f, boundsHeight)
+                rect.top = safeClamp(rect.top + dy, 0f, maxTop)
+            }
+            HandleType.BOTTOM -> {
+                val minBottom = (rect.top + safeMinH).coerceIn(0f, boundsHeight)
+                rect.bottom = safeClamp(rect.bottom + dy, minBottom, boundsHeight)
+            }
             HandleType.TOP_LEFT -> {
-                rect.left = (rect.left + dx).coerceIn(0f, rect.right - minSizePx)
-                rect.top = (rect.top + dy).coerceIn(0f, rect.bottom - minSizePx)
+                val maxLeft = (rect.right - safeMinW).coerceIn(0f, boundsWidth)
+                val maxTop = (rect.bottom - safeMinH).coerceIn(0f, boundsHeight)
+                rect.left = safeClamp(rect.left + dx, 0f, maxLeft)
+                rect.top = safeClamp(rect.top + dy, 0f, maxTop)
             }
             HandleType.TOP_RIGHT -> {
-                rect.right = (rect.right + dx).coerceIn(rect.left + minSizePx, boundsWidth)
-                rect.top = (rect.top + dy).coerceIn(0f, rect.bottom - minSizePx)
+                val minRight = (rect.left + safeMinW).coerceIn(0f, boundsWidth)
+                val maxTop = (rect.bottom - safeMinH).coerceIn(0f, boundsHeight)
+                rect.right = safeClamp(rect.right + dx, minRight, boundsWidth)
+                rect.top = safeClamp(rect.top + dy, 0f, maxTop)
             }
             HandleType.BOTTOM_LEFT -> {
-                rect.left = (rect.left + dx).coerceIn(0f, rect.right - minSizePx)
-                rect.bottom = (rect.bottom + dy).coerceIn(rect.top + minSizePx, boundsHeight)
+                val maxLeft = (rect.right - safeMinW).coerceIn(0f, boundsWidth)
+                val minBottom = (rect.top + safeMinH).coerceIn(0f, boundsHeight)
+                rect.left = safeClamp(rect.left + dx, 0f, maxLeft)
+                rect.bottom = safeClamp(rect.bottom + dy, minBottom, boundsHeight)
             }
             HandleType.BOTTOM_RIGHT -> {
-                rect.right = (rect.right + dx).coerceIn(rect.left + minSizePx, boundsWidth)
-                rect.bottom = (rect.bottom + dy).coerceIn(rect.top + minSizePx, boundsHeight)
+                val minRight = (rect.left + safeMinW).coerceIn(0f, boundsWidth)
+                val minBottom = (rect.top + safeMinH).coerceIn(0f, boundsHeight)
+                rect.right = safeClamp(rect.right + dx, minRight, boundsWidth)
+                rect.bottom = safeClamp(rect.bottom + dy, minBottom, boundsHeight)
             }
             HandleType.NONE -> Unit
         }

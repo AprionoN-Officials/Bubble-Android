@@ -13,7 +13,6 @@ import android.view.View
 import android.view.WindowManager
 import android.widget.Button
 import android.widget.ImageButton
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.view.ViewCompat
@@ -25,8 +24,10 @@ import com.bubble.screentools.capture.MediaProjectionConsentActivity
 import com.bubble.screentools.capture.ScreenCaptureManager
 import com.bubble.screentools.data.BubblePreferences
 import com.bubble.screentools.lens.LensIntegrationManager
+import com.bubble.screentools.lens.SearchEngineRegistry
 import com.bubble.screentools.lens.TemporaryImageProvider
 import com.bubble.screentools.model.ActionMode
+import com.bubble.screentools.model.ActionPanelButtonType
 import com.bubble.screentools.model.BubbleOverlayState
 import com.bubble.screentools.model.SelectionRegion
 import com.bubble.screentools.model.SelectionShape
@@ -37,11 +38,13 @@ import com.bubble.screentools.qr.QrActionHelper
 import com.bubble.screentools.qr.QrCodeScanner
 import com.bubble.screentools.security.SafeModeManager
 import com.bubble.screentools.service.MediaProjectionService
+import com.bubble.screentools.theme.ThemeManager
 import com.bubble.screentools.translation.LanguageDetectionManager
 import com.bubble.screentools.translation.TranslationManager
 import com.bubble.screentools.util.CompatibilityHelper
 import com.bubble.screentools.util.LocaleHelper
 import com.bubble.screentools.util.PerformanceManager
+import com.bubble.screentools.util.ScreenLinkDetector
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
@@ -49,14 +52,14 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.ceil
 
 /**
- * Orchestrates Mode B (Assistant Overlay) lifecycle:
- * - Safe Mode check before showing overlay and during live sessions
- * - Silent Android 11+ AccessibilityService.takeScreenshot() snapshot (NO "Start recording" prompt!)
- * - Automatic full-screen QR Code detection + Full-screen Live Text Select & Copy (without Lens!)
- * - Comfortable countdown debounce before external Visual Search (immediately canceled on touch/resize!)
- * - High-accuracy OCR-first + Accessibility fallback text detection
+ * Orchestrates Mode B (Accessibility / WindowManager Overlay) lifecycle with:
+ * - Safe Mode protection before showing and throughout live sessions
+ * - Custom Selection appearance, custom Action Panel (classic 2-button default),
+ *   and 6 working overlay actions (Translate, Search, Select Text, Copy/Save/Share Image)
+ * - Quality/Context translation pipeline, Auto QR & Auto Link Detection, & SearchEngineRegistry integration
  */
 class BubbleOverlayController(
     private val context: Context,
@@ -73,17 +76,20 @@ class BubbleOverlayController(
     private val languageDetector = LanguageDetectionManager()
     private val translationManager = TranslationManager(languageDetector)
     private val lensManager = LensIntegrationManager(context)
+    private val searchRegistry = SearchEngineRegistry(preferences)
     private val performanceManager = PerformanceManager(preferences)
 
     private var rootView: OverlayRootFrameLayout? = null
     private var selectionView: SelectionOverlayView? = null
     private var translationRenderer: TranslationOverlayRenderer? = null
-    private var btnTranslate: LinearLayout? = null
-    private var btnVisualSearch: LinearLayout? = null
+    private var actionPanelView: ActionPanelView? = null
+    private var bottomActionRow: View? = null
     private var btnToggleOriginal: Button? = null
     private var btnCopyResultText: Button? = null
     private var tvStatusHint: TextView? = null
     private var topBarSpacer: View? = null
+    private var uploadConfirmCard: View? = null
+    private var tvUploadConfirmMsg: TextView? = null
     private var languageBarHelper: OverlayLanguageBarHelper? = null
 
     private var sessionSnapshot: Bitmap? = null
@@ -96,7 +102,12 @@ class BubbleOverlayController(
     private var qrScanJob: Job? = null
     private var fullScreenTextJob: Job? = null
     private var pendingRegionAfterConsent: SelectionRegion? = null
+    private var pendingConfirmedSearchRegion: SelectionRegion? = null
     private var showOriginalText = false
+    private var lastInsetLeft = 0
+    private var lastInsetTop = 0
+    private var lastInsetRight = 0
+    private var lastInsetBottom = 0
 
     val isShowing: Boolean
         get() = rootView != null
@@ -124,7 +135,7 @@ class BubbleOverlayController(
             initialSnapshot?.let { if (!it.isRecycled) it.recycle() }
             Toast.makeText(
                 context,
-                "Berikan izin 'Tampilkan di atas aplikasi lain' terlebih dahulu.",
+                locCtx().getString(R.string.overlay_permission_required_toast),
                 Toast.LENGTH_LONG
             ).show()
             return
@@ -134,67 +145,103 @@ class BubbleOverlayController(
         replaceSessionSnapshot(initialSnapshot)
 
         val localizedContext = LocaleHelper.wrapContext(context, preferences.appLanguageCode)
-        val themedContext = ContextThemeWrapper(localizedContext, R.style.Theme_Bubble)
+        val themedBase = ContextThemeWrapper(localizedContext, R.style.Theme_Bubble)
+        val themedContext = ThemeManager.wrapOverlayContext(themedBase, preferences)
         val view = LayoutInflater.from(themedContext)
             .inflate(R.layout.overlay_bubble_container, null) as OverlayRootFrameLayout
         rootView = view
 
         val topBar = view.findViewById<View>(R.id.topControlsBar)
         val bottomBar = view.findViewById<View>(R.id.bottomActionRow)
+        bottomActionRow = bottomBar
         selectionView = view.findViewById(R.id.selectionOverlayView)
         translationRenderer = view.findViewById(R.id.translationOverlayRenderer)
-        btnTranslate = view.findViewById(R.id.btnActionTranslate)
-        btnVisualSearch = view.findViewById(R.id.btnActionVisualSearch)
+        actionPanelView = view.findViewById(R.id.primaryActionButtonsRow)
         btnToggleOriginal = view.findViewById(R.id.btnToggleOriginal)
         btnCopyResultText = view.findViewById(R.id.btnCopyResultText)
         tvStatusHint = view.findViewById(R.id.tvStatusHint)
         topBarSpacer = view.findViewById(R.id.topBarSpacer)
+        uploadConfirmCard = view.findViewById(R.id.uploadConfirmCard)
+        tvUploadConfirmMsg = view.findViewById(R.id.tvUploadConfirmMsg)
 
+        val panelConfig = preferences.actionPanelConfig
         val topBasePadding = topBar.paddingTop
-        val bottomBasePadding = bottomBar.paddingBottom
         val fallbackTopInset = getStatusBarHeightFallback()
         val fallbackBottomInset = getNavigationBarHeightFallback()
+        lastInsetLeft = 0
+        lastInsetTop = fallbackTopInset
+        lastInsetRight = 0
+        lastInsetBottom = fallbackBottomInset
         topBar.setPadding(
             topBar.paddingLeft,
             topBasePadding + fallbackTopInset,
             topBar.paddingRight,
             topBar.paddingBottom
         )
-        bottomBar.setPadding(
-            bottomBar.paddingLeft,
-            bottomBar.paddingTop,
-            bottomBar.paddingRight,
-            bottomBasePadding + fallbackBottomInset
+        ActionPanelView.applyContainerPosition(
+            container = bottomBar,
+            config = panelConfig,
+            insetLeft = 0,
+            insetTop = fallbackTopInset,
+            insetRight = 0,
+            insetBottom = fallbackBottomInset
         )
         ViewCompat.setOnApplyWindowInsetsListener(view) { _, insets ->
             val sysBars = insets.getInsets(
                 WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
             )
+            lastInsetLeft = maxOf(sysBars.left, 0)
+            lastInsetTop = maxOf(sysBars.top, 0)
+            lastInsetRight = maxOf(sysBars.right, 0)
+            lastInsetBottom = maxOf(sysBars.bottom, 0)
             topBar.setPadding(
                 topBar.paddingLeft,
-                topBasePadding + maxOf(sysBars.top, 0),
+                topBasePadding + lastInsetTop,
                 topBar.paddingRight,
                 topBar.paddingBottom
             )
-            bottomBar.setPadding(
-                bottomBar.paddingLeft,
-                bottomBar.paddingTop,
-                bottomBar.paddingRight,
-                bottomBasePadding + maxOf(sysBars.bottom, 0)
+            ActionPanelView.applyContainerPosition(
+                container = bottomBar,
+                config = panelConfig,
+                insetLeft = lastInsetLeft,
+                insetTop = lastInsetTop,
+                insetRight = lastInsetRight,
+                insetBottom = lastInsetBottom
             )
             insets
         }
 
         view.onBackPressedListener = {
             when {
+                uploadConfirmCard?.visibility == View.VISIBLE -> {
+                    uploadConfirmCard?.visibility = View.GONE
+                    pendingConfirmedSearchRegion = null
+                }
                 languageBarHelper?.closePicker() == true -> Unit
                 languageBarHelper?.exitTextSelectMode() == true -> Unit
                 else -> dismiss()
             }
         }
 
+        view.findViewById<View>(R.id.btnFullScreenSelect).setOnClickListener {
+            expandSelectionToFullScreen()
+        }
+
         view.findViewById<ImageButton>(R.id.btnCloseOverlay).setOnClickListener {
             dismiss()
+        }
+
+        view.findViewById<View>(R.id.btnCancelUpload).setOnClickListener {
+            uploadConfirmCard?.visibility = View.GONE
+            pendingConfirmedSearchRegion = null
+            updateStatusHint(null)
+        }
+
+        view.findViewById<View>(R.id.btnProceedUpload).setOnClickListener {
+            uploadConfirmCard?.visibility = View.GONE
+            val region = pendingConfirmedSearchRegion ?: return@setOnClickListener
+            pendingConfirmedSearchRegion = null
+            dispatchVisualSearchNow(service, region)
         }
 
         languageBarHelper = OverlayLanguageBarHelper(
@@ -210,7 +257,7 @@ class BubbleOverlayController(
             onSearchEngineChanged = {
                 val region = selectionView?.getCurrentRegion()
                 if (activeMode == ActionMode.VISUAL_SEARCH && region != null && region.isValid()) {
-                    executeVisualSearch(service, region)
+                    requestVisualSearch(service, region)
                 }
             },
             onTranslateSelectedBlocksRequested = { selectedBlocks ->
@@ -248,14 +295,19 @@ class BubbleOverlayController(
             }
         }
 
-        applyOverlayPreferences()
+        applyOverlayPreferences(themedContext)
         activeMode = preferences.lastActionMode
-        updateActionButtonsUi()
+        val accent = ThemeManager.resolveOverlayAccentColor(themedContext, preferences)
+        actionPanelView?.render(panelConfig, activeMode, accent)
+        actionPanelView?.onActionButtonClick = { actionType ->
+            handlePanelAction(service, actionType)
+        }
+        languageBarHelper?.setVisibleForMode(activeMode)
 
         selectionView?.listener = object : SelectionOverlayView.SelectionListener {
             override fun onSelectionInteractionStarted() {
-                // Immediately cancel any pending auto-launch and hide buttons while resizing/selecting!
                 debounceJob?.cancel()
+                uploadConfirmCard?.visibility = View.GONE
                 updateStatusHint(null)
                 languageBarHelper?.setDraggingMode(true)
             }
@@ -271,6 +323,9 @@ class BubbleOverlayController(
                 languageBarHelper?.setTranslationResultVisible(false)
                 if (preferences.autoQrScanEnabled) {
                     runAutoQrScanForRegion(region)
+                }
+                if (preferences.autoLinkDetectEnabled) {
+                    languageBarHelper?.updateLinksForRegion(region.bounds)
                 }
                 val shouldAutoRun = when (activeMode) {
                     ActionMode.TRANSLATE -> preferences.autoTranslateSelection
@@ -288,28 +343,6 @@ class BubbleOverlayController(
                 btnCopyResultText?.visibility = View.GONE
                 languageBarHelper?.setTranslationResultVisible(false)
                 updateStatusHint(null)
-            }
-        }
-
-        btnTranslate?.setOnClickListener {
-            debounceJob?.cancel()
-            activeMode = ActionMode.TRANSLATE
-            preferences.lastActionMode = activeMode
-            updateActionButtonsUi()
-            val region = selectionView?.getCurrentRegion() ?: return@setOnClickListener
-            if (region.isValid()) {
-                executeTranslate(service, region)
-            }
-        }
-
-        btnVisualSearch?.setOnClickListener {
-            debounceJob?.cancel()
-            activeMode = ActionMode.VISUAL_SEARCH
-            preferences.lastActionMode = activeMode
-            updateActionButtonsUi()
-            val region = selectionView?.getCurrentRegion() ?: return@setOnClickListener
-            if (region.isValid()) {
-                executeVisualSearch(service, region)
             }
         }
 
@@ -331,7 +364,8 @@ class BubbleOverlayController(
             }
         }
 
-        if (preferences.animationsEnabled) {
+        val allowAnim = ThemeManager.areAnimationsAllowed(context, preferences.animationsEnabled)
+        if (allowAnim) {
             view.alpha = 0f
             windowManager.addView(view, params)
             view.requestFocus()
@@ -344,7 +378,6 @@ class BubbleOverlayController(
         }
         currentState = BubbleOverlayState.Selecting(activeMode)
 
-        // Launch background Auto QR Scan + Auto Full-Screen Live Text Scan once view lays out
         view.post {
             if (!isShowing) return@post
             if (preferences.autoQrScanEnabled && sessionSnapshot != null) {
@@ -352,6 +385,90 @@ class BubbleOverlayController(
             }
             runAutoFullScreenTextScan(service)
         }
+    }
+
+    private fun handlePanelAction(service: AccessibilityService?, actionType: ActionPanelButtonType) {
+        debounceJob?.cancel()
+        uploadConfirmCard?.visibility = View.GONE
+        val region = selectionView?.getCurrentRegion() ?: return
+        val lCtx = locCtx()
+
+        when (actionType) {
+            ActionPanelButtonType.TRANSLATE -> {
+                activeMode = ActionMode.TRANSLATE
+                preferences.lastActionMode = activeMode
+                actionPanelView?.updateActiveMode(activeMode)
+                languageBarHelper?.setVisibleForMode(activeMode)
+                if (region.isValid()) executeTranslate(service, region)
+            }
+            ActionPanelButtonType.SEARCH_IMAGE -> {
+                activeMode = ActionMode.VISUAL_SEARCH
+                preferences.lastActionMode = activeMode
+                actionPanelView?.updateActiveMode(activeMode)
+                languageBarHelper?.setVisibleForMode(activeMode)
+                if (region.isValid()) requestVisualSearch(service, region)
+            }
+            ActionPanelButtonType.FULL_SCREEN -> {
+                expandSelectionToFullScreen()
+            }
+            ActionPanelButtonType.SELECT_TEXT -> {
+                languageBarHelper?.enterTextSelectMode()
+            }
+            ActionPanelButtonType.COPY_IMAGE -> executeImageTool(service, region) { bmp ->
+                val ok = OverlayExtraActionsHelper.copyImageToClipboard(context, bmp)
+                Toast.makeText(
+                    context,
+                    lCtx.getString(if (ok) R.string.panel_toast_image_copied else R.string.panel_toast_action_failed),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            ActionPanelButtonType.SAVE_IMAGE -> executeImageTool(service, region) { bmp ->
+                val ok = OverlayExtraActionsHelper.saveImageToGallery(context, bmp)
+                Toast.makeText(
+                    context,
+                    lCtx.getString(if (ok) R.string.panel_toast_image_saved else R.string.panel_toast_action_failed),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            ActionPanelButtonType.SHARE_IMAGE -> executeImageTool(service, region) { bmp ->
+                val ok = OverlayExtraActionsHelper.shareImage(context, bmp, lCtx.getString(R.string.panel_action_share_image))
+                if (ok) dismiss()
+            }
+        }
+    }
+
+    private fun executeImageTool(
+        service: AccessibilityService?,
+        region: SelectionRegion,
+        onBitmapReady: (Bitmap) -> Unit
+    ) {
+        if (!region.isValid()) return
+        activeTaskJob?.cancel()
+        activeTaskJob = scope.launch {
+            val cropped = obtainCroppedBitmap(service, region, entireScreen = false, forOcr = false) ?: return@launch
+            try {
+                onBitmapReady(cropped.bitmap)
+            } finally {
+                if (!cropped.bitmap.isRecycled) cropped.bitmap.recycle()
+            }
+        }
+    }
+
+    private fun expandSelectionToFullScreen() {
+        debounceJob?.cancel()
+        uploadConfirmCard?.visibility = View.GONE
+        pendingConfirmedSearchRegion = null
+        translationRenderer?.clear()
+        btnToggleOriginal?.visibility = View.GONE
+        btnCopyResultText?.visibility = View.GONE
+        languageBarHelper?.setTranslationResultVisible(false)
+        selectionView?.selectFullScreen(
+            insetLeft = lastInsetLeft,
+            insetTop = lastInsetTop,
+            insetRight = lastInsetRight,
+            insetBottom = lastInsetBottom
+        )
+        updateStatusHint(locCtx().getString(R.string.overlay_fullscreen_ready_hint))
     }
 
     private fun runAutoFullScreenTextScan(service: AccessibilityService?) {
@@ -372,9 +489,7 @@ class BubbleOverlayController(
                 emptyList()
             }
 
-            val finalBlocks = if (ocrBlocks.isNotEmpty()) {
-                ocrBlocks
-            } else {
+            val a11yBlocks = if (service != null && (ocrBlocks.isEmpty() || preferences.autoLinkDetectEnabled)) {
                 withContext(Dispatchers.Default) {
                     val fullRect = RectF(0f, 0f, vw.toFloat().coerceAtLeast(1080f), vh.toFloat().coerceAtLeast(1920f))
                     textExtractor.extractFromAccessibilityTree(
@@ -383,10 +498,19 @@ class BubbleOverlayController(
                         entireScreen = true
                     )
                 }
+            } else {
+                emptyList()
             }
 
+            val finalBlocks = if (ocrBlocks.isNotEmpty()) ocrBlocks else a11yBlocks
             if (isShowing && finalBlocks.isNotEmpty()) {
                 languageBarHelper?.setDetectedFullScreenTextBlocks(finalBlocks)
+            }
+            if (isShowing && preferences.autoLinkDetectEnabled && a11yBlocks.isNotEmpty() && ocrBlocks.isNotEmpty()) {
+                val extraLinks = ScreenLinkDetector.extractLinksFromBlocks(a11yBlocks)
+                if (extraLinks.isNotEmpty()) {
+                    languageBarHelper?.mergeExtraDetectedLinks(extraLinks)
+                }
             }
         }
     }
@@ -440,25 +564,13 @@ class BubbleOverlayController(
         }
     }
 
-    private fun applyOverlayPreferences() {
-        selectionView?.apply {
-            shape = preferences.defaultSelectionShape
-            borderColor = preferences.borderColor
-            borderThicknessDp = preferences.borderThicknessDp
-            dimOpacity = preferences.overlayDimOpacity
-            hapticEnabled = preferences.hapticFeedbackEnabled
-        }
-    }
-
-    private fun updateActionButtonsUi() {
-        val translateActive = activeMode == ActionMode.TRANSLATE
-        btnTranslate?.setBackgroundResource(
-            if (translateActive) R.drawable.bg_action_button_active else R.drawable.bg_action_button_inactive
-        )
-        btnVisualSearch?.setBackgroundResource(
-            if (!translateActive) R.drawable.bg_action_button_active else R.drawable.bg_action_button_inactive
-        )
-        languageBarHelper?.setVisibleForMode(activeMode)
+    private fun applyOverlayPreferences(themedContext: Context) {
+        val selConfig = preferences.selectionConfig
+        val themeConfig = preferences.themeConfig
+        val resolvedBorder = ThemeManager.resolveSelectionBorderColor(themedContext, selConfig, themeConfig)
+        val allowAnim = ThemeManager.areAnimationsAllowed(context, selConfig.animationEnabled)
+        selectionView?.applyConfig(selConfig, resolvedBorder, allowAnim)
+        selectionView?.hapticEnabled = preferences.hapticFeedbackEnabled
     }
 
     private fun locCtx(): Context = LocaleHelper.wrapContext(context, preferences.appLanguageCode)
@@ -473,12 +585,20 @@ class BubbleOverlayController(
                 }
                 ActionMode.VISUAL_SEARCH -> {
                     val totalMs = performanceManager.getVisualSearchDebounceMs()
-                    val engineName = preferences.visualSearchEngine.shortLabel
-                    updateStatusHint(locCtx().getString(R.string.overlay_countdown_fmt, engineName, 2))
-                    delay(totalMs / 2)
-                    updateStatusHint(locCtx().getString(R.string.overlay_countdown_fmt, engineName, 1))
-                    delay(totalMs - totalMs / 2)
-                    executeVisualSearch(service, region)
+                    val engineName = searchRegistry.getActiveVisualEngine().name
+                    if (totalMs <= 0L) {
+                        requestVisualSearch(service, region)
+                    } else {
+                        var remainingMs = totalMs
+                        while (remainingMs > 0L) {
+                            val secLabel = ceil(remainingMs / 1000.0).toInt().coerceAtLeast(1)
+                            updateStatusHint(locCtx().getString(R.string.overlay_countdown_fmt, engineName, secLabel))
+                            val stepMs = minOf(1000L, remainingMs)
+                            delay(stepMs)
+                            remainingMs -= stepMs
+                        }
+                        requestVisualSearch(service, region)
+                    }
                 }
             }
         }
@@ -494,7 +614,11 @@ class BubbleOverlayController(
                 sourceLangPref = preferences.sourceLanguageCode,
                 targetLangPref = preferences.targetLanguageCode,
                 autoDetect = preferences.autoDetectLanguage,
-                useCache = preferences.translationCacheEnabled
+                useCache = preferences.translationCacheEnabled,
+                qualityMode = preferences.translationQualityMode,
+                contextProfile = preferences.translationContextProfile,
+                preferredSources = preferences.preferredSourceLanguages,
+                fallbackSourceLang = preferences.fallbackLanguageCode
             )
             languageBarHelper?.lastDetectedSourceLang = translated.firstOrNull()?.detectedLangCode
             showOriginalText = false
@@ -575,7 +699,11 @@ class BubbleOverlayController(
                 sourceLangPref = preferences.sourceLanguageCode,
                 targetLangPref = preferences.targetLanguageCode,
                 autoDetect = preferences.autoDetectLanguage,
-                useCache = preferences.translationCacheEnabled
+                useCache = preferences.translationCacheEnabled,
+                qualityMode = preferences.translationQualityMode,
+                contextProfile = preferences.translationContextProfile,
+                preferredSources = preferences.preferredSourceLanguages,
+                fallbackSourceLang = preferences.fallbackLanguageCode
             )
 
             languageBarHelper?.lastDetectedSourceLang = translated.firstOrNull()?.detectedLangCode
@@ -594,7 +722,18 @@ class BubbleOverlayController(
         }
     }
 
-    private fun executeVisualSearch(service: AccessibilityService?, region: SelectionRegion) {
+    private fun requestVisualSearch(service: AccessibilityService?, region: SelectionRegion) {
+        if (preferences.confirmBeforeImageUpload) {
+            pendingConfirmedSearchRegion = region
+            val engineName = searchRegistry.getActiveVisualEngine().name
+            tvUploadConfirmMsg?.text = locCtx().getString(R.string.search_confirm_upload_msg, engineName)
+            uploadConfirmCard?.visibility = View.VISIBLE
+            return
+        }
+        dispatchVisualSearchNow(service, region)
+    }
+
+    private fun dispatchVisualSearchNow(service: AccessibilityService?, region: SelectionRegion) {
         val decision = safeModeManager.evaluateActiveApp()
         if (decision is SafeModeManager.SafeModeDecision.Blocked) {
             haltAllAndDismiss(decision.reason)
@@ -604,18 +743,19 @@ class BubbleOverlayController(
         activeTaskJob?.cancel()
         activeTaskJob = scope.launch {
             currentState = BubbleOverlayState.Searching(region)
-            val engine = preferences.visualSearchEngine
-            updateStatusHint(locCtx().getString(R.string.overlay_preparing_search_fmt, engine.shortLabel))
+            val engineItem = searchRegistry.getActiveVisualEngine()
+            updateStatusHint(locCtx().getString(R.string.overlay_preparing_search_fmt, engineItem.name))
 
             val cropped = obtainCroppedBitmap(
                 service = service,
                 region = region,
                 entireScreen = false,
-                forOcr = false
+                forOcr = false,
+                maxDimOverride = preferences.searchMaxResolutionPx
             ) ?: return@launch
 
             val dispatch = try {
-                lensManager.launchVisualSearch(cropped.bitmap, engine)
+                lensManager.launchVisualSearch(cropped.bitmap, engineItem)
             } finally {
                 if (!cropped.bitmap.isRecycled) {
                     cropped.bitmap.recycle()
@@ -639,11 +779,13 @@ class BubbleOverlayController(
         service: AccessibilityService?,
         region: SelectionRegion,
         entireScreen: Boolean,
-        forOcr: Boolean
+        forOcr: Boolean,
+        maxDimOverride: Int? = null
     ): CroppedBitmapResult? {
-        val maxDim = performanceManager.getMaxOcrDimensionPx()
+        val maxDim = maxDimOverride ?: performanceManager.getMaxOcrDimensionPx()
         val vw = selectionView?.width ?: 0
         val vh = selectionView?.height ?: 0
+        val qualityMode = preferences.translationQualityMode
 
         val existing = sessionSnapshot
         if (existing != null && !existing.isRecycled) {
@@ -664,7 +806,8 @@ class BubbleOverlayController(
                     maxDimensionPx = maxDim,
                     viewWidth = vw,
                     viewHeight = vh,
-                    forOcr = forOcr
+                    forOcr = forOcr,
+                    qualityMode = qualityMode
                 )
             }
         }
@@ -695,16 +838,17 @@ class BubbleOverlayController(
                             maxDimensionPx = maxDim,
                             viewWidth = vw,
                             viewHeight = vh,
-                            forOcr = forOcr
+                            forOcr = forOcr,
+                            qualityMode = qualityMode
                         )
                     }
                 }
                 ScreenCaptureManager.FullScreenCaptureResult.ProtectedContent -> {
-                    haltAllAndDismiss("Layar dilindungi FLAG_SECURE. Bubble tidak membaca konten terlindungi.")
+                    haltAllAndDismiss(locCtx().getString(R.string.overlay_flag_secure_blocked))
                     null
                 }
                 ScreenCaptureManager.FullScreenCaptureResult.RateLimited -> {
-                    updateStatusHint("Tunggu sebentar sebelum memindai ulang...")
+                    updateStatusHint(locCtx().getString(R.string.overlay_wait_rate_limit))
                     null
                 }
                 is ScreenCaptureManager.FullScreenCaptureResult.Failed -> {
@@ -716,7 +860,7 @@ class BubbleOverlayController(
 
         if (!screenCaptureManager.hasActiveGrant) {
             pendingRegionAfterConsent = region
-            updateStatusHint("Meminta izin capture layar...")
+            updateStatusHint(locCtx().getString(R.string.overlay_requesting_capture))
             rootView?.visibility = View.GONE
             MediaProjectionConsentActivity.launch(context)
             return null
@@ -730,7 +874,7 @@ class BubbleOverlayController(
         return when (captureResult) {
             is ScreenCaptureManager.CaptureResult.Success -> captureResult.cropped
             ScreenCaptureManager.CaptureResult.ProtectedContent -> {
-                haltAllAndDismiss("Layar dilindungi FLAG_SECURE. Bubble tidak membaca konten terlindungi.")
+                haltAllAndDismiss(locCtx().getString(R.string.overlay_flag_secure_blocked))
                 null
             }
             ScreenCaptureManager.CaptureResult.PermissionRequired -> {
@@ -754,7 +898,7 @@ class BubbleOverlayController(
         pendingRegionAfterConsent = null
         when (activeMode) {
             ActionMode.TRANSLATE -> executeTranslate(service, region)
-            ActionMode.VISUAL_SEARCH -> executeVisualSearch(service, region)
+            ActionMode.VISUAL_SEARCH -> requestVisualSearch(service, region)
         }
     }
 
@@ -762,7 +906,7 @@ class BubbleOverlayController(
         rootView?.visibility = View.VISIBLE
         rootView?.requestFocus()
         pendingRegionAfterConsent = null
-        updateStatusHint("Izin screen capture ditolak.")
+        updateStatusHint(locCtx().getString(R.string.overlay_capture_denied))
     }
 
     fun haltAllAndDismiss(notice: String? = null) {
@@ -771,6 +915,7 @@ class BubbleOverlayController(
         qrScanJob?.cancel()
         fullScreenTextJob?.cancel()
         pendingRegionAfterConsent = null
+        pendingConfirmedSearchRegion = null
         replaceSessionSnapshot(null)
         screenCaptureManager.releaseSession()
         MediaProjectionService.stop(context)
@@ -799,12 +944,22 @@ class BubbleOverlayController(
         }
         val view = rootView
         rootView = null
+        selectionView = null
+        translationRenderer = null
+        actionPanelView = null
+        bottomActionRow = null
+        btnToggleOriginal = null
+        btnCopyResultText = null
+        tvStatusHint = null
+        topBarSpacer = null
+        uploadConfirmCard = null
+        tvUploadConfirmMsg = null
         languageBarHelper = null
         activeServiceRef = null
-        if (view != null) {
-            runCatching { windowManager.removeView(view) }
-        }
         currentState = BubbleOverlayState.Idle
+        if (view != null) {
+            runCatching { windowManager.removeViewImmediate(view) }
+        }
     }
 
     private fun replaceSessionSnapshot(newBitmap: Bitmap?) {

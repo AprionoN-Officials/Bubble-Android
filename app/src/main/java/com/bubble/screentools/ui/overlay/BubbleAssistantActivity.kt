@@ -9,7 +9,6 @@ import android.view.WindowManager
 import android.widget.Button
 import android.widget.ImageButton
 import android.widget.ImageView
-import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
@@ -23,7 +22,9 @@ import com.bubble.screentools.capture.BitmapCropHelper
 import com.bubble.screentools.capture.SessionSnapshotStore
 import com.bubble.screentools.data.BubblePreferences
 import com.bubble.screentools.lens.LensIntegrationManager
+import com.bubble.screentools.lens.SearchEngineRegistry
 import com.bubble.screentools.model.ActionMode
+import com.bubble.screentools.model.ActionPanelButtonType
 import com.bubble.screentools.model.BubbleOverlayState
 import com.bubble.screentools.model.SelectionRegion
 import com.bubble.screentools.model.SelectionShape
@@ -31,26 +32,31 @@ import com.bubble.screentools.model.TextBlockResult
 import com.bubble.screentools.ocr.OCRManager
 import com.bubble.screentools.qr.QrActionHelper
 import com.bubble.screentools.qr.QrCodeScanner
+import com.bubble.screentools.theme.ThemeManager
 import com.bubble.screentools.translation.LanguageDetectionManager
 import com.bubble.screentools.translation.TranslationManager
 import com.bubble.screentools.util.PerformanceManager
+import com.bubble.screentools.util.ScreenLinkDetector
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.math.ceil
 
 /**
  * Fullscreen edge-to-edge session UI launched when Bubble is invoked as the
- * Default Digital Assistant (like CircleToSearch v0.5).
- * Includes Auto QR Code detection, Auto Full-Screen Live Text Select & Copy (without Lens!),
- * cancelable Visual Search countdown, and high-accuracy OCR-first text detection.
+ * Default Digital Assistant (zero recording prompt, zero Accessibility required).
+ * Integrates custom Selection appearance, custom Action Panel (with 2-button default),
+ * Quality/Context Translation, Multi-Engine Search, Auto QR, Auto Link Detection, Live Text,
+ * and Copy/Save/Share image actions.
  */
 class BubbleAssistantActivity : AppCompatActivity() {
 
     private lateinit var preferences: BubblePreferences
     private lateinit var performanceManager: PerformanceManager
     private lateinit var lensManager: LensIntegrationManager
+    private lateinit var searchRegistry: SearchEngineRegistry
     private lateinit var ocrManager: OCRManager
 
     private val qrScanner = QrCodeScanner()
@@ -63,12 +69,16 @@ class BubbleAssistantActivity : AppCompatActivity() {
     private lateinit var ivFrozenScreen: ImageView
     private lateinit var selectionView: SelectionOverlayView
     private lateinit var translationRenderer: TranslationOverlayRenderer
-    private lateinit var btnTranslate: LinearLayout
-    private lateinit var btnVisualSearch: LinearLayout
+    private lateinit var actionPanelView: ActionPanelView
+    private lateinit var bottomActionRow: View
     private lateinit var btnToggleOriginal: Button
     private lateinit var btnCopyResultText: Button
     private lateinit var tvStatusHint: TextView
     private lateinit var topBarSpacer: View
+    private lateinit var uploadConfirmCard: View
+    private lateinit var tvUploadConfirmMsg: TextView
+    private lateinit var btnCancelUpload: View
+    private lateinit var btnProceedUpload: View
     private lateinit var languageBarHelper: OverlayLanguageBarHelper
 
     private var activeMode: ActionMode = ActionMode.TRANSLATE
@@ -78,9 +88,17 @@ class BubbleAssistantActivity : AppCompatActivity() {
     private var qrScanJob: Job? = null
     private var fullScreenTextJob: Job? = null
     private var showOriginalText = false
+    private var pendingConfirmedSearchRegion: SelectionRegion? = null
+    private var lastInsetLeft = 0
+    private var lastInsetTop = 0
+    private var lastInsetRight = 0
+    private var lastInsetBottom = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        preferences = BubblePreferences(this)
+        ThemeManager.applyToActivityBeforeContent(this, preferences)
         super.onCreate(savedInstanceState)
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             overrideActivityTransition(OVERRIDE_TRANSITION_OPEN, 0, 0)
             overrideActivityTransition(OVERRIDE_TRANSITION_CLOSE, 0, 0)
@@ -106,9 +124,9 @@ class BubbleAssistantActivity : AppCompatActivity() {
         frozenScreenshot = payload.screenshot
         assistTextBlocks = payload.assistTextBlocks
 
-        preferences = BubblePreferences(this)
         performanceManager = PerformanceManager(preferences)
         lensManager = LensIntegrationManager(this)
+        searchRegistry = SearchEngineRegistry(preferences)
         ocrManager = OCRManager(this, preferences)
         activeMode = preferences.lastActionMode
 
@@ -116,39 +134,48 @@ class BubbleAssistantActivity : AppCompatActivity() {
 
         val root = findViewById<OverlayRootFrameLayout>(R.id.overlayRoot)
         val topBar = findViewById<View>(R.id.topControlsBar)
-        val bottomBar = findViewById<View>(R.id.bottomActionRow)
+        bottomActionRow = findViewById(R.id.bottomActionRow)
         ivFrozenScreen = findViewById(R.id.ivFrozenScreen)
         selectionView = findViewById(R.id.selectionOverlayView)
         translationRenderer = findViewById(R.id.translationOverlayRenderer)
-        btnTranslate = findViewById(R.id.btnActionTranslate)
-        btnVisualSearch = findViewById(R.id.btnActionVisualSearch)
+        actionPanelView = findViewById(R.id.primaryActionButtonsRow)
         btnToggleOriginal = findViewById(R.id.btnToggleOriginal)
         btnCopyResultText = findViewById(R.id.btnCopyResultText)
         tvStatusHint = findViewById(R.id.tvStatusHint)
         topBarSpacer = findViewById(R.id.topBarSpacer)
+        uploadConfirmCard = findViewById(R.id.uploadConfirmCard)
+        tvUploadConfirmMsg = findViewById(R.id.tvUploadConfirmMsg)
+        btnCancelUpload = findViewById(R.id.btnCancelUpload)
+        btnProceedUpload = findViewById(R.id.btnProceedUpload)
 
         if (frozenScreenshot != null) {
             ivFrozenScreen.setImageBitmap(frozenScreenshot)
             ivFrozenScreen.visibility = View.VISIBLE
         }
 
+        val panelConfig = preferences.actionPanelConfig
         val topBasePadding = topBar.paddingTop
-        val bottomBasePadding = bottomBar.paddingBottom
         ViewCompat.setOnApplyWindowInsetsListener(root) { _, insets ->
             val sysBars = insets.getInsets(
                 WindowInsetsCompat.Type.systemBars() or WindowInsetsCompat.Type.displayCutout()
             )
+            lastInsetLeft = sysBars.left
+            lastInsetTop = sysBars.top
+            lastInsetRight = sysBars.right
+            lastInsetBottom = sysBars.bottom
             topBar.setPadding(
                 topBar.paddingLeft,
                 topBasePadding + sysBars.top,
                 topBar.paddingRight,
                 topBar.paddingBottom
             )
-            bottomBar.setPadding(
-                bottomBar.paddingLeft,
-                bottomBar.paddingTop,
-                bottomBar.paddingRight,
-                bottomBasePadding + sysBars.bottom
+            ActionPanelView.applyContainerPosition(
+                container = bottomActionRow,
+                config = panelConfig,
+                insetLeft = sysBars.left,
+                insetTop = sysBars.top,
+                insetRight = sysBars.right,
+                insetBottom = sysBars.bottom
             )
             insets
         }
@@ -156,6 +183,10 @@ class BubbleAssistantActivity : AppCompatActivity() {
 
         val handleBack: () -> Unit = {
             when {
+                uploadConfirmCard.visibility == View.VISIBLE -> {
+                    uploadConfirmCard.visibility = View.GONE
+                    pendingConfirmedSearchRegion = null
+                }
                 languageBarHelper.closePicker() -> Unit
                 languageBarHelper.exitTextSelectMode() -> Unit
                 else -> finishCleanly()
@@ -166,8 +197,25 @@ class BubbleAssistantActivity : AppCompatActivity() {
             override fun handleOnBackPressed() = handleBack()
         })
 
+        findViewById<View>(R.id.btnFullScreenSelect).setOnClickListener {
+            expandSelectionToFullScreen()
+        }
+
         findViewById<ImageButton>(R.id.btnCloseOverlay).setOnClickListener {
             finishCleanly()
+        }
+
+        btnCancelUpload.setOnClickListener {
+            uploadConfirmCard.visibility = View.GONE
+            pendingConfirmedSearchRegion = null
+            updateStatusHint(null)
+        }
+
+        btnProceedUpload.setOnClickListener {
+            uploadConfirmCard.visibility = View.GONE
+            val region = pendingConfirmedSearchRegion ?: return@setOnClickListener
+            pendingConfirmedSearchRegion = null
+            dispatchVisualSearchNow(region)
         }
 
         languageBarHelper = OverlayLanguageBarHelper(
@@ -183,7 +231,7 @@ class BubbleAssistantActivity : AppCompatActivity() {
             onSearchEngineChanged = {
                 val region = selectionView.getCurrentRegion()
                 if (activeMode == ActionMode.VISUAL_SEARCH && region.isValid()) {
-                    executeVisualSearch(region)
+                    requestVisualSearch(region)
                 }
             },
             onTranslateSelectedBlocksRequested = { selectedBlocks ->
@@ -221,19 +269,13 @@ class BubbleAssistantActivity : AppCompatActivity() {
             }
         }
 
-        selectionView.apply {
-            shape = preferences.defaultSelectionShape
-            borderColor = preferences.borderColor
-            borderThicknessDp = preferences.borderThicknessDp
-            dimOpacity = preferences.overlayDimOpacity
-            hapticEnabled = preferences.hapticFeedbackEnabled
-        }
-        updateActionButtonsUi()
+        applySelectionPreferences()
+        setupActionPanel()
 
         selectionView.listener = object : SelectionOverlayView.SelectionListener {
             override fun onSelectionInteractionStarted() {
-                // Immediately cancel any pending auto-launch and hide buttons while resizing/selecting!
                 debounceJob?.cancel()
+                uploadConfirmCard.visibility = View.GONE
                 updateStatusHint(null)
                 languageBarHelper.setDraggingMode(true)
             }
@@ -249,6 +291,9 @@ class BubbleAssistantActivity : AppCompatActivity() {
                 languageBarHelper.setTranslationResultVisible(false)
                 if (preferences.autoQrScanEnabled) {
                     runAutoQrScanForRegion(region)
+                }
+                if (preferences.autoLinkDetectEnabled) {
+                    languageBarHelper.updateLinksForRegion(region.bounds)
                 }
                 val shouldAutoRun = when (activeMode) {
                     ActionMode.TRANSLATE -> preferences.autoTranslateSelection
@@ -269,31 +314,8 @@ class BubbleAssistantActivity : AppCompatActivity() {
             }
         }
 
-        btnTranslate.setOnClickListener {
-            debounceJob?.cancel()
-            activeMode = ActionMode.TRANSLATE
-            preferences.lastActionMode = activeMode
-            updateActionButtonsUi()
-            val region = selectionView.getCurrentRegion()
-            if (region.isValid()) {
-                executeTranslate(region)
-            }
-        }
-
-        btnVisualSearch.setOnClickListener {
-            debounceJob?.cancel()
-            activeMode = ActionMode.VISUAL_SEARCH
-            preferences.lastActionMode = activeMode
-            updateActionButtonsUi()
-            val region = selectionView.getCurrentRegion()
-            if (region.isValid()) {
-                executeVisualSearch(region)
-            }
-        }
-
         currentState = BubbleOverlayState.Selecting(activeMode)
 
-        // Auto-scan QR codes + full-screen Live Text immediately once view dimensions are ready!
         root.post {
             if (isFinishing) return@post
             if (preferences.autoQrScanEnabled && frozenScreenshot != null) {
@@ -301,6 +323,117 @@ class BubbleAssistantActivity : AppCompatActivity() {
             }
             runAutoFullScreenTextScan()
         }
+    }
+
+    private fun applySelectionPreferences() {
+        val selConfig = preferences.selectionConfig
+        val themeConfig = preferences.themeConfig
+        val resolvedBorder = ThemeManager.resolveSelectionBorderColor(this, selConfig, themeConfig)
+        val allowAnim = ThemeManager.areAnimationsAllowed(this, selConfig.animationEnabled)
+        selectionView.applyConfig(selConfig, resolvedBorder, allowAnim)
+        selectionView.hapticEnabled = preferences.hapticFeedbackEnabled
+    }
+
+    private fun setupActionPanel() {
+        val accent = ThemeManager.resolveOverlayAccentColor(this, preferences)
+        actionPanelView.render(preferences.actionPanelConfig, activeMode, accent)
+        actionPanelView.onActionButtonClick = { actionType ->
+            handlePanelAction(actionType)
+        }
+        languageBarHelper.setVisibleForMode(activeMode)
+    }
+
+    private fun handlePanelAction(actionType: ActionPanelButtonType) {
+        debounceJob?.cancel()
+        uploadConfirmCard.visibility = View.GONE
+        val region = selectionView.getCurrentRegion()
+
+        when (actionType) {
+            ActionPanelButtonType.TRANSLATE -> {
+                activeMode = ActionMode.TRANSLATE
+                preferences.lastActionMode = activeMode
+                actionPanelView.updateActiveMode(activeMode)
+                languageBarHelper.setVisibleForMode(activeMode)
+                if (region.isValid()) executeTranslate(region)
+            }
+            ActionPanelButtonType.SEARCH_IMAGE -> {
+                activeMode = ActionMode.VISUAL_SEARCH
+                preferences.lastActionMode = activeMode
+                actionPanelView.updateActiveMode(activeMode)
+                languageBarHelper.setVisibleForMode(activeMode)
+                if (region.isValid()) requestVisualSearch(region)
+            }
+            ActionPanelButtonType.FULL_SCREEN -> {
+                expandSelectionToFullScreen()
+            }
+            ActionPanelButtonType.SELECT_TEXT -> {
+                languageBarHelper.enterTextSelectMode()
+            }
+            ActionPanelButtonType.COPY_IMAGE -> executeImageTool(region) { bmp ->
+                val ok = OverlayExtraActionsHelper.copyImageToClipboard(this, bmp)
+                Toast.makeText(
+                    this,
+                    getString(if (ok) R.string.panel_toast_image_copied else R.string.panel_toast_action_failed),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            ActionPanelButtonType.SAVE_IMAGE -> executeImageTool(region) { bmp ->
+                val ok = OverlayExtraActionsHelper.saveImageToGallery(this, bmp)
+                Toast.makeText(
+                    this,
+                    getString(if (ok) R.string.panel_toast_image_saved else R.string.panel_toast_action_failed),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+            ActionPanelButtonType.SHARE_IMAGE -> executeImageTool(region) { bmp ->
+                val ok = OverlayExtraActionsHelper.shareImage(this, bmp, getString(R.string.panel_action_share_image))
+                if (ok) finishCleanly()
+            }
+        }
+    }
+
+    private fun executeImageTool(region: SelectionRegion, onBitmapReady: (Bitmap) -> Unit) {
+        val snapshot = frozenScreenshot
+        if (snapshot == null || snapshot.isRecycled) {
+            updateStatusHint(getString(R.string.overlay_flag_secure_blocked))
+            return
+        }
+        if (!region.isValid()) return
+        activeTaskJob?.cancel()
+        activeTaskJob = lifecycleScope.launch {
+            val cropped = withContext(Dispatchers.Default) {
+                BitmapCropHelper.cropAndMask(
+                    source = snapshot,
+                    region = region,
+                    maxDimensionPx = 2400,
+                    viewWidth = selectionView.width,
+                    viewHeight = selectionView.height,
+                    forOcr = false
+                )
+            }
+            try {
+                onBitmapReady(cropped.bitmap)
+            } finally {
+                if (!cropped.bitmap.isRecycled) cropped.bitmap.recycle()
+            }
+        }
+    }
+
+    private fun expandSelectionToFullScreen() {
+        debounceJob?.cancel()
+        uploadConfirmCard.visibility = View.GONE
+        pendingConfirmedSearchRegion = null
+        translationRenderer.clear()
+        btnToggleOriginal.visibility = View.GONE
+        btnCopyResultText.visibility = View.GONE
+        languageBarHelper.setTranslationResultVisible(false)
+        selectionView.selectFullScreen(
+            insetLeft = lastInsetLeft,
+            insetTop = lastInsetTop,
+            insetRight = lastInsetRight,
+            insetBottom = lastInsetBottom
+        )
+        updateStatusHint(getString(R.string.overlay_fullscreen_ready_hint))
     }
 
     private fun runAutoFullScreenTextScan() {
@@ -324,6 +457,12 @@ class BubbleAssistantActivity : AppCompatActivity() {
             val finalBlocks = if (ocrBlocks.isNotEmpty()) ocrBlocks else assistTextBlocks
             if (!isFinishing && finalBlocks.isNotEmpty()) {
                 languageBarHelper.setDetectedFullScreenTextBlocks(finalBlocks)
+            }
+            if (!isFinishing && preferences.autoLinkDetectEnabled && assistTextBlocks.isNotEmpty()) {
+                val extraLinks = ScreenLinkDetector.extractLinksFromBlocks(assistTextBlocks)
+                if (extraLinks.isNotEmpty()) {
+                    languageBarHelper.mergeExtraDetectedLinks(extraLinks)
+                }
             }
         }
     }
@@ -375,17 +514,6 @@ class BubbleAssistantActivity : AppCompatActivity() {
         }
     }
 
-    private fun updateActionButtonsUi() {
-        val translateActive = activeMode == ActionMode.TRANSLATE
-        btnTranslate.setBackgroundResource(
-            if (translateActive) R.drawable.bg_action_button_active else R.drawable.bg_action_button_inactive
-        )
-        btnVisualSearch.setBackgroundResource(
-            if (!translateActive) R.drawable.bg_action_button_active else R.drawable.bg_action_button_inactive
-        )
-        languageBarHelper.setVisibleForMode(activeMode)
-    }
-
     private fun scheduleDebouncedAction(region: SelectionRegion) {
         debounceJob?.cancel()
         debounceJob = lifecycleScope.launch {
@@ -396,12 +524,20 @@ class BubbleAssistantActivity : AppCompatActivity() {
                 }
                 ActionMode.VISUAL_SEARCH -> {
                     val totalMs = performanceManager.getVisualSearchDebounceMs()
-                    val engineName = preferences.visualSearchEngine.shortLabel
-                    updateStatusHint(getString(R.string.overlay_countdown_fmt, engineName, 2))
-                    delay(totalMs / 2)
-                    updateStatusHint(getString(R.string.overlay_countdown_fmt, engineName, 1))
-                    delay(totalMs - totalMs / 2)
-                    executeVisualSearch(region)
+                    val engineName = searchRegistry.getActiveVisualEngine().name
+                    if (totalMs <= 0L) {
+                        requestVisualSearch(region)
+                    } else {
+                        var remainingMs = totalMs
+                        while (remainingMs > 0L) {
+                            val secLabel = ceil(remainingMs / 1000.0).toInt().coerceAtLeast(1)
+                            updateStatusHint(getString(R.string.overlay_countdown_fmt, engineName, secLabel))
+                            val stepMs = minOf(1000L, remainingMs)
+                            delay(stepMs)
+                            remainingMs -= stepMs
+                        }
+                        requestVisualSearch(region)
+                    }
                 }
             }
         }
@@ -417,7 +553,11 @@ class BubbleAssistantActivity : AppCompatActivity() {
                 sourceLangPref = preferences.sourceLanguageCode,
                 targetLangPref = preferences.targetLanguageCode,
                 autoDetect = preferences.autoDetectLanguage,
-                useCache = preferences.translationCacheEnabled
+                useCache = preferences.translationCacheEnabled,
+                qualityMode = preferences.translationQualityMode,
+                contextProfile = preferences.translationContextProfile,
+                preferredSources = preferences.preferredSourceLanguages,
+                fallbackSourceLang = preferences.fallbackLanguageCode
             )
             languageBarHelper.lastDetectedSourceLang = translated.firstOrNull()?.detectedLangCode
             showOriginalText = false
@@ -463,7 +603,8 @@ class BubbleAssistantActivity : AppCompatActivity() {
                         maxDimensionPx = performanceManager.getMaxOcrDimensionPx(),
                         viewWidth = vw,
                         viewHeight = vh,
-                        forOcr = true
+                        forOcr = true,
+                        qualityMode = preferences.translationQualityMode
                     )
                 }
                 try {
@@ -506,7 +647,11 @@ class BubbleAssistantActivity : AppCompatActivity() {
                 sourceLangPref = preferences.sourceLanguageCode,
                 targetLangPref = preferences.targetLanguageCode,
                 autoDetect = preferences.autoDetectLanguage,
-                useCache = preferences.translationCacheEnabled
+                useCache = preferences.translationCacheEnabled,
+                qualityMode = preferences.translationQualityMode,
+                contextProfile = preferences.translationContextProfile,
+                preferredSources = preferences.preferredSourceLanguages,
+                fallbackSourceLang = preferences.fallbackLanguageCode
             )
 
             languageBarHelper.lastDetectedSourceLang = translated.firstOrNull()?.detectedLangCode
@@ -525,7 +670,18 @@ class BubbleAssistantActivity : AppCompatActivity() {
         }
     }
 
-    private fun executeVisualSearch(region: SelectionRegion) {
+    private fun requestVisualSearch(region: SelectionRegion) {
+        if (preferences.confirmBeforeImageUpload) {
+            pendingConfirmedSearchRegion = region
+            val engineName = searchRegistry.getActiveVisualEngine().name
+            tvUploadConfirmMsg.text = getString(R.string.search_confirm_upload_msg, engineName)
+            uploadConfirmCard.visibility = View.VISIBLE
+            return
+        }
+        dispatchVisualSearchNow(region)
+    }
+
+    private fun dispatchVisualSearchNow(region: SelectionRegion) {
         val snapshot = frozenScreenshot
         if (snapshot == null || snapshot.isRecycled) {
             updateStatusHint(getString(R.string.overlay_flag_secure_blocked))
@@ -535,21 +691,21 @@ class BubbleAssistantActivity : AppCompatActivity() {
         activeTaskJob?.cancel()
         activeTaskJob = lifecycleScope.launch {
             currentState = BubbleOverlayState.Searching(region)
-            val engine = preferences.visualSearchEngine
-            updateStatusHint(getString(R.string.overlay_preparing_search_fmt, engine.shortLabel))
+            val engineItem = searchRegistry.getActiveVisualEngine()
+            updateStatusHint(getString(R.string.overlay_preparing_search_fmt, engineItem.name))
 
             val cropped = withContext(Dispatchers.Default) {
                 BitmapCropHelper.cropAndMask(
                     source = snapshot,
                     region = region,
-                    maxDimensionPx = performanceManager.getMaxOcrDimensionPx(),
+                    maxDimensionPx = preferences.searchMaxResolutionPx,
                     viewWidth = selectionView.width,
                     viewHeight = selectionView.height,
                     forOcr = false
                 )
             }
             val dispatch = try {
-                lensManager.launchVisualSearch(cropped.bitmap, engine)
+                lensManager.launchVisualSearch(cropped.bitmap, engineItem)
             } finally {
                 if (!cropped.bitmap.isRecycled) {
                     cropped.bitmap.recycle()
@@ -585,7 +741,7 @@ class BubbleAssistantActivity : AppCompatActivity() {
         activeTaskJob?.cancel()
         qrScanJob?.cancel()
         fullScreenTextJob?.cancel()
-        finish()
+        finishAndRemoveTask()
     }
 
     override fun onDestroy() {

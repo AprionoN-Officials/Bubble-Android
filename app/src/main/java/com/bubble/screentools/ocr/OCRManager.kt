@@ -3,6 +3,7 @@ package com.bubble.screentools.ocr
 import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.RectF
+import android.os.Build
 import com.bubble.screentools.capture.BitmapCropHelper
 import com.bubble.screentools.data.BubblePreferences
 import com.bubble.screentools.model.TextBlockResult
@@ -82,7 +83,7 @@ class OCRManager(
     ): List<TextBlockResult> {
         if (source.isRecycled) return emptyList()
         val safeSource = withContext(Dispatchers.Default) {
-            if (source.config == Bitmap.Config.HARDWARE) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && source.config == Bitmap.Config.HARDWARE) {
                 source.copy(Bitmap.Config.ARGB_8888, false)
             } else {
                 source
@@ -136,6 +137,8 @@ class OCRManager(
             cont.resume(emptyList())
             return@suspendCancellableCoroutine
         }
+        val safeScaleX = if (scaleX.isFinite() && scaleX > 0f) scaleX else 1f
+        val safeScaleY = if (scaleY.isFinite() && scaleY > 0f) scaleY else 1f
         val image = InputImage.fromBitmap(bitmap, 0)
         getOrCreateRecognizer().process(image)
             .addOnSuccessListener { visionText ->
@@ -144,10 +147,10 @@ class OCRManager(
                     val box = block.boundingBox ?: return@mapNotNull null
                     if (clean.isEmpty()) return@mapNotNull null
                     val mapped = RectF(
-                        cropOffsetLeft + (box.left - padPx) / scaleX,
-                        cropOffsetTop + (box.top - padPx) / scaleY,
-                        cropOffsetLeft + (box.right - padPx) / scaleX,
-                        cropOffsetTop + (box.bottom - padPx) / scaleY
+                        cropOffsetLeft + (box.left - padPx) / safeScaleX,
+                        cropOffsetTop + (box.top - padPx) / safeScaleY,
+                        cropOffsetLeft + (box.right - padPx) / safeScaleX,
+                        cropOffsetTop + (box.bottom - padPx) / safeScaleY
                     )
                     TextBlockResult(
                         text = clean,
@@ -155,10 +158,13 @@ class OCRManager(
                         fromAccessibility = false
                     )
                 }
-                cont.resume(blocks)
+                if (cont.isActive) cont.resume(blocks)
             }
             .addOnFailureListener {
-                cont.resume(emptyList())
+                if (cont.isActive) cont.resume(emptyList())
+            }
+            .addOnCanceledListener {
+                if (cont.isActive) cont.resume(emptyList())
             }
     }
 

@@ -86,11 +86,7 @@ class BubbleVoiceInteractionSession(context: Context) : VoiceInteractionSession(
         super.onHandleScreenshot(screenshot)
         capturedScreenshot = screenshot?.let { bmp ->
             runCatching {
-                if (bmp.config == Bitmap.Config.HARDWARE) {
-                    bmp.copy(Bitmap.Config.ARGB_8888, false)
-                } else {
-                    bmp.copy(Bitmap.Config.ARGB_8888, false)
-                }
+                bmp.copy(Bitmap.Config.ARGB_8888, false)
             }.getOrNull()
         }
         screenshotReceived = true
@@ -149,7 +145,11 @@ class BubbleVoiceInteractionSession(context: Context) : VoiceInteractionSession(
             )
         }
         runCatching {
-            startAssistantActivity(intent)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                startAssistantActivity(intent)
+            } else {
+                context.startActivity(intent)
+            }
         }.onFailure {
             context.startActivity(intent)
         }
@@ -198,7 +198,7 @@ class BubbleVoiceInteractionSession(context: Context) : VoiceInteractionSession(
         seen: MutableSet<String>
     ) {
         if (node.visibility != View.VISIBLE) return
-        if (isPasswordInputType(node.inputType)) return
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && isPasswordInputType(node.inputType)) return
 
         val absLeft = offsetX + node.left
         val absTop = offsetY + node.top

@@ -2,12 +2,12 @@
 <resources>
     <color name="bubble_primary_blue">#2196F3</color>
     <color name="bubble_accent_blue">#42A5F5</color>
-    <color name="bubble_dark_surface">#1A1C22</color>
+    <color name="bubble_dark_surface">#202124</color>
     <color name="bubble_light_surface">#FFFFFF</color>
     <color name="bubble_overlay_dim">#66000000</color>
     <color name="bubble_handle_fill">#FFFFFF</color>
     <color name="bubble_handle_stroke">#2196F3</color>
-    <color name="bubble_neutral_button">#E61B1D24</color>
+    <color name="bubble_neutral_button">#CC202124</color>
     <color name="bubble_status_ok">#16A34A</color>
     <color name="bubble_status_warn">#D97706</color>
     <color name="bubble_status_blocked">#DC2626</color>

@@ -1,5 +1,6 @@
 # Gradle & Build outputs
 .gradle/
+.kotlin/
 build/
 app/build/
 captures/
@@ -7,6 +8,11 @@ captures/
 *.aab
 *.ap_
 *.dex
+
+# Local i18n scratch & UI reference screenshots
+tools/i18n/__pycache__/
+tools/i18n/out/
+tools/i18n/ui-references/
 
 # Keystores & secrets (NEVER commit private signing keys!)
 keystore/

@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.bubble.screentools.ui.overlay.OverlayRootFrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/overlayRoot"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -68,6 +69,19 @@
             android:layout_weight="1" />
 
         <Button
+            android:id="@+id/btnFullScreenSelect"
+            android:layout_width="wrap_content"
+            android:layout_height="34dp"
+            android:layout_marginEnd="5dp"
+            android:background="@drawable/bg_action_button_inactive"
+            android:minWidth="0dp"
+            android:paddingHorizontal="10dp"
+            android:text="@string/panel_action_full_screen"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFF"
+            android:textSize="11.5sp" />
+
+        <Button
             android:id="@+id/btnSelectTextMode"
             android:layout_width="wrap_content"
             android:layout_height="34dp"
@@ -130,7 +144,7 @@
             android:background="@drawable/bg_action_button_inactive"
             android:contentDescription="@string/overlay_close_cd"
             android:src="@android:drawable/ic_menu_close_clear_cancel"
-            android:tint="#FFFFFF" />
+            app:tint="#FFFFFF" />
     </LinearLayout>
 
     <!-- Bottom Controls Container (auto-hides while dragging/selecting and when reading translations!) -->
@@ -199,7 +213,7 @@
                     android:paddingBottom="10dp"
                     android:text="@string/overlay_tap_text_hint"
                     android:textColor="#FFFFFF"
-                    android:textIsSelectable="true"
+                    android:textColorLink="#64B5F6"
                     android:textSize="13.5sp" />
             </ScrollView>
 
@@ -282,16 +296,17 @@
                     android:textSize="11sp"
                     android:textStyle="bold" />
 
-                <TextView
+                <ImageView
                     android:id="@+id/btnDismissQr"
                     android:layout_width="28dp"
                     android:layout_height="28dp"
                     android:clickable="true"
+                    android:contentDescription="@string/btn_close"
                     android:focusable="true"
-                    android:gravity="center"
-                    android:text="✕"
-                    android:textColor="#CCFFFFFF"
-                    android:textSize="14sp" />
+                    android:padding="5dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_close"
+                    app:tint="#CCFFFFFF" />
             </LinearLayout>
 
             <TextView
@@ -354,6 +369,119 @@
             </LinearLayout>
         </LinearLayout>
 
+        <!-- Auto-Detected Screen Link Quick Action Card (non-blocking, yields priority to QR card) -->
+        <LinearLayout
+            android:id="@+id/linkResultCard"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:background="@drawable/bg_action_button_inactive"
+            android:clickable="true"
+            android:focusable="true"
+            android:orientation="vertical"
+            android:padding="14dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:layout_width="15dp"
+                    android:layout_height="15dp"
+                    android:layout_marginEnd="6dp"
+                    android:contentDescription="@null"
+                    android:src="@drawable/ic_link"
+                    app:tint="#4DD0E1" />
+
+                <TextView
+                    android:id="@+id/tvLinkBadge"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="@string/overlay_link_badge"
+                    android:textColor="#4DD0E1"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+
+                <ImageView
+                    android:id="@+id/btnDismissLink"
+                    android:layout_width="28dp"
+                    android:layout_height="28dp"
+                    android:clickable="true"
+                    android:contentDescription="@string/btn_close"
+                    android:focusable="true"
+                    android:padding="5dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_close"
+                    app:tint="#CCFFFFFF" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/tvLinkTitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="1"
+                android:paddingTop="2dp"
+                android:text="@string/overlay_link_found_title"
+                android:textColor="#FFFFFF"
+                android:textSize="15sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/tvLinkSubtitle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ellipsize="end"
+                android:maxLines="2"
+                android:paddingTop="2dp"
+                android:paddingBottom="10dp"
+                android:textColor="#CCFFFFFF"
+                android:textSize="12sp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/btnLinkPrimaryAction"
+                    android:layout_width="0dp"
+                    android:layout_height="38dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1.3"
+                    android:background="@drawable/bg_action_button_active"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingHorizontal="12dp"
+                    android:singleLine="true"
+                    android:text="@string/overlay_open_link"
+                    android:textColor="#FFFFFF"
+                    android:textSize="13sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/btnLinkSecondaryAction"
+                    android:layout_width="0dp"
+                    android:layout_height="38dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_action_button_inactive"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingHorizontal="10dp"
+                    android:singleLine="true"
+                    android:text="@string/overlay_copy_link"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12.5sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
+
         <!-- Collapsible Bottom Controls Panel (auto-hidden when viewing translations so text is never covered!) -->
         <LinearLayout
             android:id="@+id/bottomControlsPanel"
@@ -387,7 +515,7 @@
                     android:textSize="12.5sp"
                     android:textStyle="bold" />
 
-                <TextView
+                <ImageView
                     android:id="@+id/btnSwapLang"
                     android:layout_width="32dp"
                     android:layout_height="28dp"
@@ -396,11 +524,10 @@
                     android:clickable="true"
                     android:contentDescription="@string/overlay_swap_cd"
                     android:focusable="true"
-                    android:gravity="center"
-                    android:text="⇄"
-                    android:textColor="#FFFFFF"
-                    android:textSize="15sp"
-                    android:textStyle="bold" />
+                    android:padding="5dp"
+                    android:scaleType="centerInside"
+                    android:src="@drawable/ic_swap_horiz"
+                    app:tint="#FFFFFF" />
 
                 <TextView
                     android:id="@+id/btnTargetLang"
@@ -440,74 +567,64 @@
                     android:textStyle="bold" />
             </LinearLayout>
 
-            <!-- Compact two primary action buttons -->
+            <!-- Optional Manual Upload Confirmation Bar (when Confirm Before Upload is enabled) -->
             <LinearLayout
-                android:id="@+id/primaryActionButtonsRow"
+                android:id="@+id/uploadConfirmCard"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center"
-                android:orientation="horizontal">
+                android:layout_marginBottom="8dp"
+                android:background="@drawable/bg_action_button_inactive"
+                android:clickable="true"
+                android:focusable="true"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="12dp"
+                android:visibility="gone">
 
-                <LinearLayout
-                    android:id="@+id/btnActionTranslate"
+                <TextView
+                    android:id="@+id/tvUploadConfirmMsg"
                     android:layout_width="0dp"
-                    android:layout_height="42dp"
+                    android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:background="@drawable/bg_action_button_active"
-                    android:clickable="true"
-                    android:focusable="true"
-                    android:gravity="center"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="12dp">
+                    android:textColor="#FFFFFF"
+                    android:textSize="12.5sp" />
 
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:layout_marginEnd="6dp"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_translate" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:singleLine="true"
-                        android:text="@string/action_translate"
-                        android:textColor="#FFFFFF"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:id="@+id/btnActionVisualSearch"
-                    android:layout_width="0dp"
-                    android:layout_height="42dp"
-                    android:layout_marginStart="8dp"
-                    android:layout_weight="1"
+                <TextView
+                    android:id="@+id/btnCancelUpload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="34dp"
+                    android:layout_marginEnd="6dp"
                     android:background="@drawable/bg_action_button_inactive"
                     android:clickable="true"
                     android:focusable="true"
                     android:gravity="center"
-                    android:orientation="horizontal"
-                    android:paddingHorizontal="12dp">
+                    android:paddingHorizontal="10dp"
+                    android:text="@string/btn_cancel"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
 
-                    <ImageView
-                        android:layout_width="18dp"
-                        android:layout_height="18dp"
-                        android:layout_marginEnd="6dp"
-                        android:contentDescription="@null"
-                        android:src="@drawable/ic_visual_search" />
-
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:singleLine="true"
-                        android:text="@string/action_visual_search"
-                        android:textColor="#FFFFFF"
-                        android:textSize="13sp"
-                        android:textStyle="bold" />
-                </LinearLayout>
+                <TextView
+                    android:id="@+id/btnProceedUpload"
+                    android:layout_width="wrap_content"
+                    android:layout_height="34dp"
+                    android:background="@drawable/bg_action_button_active"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:gravity="center"
+                    android:paddingHorizontal="12dp"
+                    android:text="@string/search_confirm_upload_btn"
+                    android:textColor="#FFFFFF"
+                    android:textSize="12sp"
+                    android:textStyle="bold" />
             </LinearLayout>
+
+            <!-- Shared Customizable Action Panel (defaults to classic two capsule buttons: Translate + Search Image) -->
+            <com.bubble.screentools.ui.overlay.ActionPanelView
+                android:id="@+id/primaryActionButtonsRow"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
         </LinearLayout>
     </LinearLayout>
 
