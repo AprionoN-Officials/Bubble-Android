@@ -533,7 +533,7 @@
       <a class="btn" id="btnDownloadTemplate" href="Bubble-v1.1.1-Translation-Template.xlsx" download>⬇ Excel Template (.xlsx)</a>
       <button class="btn" id="btnExportCsv">Download .csv</button>
       <button class="btn" id="btnExportXml">Export strings.xml</button>
-      <button class="btn primary" id="btnSubmitGuide">Submit to Issue #4</button>
+      <button class="btn primary" id="btnSubmitGuide">Submit Translation</button>
     </div>
   </header>
 
@@ -660,16 +660,16 @@
   <div class="modal-backdrop" id="submitModal">
     <div class="modal-card">
       <h2>🎉 Ready to Submit Your Translation!</h2>
-      <p style="margin:0;font-size:13px;color:var(--muted);">No coding, Git, or Pull Request required — just attach your exported file in a comment on Issue #4.</p>
+      <p style="margin:0;font-size:13px;color:var(--muted);">No coding, Git, or Pull Request required — submit via our dedicated <strong>Submit Translation</strong> form so each language gets its own clean review ticket (linked under <a href="https://github.com/AprionoN-Officials/Bubble-Android/issues/4" target="_blank" rel="noopener" style="color:var(--accent);">Issue #4</a>).</p>
       <ol>
-        <li>Click <strong>Export strings.xml</strong> (or <strong>Download .csv</strong>) below to save your translation file.</li>
-        <li>Open <strong>GitHub Issue #4</strong> and drag-and-drop your downloaded file (or your <code>.xlsx</code> file) into a comment.</li>
-        <li>Mention your language name (e.g. <code>Japanese (ja)</code>) — we will review, test, and credit you as a contributor!</li>
+        <li>Click <strong>1. Download strings.xml</strong> below (or use your edited <code>.xlsx</code> / <code>.csv</code> file).</li>
+        <li>Click <strong>2. Open Submission Form ↗</strong>, fill in your language name &amp; ISO code (e.g. <code>ja</code>, <code>ko</code>, <code>vi</code>), and drag-and-drop your file.</li>
+        <li>We will link your submission to Issue #4, run automated placeholder checks, test it in Bubble, and credit you in the release notes!</li>
       </ol>
       <div id="submitStatsNote" style="font-size:12px;padding:8px 10px;border-radius:10px;background:#10121c;border:1px solid var(--border);"></div>
       <div class="chip-row" style="justify-content:flex-end;margin-top:4px;">
         <button class="btn" id="modalExportXml">1. Download strings.xml</button>
-        <a class="btn primary" href="https://github.com/AprionoN-Officials/Bubble-Android/issues/4" target="_blank" rel="noopener">2. Open GitHub Issue #4 ↗</a>
+        <a class="btn primary" href="https://github.com/AprionoN-Officials/Bubble-Android/issues/new?template=03_translation_submission.yml" target="_blank" rel="noopener">2. Open Submission Form ↗</a>
         <button class="btn" id="modalClose">Close</button>
       </div>
     </div>
