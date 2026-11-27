@@ -235,12 +235,17 @@
       --m3-divider: rgba(0,0,0,0.10);
     }
     .phone-screen[data-theme="dark"] {
-      --m3-bg: #121216;
-      --m3-surface: #1b1b22;
-      --m3-surface-2: #24242d;
-      --m3-outline: #393846;
-      --m3-text: #f1eff7;
-      --m3-sub: #aca9b8;
+      --m3-bg: #151218;
+      --m3-surface: #1e1a22;
+      --m3-surface-2: #241f29;
+      --m3-outline: #3c3645;
+      --m3-text: #f3eff7;
+      --m3-sub: #a8a2b2;
+      --m3-accent: #a67df9;
+      --m3-accent-bright: #a67df9;
+      --m3-on-accent: #1d0e3b;
+      --m3-tonal: #37255e;
+      --m3-on-tonal: #e9ddff;
     }
     .phone-screen[data-accent="blue"] {
       --m3-accent: #2196f3; --m3-accent-bright: #64b5f6; --m3-on-accent: #ffffff;
@@ -366,34 +371,45 @@
     }
     .drag-handle i { display: block; width: 16px; height: 2.2px; background: var(--m3-text); border-radius: 2px; }
 
-    /* Kyoto Live Selection Preview Card (matching 04-tab-selection.png) */
+    /* Kyoto Live Selection Preview Card (matching Seleksi.png & 04-tab-selection.png) */
     .kyoto-preview {
-      position: relative; border-radius: 16px; overflow: hidden; background: #8e9199;
-      padding: 16px 14px; color: #16181d; min-height: 168px;
+      position: relative; border-radius: 16px; overflow: hidden; background: #141219;
+      padding: 16px 14px; color: #e8e5ef; min-height: 176px; border: 1px solid var(--m3-outline);
     }
+    .phone-screen[data-theme="light"] .kyoto-preview { background: #8e9199; color: #16181d; border-color: transparent; }
     .kyoto-cutout {
-      position: relative; background: #f4f6fa; border: 2.5px solid var(--m3-accent);
+      position: relative; background: rgba(166, 125, 249, 0.05); border: 2.5px solid var(--m3-accent);
       border-radius: 16px; padding: 12px 14px; margin: 10px 14px 4px;
-      box-shadow: 0 0 0 999px rgba(72, 75, 82, 0.45);
+    }
+    .phone-screen[data-theme="light"] .kyoto-cutout {
+      background: #f4f6fa; box-shadow: 0 0 0 999px rgba(72, 75, 82, 0.45);
     }
     .kyoto-handle {
-      position: absolute; width: 13px; height: 13px; border-radius: 50%;
-      background: #fff; border: 2.2px solid var(--m3-accent);
+      position: absolute; width: 12px; height: 12px; border-radius: 50%;
+      background: #fff; border: 2px solid var(--m3-accent);
+    }
+    .kyoto-handle.corner { width: 16px; height: 16px; }
+    .handle-swatches { display: flex; gap: 10px; align-items: center; margin: 4px 0 6px; }
+    .handle-swatch {
+      width: 28px; height: 28px; border-radius: 50%; border: 1.5px solid var(--m3-outline);
     }
 
-    /* Live Action Panel Preview Box (matching 05-tab-panel.png) */
+    /* Live Action Panel Preview Box (matching Panel.png) */
     .panel-stage-box {
-      border-radius: 16px; border: 1px solid var(--m3-outline); background: var(--m3-surface-2);
-      padding: 18px 14px 14px; display: flex; flex-direction: column; align-items: center; gap: 10px;
+      border-radius: 16px; border: 1px solid var(--m3-outline); background: #131117;
+      padding: 20px 14px 14px; display: flex; flex-direction: column; align-items: center; gap: 10px;
     }
+    .phone-screen[data-theme="light"] .panel-stage-box { background: var(--m3-surface-2); }
     .panel-sel-rect {
-      width: 100%; height: 92px; border: 2px solid var(--m3-accent); border-radius: 12px;
-      display: flex; align-items: flex-end; justify-content: center; padding-bottom: 8px;
+      width: 100%; height: 96px; border: 2px solid var(--m3-accent); border-radius: 14px;
+      background: rgba(166, 125, 249, 0.08);
+      display: flex; align-items: flex-end; justify-content: center; padding-bottom: 6px;
     }
     .engine-chip-dark {
-      background: #2b2c32; color: #f1f2f6; font-size: 11px; font-weight: 600;
-      padding: 4px 12px; border-radius: 999px;
+      color: #e9e6f0; font-size: 11px; font-weight: 600;
+      padding: 2px 10px; border-radius: 999px;
     }
+    .phone-screen[data-theme="light"] .engine-chip-dark { background: #2b2c32; color: #fff; padding: 4px 12px; }
 
     /* Overlay Mockups (matching 11, 12, 15 screenshots) */
     .overlay-bg {
@@ -577,8 +593,8 @@
           <button class="btn active" id="width412">412dp (Standard)</button>
         </div>
         <div class="chip-row">
-          <button class="btn active" id="themeAmoled">AMOLED</button>
-          <button class="btn" id="themeDark">Dark</button>
+          <button class="btn" id="themeAmoled">AMOLED</button>
+          <button class="btn active" id="themeDark">Dark</button>
           <button class="btn" id="themeLight">Light</button>
         </div>
         <div class="chip-row">
@@ -607,7 +623,7 @@
         <button class="btn" id="stageTabRight" style="padding:3px 9px;font-size:11px;">Scroll Tabs ›</button>
       </div>
       <div class="phone-frame" id="phoneFrame" style="width: 434px;">
-        <div class="phone-screen highlight-issues" id="phoneScreen" data-theme="amoled" data-accent="lavender" dir="ltr"></div>
+        <div class="phone-screen highlight-issues" id="phoneScreen" data-theme="dark" data-accent="lavender" dir="ltr"></div>
       </div>
     </section>
 
@@ -882,23 +898,28 @@
               <div class="m3-row"><span>${tSpan("switch_auto_link_detect")}</span><div class="m3-switch"></div></div>
               <div class="m3-sub">${tSpan("auto_link_detect_subtitle")}</div>
               <div class="m3-divider"></div>
-              <div class="m3-btn-row">
-                <div class="m3-pill">${tSpan("quick_translation_langs")}</div>
-                <div class="m3-pill">${tSpan("quick_default_search")}</div>
+              <div class="m3-row"><span>${tSpan("switch_safe_mode")}</span><div class="m3-switch"></div></div>
+              <div class="m3-sub">${tSpan("safe_mode_subtitle")}</div>
+              <div class="m3-btn-row" style="margin-top:4px;">
+                <div class="m3-pill tonal">${tSpan("quick_translation_langs")}</div>
+                <div class="m3-pill tonal">${tSpan("quick_default_search")}</div>
               </div>
               <div class="m3-btn-row">
-                <div class="m3-pill">${tSpan("quick_permissions")}</div>
+                <div class="m3-pill">${tSpan("btn_excluded_apps_fmt")}</div>
                 <div class="m3-pill">${tSpan("quick_usage_guide")}</div>
               </div>
             </div>
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_bubble_preview")}</div>
               <div class="m3-sub">${tSpan("bubble_preview_subtitle")}</div>
-              <div class="panel-stage-box" style="padding:12px;">
+              <div class="panel-stage-box" style="padding:14px;">
                 <div class="ov-action-bar">
-                  <span class="ov-action-btn primary">${ICON_TRANSLATE} ${tSpan("action_translate")}</span>
-                  <span class="ov-action-btn">${ICON_SEARCH} ${tSpan("action_visual_search")}</span>
+                  <span class="ov-action-btn">${ICON_TRANSLATE} ${tSpan("action_translate")}</span>
+                  <span class="ov-action-btn primary">${ICON_SEARCH} ${tSpan("action_visual_search")}</span>
                 </div>
+              </div>
+              <div style="display:flex;justify-content:flex-end;">
+                <span class="m3-pill text-btn">${tSpan("tab_panel")}</span>
               </div>
             </div>
           </div>`;
@@ -961,66 +982,80 @@
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_models_imports")}</div>
               <div class="m3-sub">${tSpan("models_separation_note")}</div>
-              <div class="m3-sub">${tSpan("ocr_engine_mlkit_fmt")}</div>
-              <div class="m3-sub">${tSpan("offline_storage_summary_fmt")}</div>
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("ocr_engine_mlkit_fmt")}<br/>${tSpan("offline_storage_summary_fmt")}</div>
               <div class="m3-btn-row">
-                <div class="m3-pill filled">${tSpan("btn_download_languages")}</div>
+                <div class="m3-pill tonal">${tSpan("btn_download_languages")}</div>
                 <div class="m3-pill">${tSpan("btn_import_ocr")}</div>
               </div>
-              <div class="m3-pill">${tSpan("btn_delete_unused_models")}</div>
+              <span class="m3-pill text-btn">${tSpan("btn_delete_unused_models")}</span>
             </div>
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_translation_preview")}</div>
               <div class="m3-sub">${tSpan("translation_preview_badge")}</div>
-              <div class="m3-label-bold">${tSpan("translation_preview_input_label")}</div>
-              <div class="m3-sub">Ex-ploring Au-tumn Temples</div>
+              <div class="m3-sub">${tSpan("translation_preview_input_label")}<br/>"Critical| Damage increases your\nElemental Mastery by +25% in\nmulti-line battle scenes."</div>
               <div class="m3-label-bold">${tSpan("translation_preview_output_label")}</div>
-              <div class="m3-sub">Exploring Autumn Temples</div>
+              <div style="font-size:12.5px;font-weight:700;line-height:1.4;">Critical Damage increases your Elemental Mastery by +25% in multi-line battle scenes.</div>
             </div>
           </div>`;
         }
 
         if (s === "tab_search") {
+          const vEngines = [
+            [`${tSpan("engine_google_lens")} ★`, `Native App Intent (Fallback: ${tSpan("engine_pick_app")})`, true, true, false],
+            [`${tSpan("engine_yandex")} Images`, "https://yandex.com/images/", false, false, false],
+            [`${tSpan("engine_tineye")}`, "https://tineye.com/", false, false, false],
+            ["Bing Visual Search", "https://www.bing.com/visualsearch", false, false, false],
+            ["SauceNAO", "https://saucenao.com/", false, true, false],
+            ["trace.moe", "https://trace.moe/", false, false, false],
+            [`${tSpan("engine_pick_app")} / Share`, "Android System Chooser", false, true, false],
+            ["Custom Engine (IQDB)", "https://iqdb.org/", false, true, true],
+          ];
+          const tEngines = [
+            ["Google Search ★", "https://www.google.com/search?q={query}", true],
+            ["DuckDuckGo", "https://duckduckgo.com/?q={query}", false],
+            ["Bing", "https://www.bing.com/search?q={query}", false],
+            ["Wikipedia", "https://en.wikipedia.org/wiki/Special:Search?search={query}", false],
+          ];
           return `${renderAppHeader("tab_search")}
           <div class="b-content">
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_visual_search")}</div>
               <div class="m3-sub">${tSpan("visual_search_subtitle")}</div>
-              <div class="m3-engine-row">
-                ${DRAG_HANDLE}
-                <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
-                  <div style="font-size:13.5px;font-weight:600;">${tSpan("engine_google_lens")} ★</div>
-                  <div class="m3-sub">Native App Intent (Fallback: ${tSpan("engine_pick_app")})</div>
-                  <div><span class="m3-pill tonal" style="min-height:32px;padding:4px 14px;font-size:12px;">${tSpan("label_default_badge")}</span></div>
-                </div>
-                <div class="m3-switch"></div>
-              </div>
-              <div class="m3-divider"></div>
-              <div class="m3-engine-row">
-                ${DRAG_HANDLE}
-                <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
-                  <div style="font-size:13.5px;font-weight:600;">${tSpan("engine_yandex")} Images</div>
-                  <div class="m3-sub">https://yandex.com/images/</div>
-                  <div><span class="m3-pill" style="min-height:32px;padding:4px 14px;font-size:12px;">${tSpan("btn_set_default")}</span></div>
-                </div>
-                <div class="m3-switch"></div>
-              </div>
-              <div class="m3-divider"></div>
-              <div class="m3-engine-row">
-                ${DRAG_HANDLE}
-                <div style="flex:1;display:flex;flex-direction:column;gap:4px;">
-                  <div style="font-size:13.5px;font-weight:600;">${tSpan("engine_tineye")}</div>
-                  <div class="m3-sub">https://tineye.com/</div>
-                  <div><span class="m3-pill" style="min-height:32px;padding:4px 14px;font-size:12px;">${tSpan("btn_set_default")}</span></div>
-                </div>
-                <div class="m3-switch"></div>
-              </div>
-              <div class="m3-pill tonal">+ ${tSpan("btn_add_custom_engine")}</div>
+              ${vEngines
+                .map(([name, url, isDef, isOn, isCustom], idx) => `
+                  ${idx > 0 ? '<div class="m3-divider"></div>' : ""}
+                  <div class="m3-engine-row">
+                    ${DRAG_HANDLE}
+                    <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+                      <div style="font-size:13.5px;font-weight:600;">${name}</div>
+                      <div class="m3-sub">${url}</div>
+                      <div style="display:flex;align-items:center;gap:12px;flex-wrap:wrap;">
+                        <span class="m3-pill ${isDef ? "tonal" : ""}" style="min-height:34px;padding:4px 16px;font-size:12px;">${isDef ? tSpan("label_default_badge") : tSpan("btn_set_default")}</span>
+                        ${isCustom ? `<span class="m3-pill text-btn" style="font-size:12px;">${tSpan("btn_edit")}</span><span class="m3-pill text-btn" style="font-size:12px;">${tSpan("btn_delete")}</span>` : ""}
+                      </div>
+                    </div>
+                    <div class="m3-switch ${isOn ? "" : "off"}"></div>
+                  </div>`)
+                .join("")}
+              <div class="m3-pill tonal" style="margin-top:4px;">+ ${tSpan("btn_add_custom_engine")}</div>
             </div>
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_text_search")}</div>
               <div class="m3-sub">${tSpan("text_search_subtitle")}</div>
-              <div class="m3-row"><span>Google · DuckDuckGo · Bing · Wikipedia</span><span class="m3-pill tonal" style="min-height:30px;padding:3px 10px;font-size:11.5px;">${tSpan("btn_edit")}</span></div>
+              ${tEngines
+                .map(([name, url, isDef], idx) => `
+                  ${idx > 0 ? '<div class="m3-divider"></div>' : ""}
+                  <div class="m3-engine-row">
+                    ${DRAG_HANDLE}
+                    <div style="flex:1;display:flex;flex-direction:column;gap:5px;">
+                      <div style="font-size:13.5px;font-weight:600;">${name}</div>
+                      <div class="m3-sub">${url}</div>
+                      <div><span class="m3-pill ${isDef ? "tonal" : ""}" style="min-height:34px;padding:4px 16px;font-size:12px;">${isDef ? tSpan("label_default_badge") : tSpan("btn_set_default")}</span></div>
+                    </div>
+                    <div class="m3-switch"></div>
+                  </div>`)
+                .join("")}
+              <div class="m3-pill" style="margin-top:4px;">+ ${tSpan("btn_add_custom_engine")}</div>
             </div>
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_search_optimization")}</div>
@@ -1066,15 +1101,16 @@
               <div class="m3-card-title">${tSpan("section_selection_preview")}</div>
               <div class="m3-sub">${tSpan("selection_preview_hint")}</div>
               <div class="kyoto-preview">
-                <div style="font-size:9.5px;font-weight:800;letter-spacing:0.05em;color:#2c3a57;">KYOTO TRAVEL GUIDE</div>
+                <div style="font-size:9.5px;font-weight:800;letter-spacing:0.05em;color:var(--m3-accent-bright);">KYOTO TRAVEL GUIDE</div>
                 <div class="kyoto-cutout">
                   <div style="font-size:14px;font-weight:800;margin-bottom:4px;">Exploring Autumn Temples</div>
-                  <div style="font-size:10.5px;color:#3f4450;line-height:1.35;">Morning walks through ancient cedar forests offer quiet paths and vibrant red maple leaves.</div>
-                  <div style="font-size:10.5px;color:#272a33;margin-top:6px;">京都の秋は美しい紅葉と静かな寺院が魅力です。</div>
-                  <span class="kyoto-handle" style="top:-7px;left:50%;transform:translateX(-50%);"></span>
-                  <span class="kyoto-handle" style="bottom:-7px;left:50%;transform:translateX(-50%);"></span>
-                  <span class="kyoto-handle" style="left:-7px;top:50%;transform:translateY(-50%);"></span>
-                  <span class="kyoto-handle" style="right:-7px;top:50%;transform:translateY(-50%);"></span>
+                  <div style="font-size:10.5px;opacity:0.8;line-height:1.35;">Morning walks through ancient cedar forests offer quiet paths and vibrant red maple leaves across the hills.</div>
+                  <div style="font-size:10.5px;opacity:0.9;margin-top:8px;">京都の秋は美しい紅葉と静かな寺院が魅力です。</div>
+                  <span class="kyoto-handle" style="top:-6px;left:50%;transform:translateX(-50%);"></span>
+                  <span class="kyoto-handle" style="bottom:-6px;left:50%;transform:translateX(-50%);"></span>
+                  <span class="kyoto-handle" style="left:-6px;top:50%;transform:translateY(-50%);"></span>
+                  <span class="kyoto-handle" style="right:-6px;top:50%;transform:translateY(-50%);"></span>
+                  <span class="kyoto-handle corner" style="right:-8px;bottom:-8px;"></span>
                 </div>
               </div>
             </div>
@@ -1103,22 +1139,31 @@
                 <span class="m3-chip selected">${tSpan("color_mode_material_you")}</span>
                 <span class="m3-chip">${tSpan("color_mode_custom")}</span>
               </div>
-              <span class="m3-pill text-btn">${tSpan("btn_pick_custom_hex")}</span>
-              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_border_thickness_fmt")}</div>${sliderHtml(45)}
-              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_corner_radius_fmt")}</div>${sliderHtml(52)}
-              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_curvature_fmt")}</div>${sliderHtml(40)}
-              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_fill_opacity_fmt")}</div>${sliderHtml(25)}
-              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_outer_dim_fmt")}</div>${sliderHtml(55)}
-              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_handle_size_fmt")}</div>${sliderHtml(50)}
-              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_min_selection_fmt")}</div>${sliderHtml(35)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_border_thickness_fmt")}</div>${sliderHtml(32)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_corner_radius_fmt")}</div>${sliderHtml(44)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_curvature_fmt")}</div>${sliderHtml(55)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_fill_opacity_fmt")}</div>${sliderHtml(4)}
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_outer_dim_fmt")}</div>${sliderHtml(44)}
             </div>
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_selection_advanced")}</div>
               <div class="m3-row"><span>${tSpan("switch_show_handles")}</span><div class="m3-switch"></div></div>
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_handle_size_fmt")}</div>${sliderHtml(34)}
+              <div class="handle-swatches">
+                <span class="handle-swatch" style="background:#ffffff;"></span>
+                <span class="handle-swatch" style="background:#2196f3;"></span>
+                <span class="handle-swatch" style="background:#f59e0b;"></span>
+                <span class="handle-swatch" style="background:#10b981;"></span>
+                <span class="handle-swatch" style="background:#18181b;"></span>
+              </div>
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_min_selection_fmt")}</div>${sliderHtml(26)}
+              <div class="m3-divider"></div>
               <div class="m3-row"><span>${tSpan("switch_smooth_freeform")}</span><div class="m3-switch"></div></div>
               <div class="m3-row"><span>${tSpan("switch_edge_smoothing")}</span><div class="m3-switch"></div></div>
-              <div class="m3-row"><span>${tSpan("switch_selection_animation")}</span><div class="m3-switch off"></div></div>
-              <span class="m3-pill text-btn">${tSpan("btn_reset_default")}</span>
+              <div class="m3-row"><span>${tSpan("switch_selection_animation")}</span><div class="m3-switch"></div></div>
+              <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+                <span class="m3-pill" style="min-height:38px;padding:6px 18px;">${tSpan("btn_reset_default")}</span>
+              </div>
             </div>
           </div>`;
         }
@@ -1138,7 +1183,6 @@
                   <span class="ov-action-btn">${ICON_SEARCH} ${tSpan("action_visual_search")}</span>
                 </div>
               </div>
-              <span class="m3-pill text-btn">${tSpan("btn_reset_position")}</span>
             </div>
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_panel_buttons")}</div>
@@ -1190,8 +1234,10 @@
               <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_btn_padding_fmt")}</div>${sliderHtml(45)}
               <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_btn_radius_fmt")}</div>${sliderHtml(70)}
               <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_margin_h_fmt")}</div>${sliderHtml(40)}
-              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_margin_v_fmt")}</div>${sliderHtml(50)}
-              <span class="m3-pill text-btn">${tSpan("btn_reset_default")}</span>
+              <div class="m3-sub" style="color:var(--m3-text);">${tSpan("slider_margin_v_fmt")}</div>${sliderHtml(18)}
+              <div style="display:flex;justify-content:flex-end;margin-top:4px;">
+                <span class="m3-pill" style="min-height:38px;padding:6px 18px;">${tSpan("btn_reset_default")}</span>
+              </div>
             </div>
           </div>`;
         }
@@ -1240,12 +1286,18 @@
                 <span class="m3-chip">${tSpan("palette_mono")}</span>
                 <span class="m3-chip">${tSpan("palette_custom")}</span>
               </div>
+              <div style="display:flex;margin-top:2px;">
+                <span class="m3-pill" style="min-height:38px;padding:6px 16px;">${tSpan("btn_pick_custom_hex")} (#2196F3)</span>
+              </div>
             </div>
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_theme_scope")}</div>
               <div class="m3-row"><span>${tSpan("scope_main_ui")}</span><div class="m3-switch"></div></div>
               <div class="m3-row"><span>${tSpan("scope_overlay")}</span><div class="m3-switch"></div></div>
               <div class="m3-row"><span>${tSpan("scope_selection")}</span><div class="m3-switch"></div></div>
+              <div style="display:flex;justify-content:flex-end;">
+                <span class="m3-pill text-btn">${tSpan("btn_reset_default")}</span>
+              </div>
             </div>
           </div>`;
         }
@@ -1260,10 +1312,11 @@
                 <div>${tSpan("update_latest_version_fmt")}</div>
                 <div class="m3-sub">${tSpan("update_last_checked_fmt")}</div>
               </div>
-              <div class="m3-btn-row">
-                <div class="m3-pill tonal">${tSpan("btn_check_updates")}</div>
-                <div class="m3-pill">${tSpan("btn_download_update")}</div>
+              <div class="m3-btn-row" style="margin-top:2px;">
+                <div class="m3-pill filled">${tSpan("btn_check_updates")}</div>
+                <div class="m3-pill">${tSpan("btn_view_github")}</div>
               </div>
+              <div class="m3-divider"></div>
               <div class="m3-row"><span>${tSpan("switch_auto_update")}</span><div class="m3-switch"></div></div>
               <div class="m3-row"><span>${tSpan("switch_update_on_launch")}</span><div class="m3-switch"></div></div>
               <div class="m3-row"><span>${tSpan("switch_update_wifi_only")}</span><div class="m3-switch off"></div></div>
@@ -1280,11 +1333,10 @@
               <div class="m3-card-title">${tSpan("section_privacy")}</div>
               <div class="m3-row"><span>${tSpan("switch_safe_mode")}</span><div class="m3-switch"></div></div>
               <div class="m3-sub">${tSpan("safe_mode_subtitle")}</div>
-              <div class="m3-btn-row">
+              <div class="m3-btn-row" style="margin-top:2px;">
                 <div class="m3-pill">${tSpan("btn_excluded_apps_fmt")}</div>
                 <div class="m3-pill">${tSpan("btn_clear_cache")}</div>
               </div>
-              <span class="m3-pill text-btn">${tSpan("btn_legacy_capture")}</span>
             </div>
             <div class="m3-card">
               <div class="m3-card-title">${tSpan("section_about")}</div>
@@ -2127,6 +2179,13 @@
       const qTheme = params.get("theme");
       if (qTheme && ["amoled", "dark", "light"].includes(qTheme)) {
         document.getElementById("phoneScreen").dataset.theme = qTheme;
+      }
+      if (params.get("lang") === "id") {
+        state.langCode = "id";
+        state.modeName = "Bahasa Indonesia (ID)";
+        state.translations = Object.fromEntries(DATA.entries.map((e) => [e.key, e.id]));
+        document.getElementById("loadedSourceBadge").textContent = "Loaded: Bahasa Indonesia (ID)";
+        setPresetBtn("presetId");
       }
       renderScreenNav();
       renderAll(true);
