@@ -15,6 +15,9 @@ Asisten layar Android yang ringan dan mengutamakan privasi untuk penerjemahan la
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-7F52FF?style=flat-square&logo=kotlin&logoColor=white)](build.gradle.kts)
 [![Gradle](https://img.shields.io/badge/Gradle-8.9-02303A?style=flat-square&logo=gradle&logoColor=white)](gradle/wrapper/gradle-wrapper.properties)
 [![Rilis](https://img.shields.io/badge/Unduh-GitHub%20Releases-181717?style=flat-square&logo=github)](https://github.com/AprionoN-Officials/Bubble-Android/releases)
+[![Telegram](https://img.shields.io/badge/Telegram-Grup%20Komunitas-26A5E4?style=flat-square&logo=telegram&logoColor=white)](https://t.me/BubbleAndroid)
+[![Terjemahkan](https://img.shields.io/badge/Terjemahkan-Studio%201%3A1-0EA5E9?style=flat-square&logo=googletranslate&logoColor=white)](https://apriononurhakim.store/Bubble-Android/)
+[![Lisensi: GPL v3](https://img.shields.io/badge/Lisensi-GPLv3-blue?style=flat-square)](LICENSE)
 
 </div>
 
@@ -433,10 +436,25 @@ cd Bubble-Android
 
 ---
 
+## 🌍 Bantu Menerjemahkan Bubble & Gabung Komunitas
+
+### Bantu Saya Menerjemahkan Bubble (Tanpa Coding!)
+Saat ini Bubble tersedia dalam **Bahasa Inggris** dan **Bahasa Indonesia**. Anda bisa ikut membantu menerjemahkan Bubble ke bahasa lain dengan sangat mudah — tanpa perlu Git, Android Studio, atau keahlian coding:
+
+1. **🌐 Terjemahkan Langsung di Browser (Pratinjau 1:1):** Buka **[Bubble Translation Studio](https://apriononurhakim.store/Bubble-Android/)** untuk menerjemahkan sambil melihat tampilan aplikasi Bubble v1.1.1 secara 1:1 dan ekspor `strings.xml` dalam sekali klik.
+2. **📊 Atau Terjemahkan Offline via Excel / Sheets:** Unduh **[Template Excel (.xlsx)](https://apriononurhakim.store/Bubble-Android/Bubble-v1.1.1-Translation-Template.xlsx)**.
+3. **📤 Kirim Tanpa Pull Request:** Unggah hasil terjemahan Anda melalui **[🌍 Formulir Submit Translation](https://github.com/AprionoN-Officials/Bubble-Android/issues/new?template=03_translation_submission.yml)** — daftar status seluruh bahasa dapat dipantau di **[Master Tracker Lokalisasi #4](https://github.com/AprionoN-Officials/Bubble-Android/issues/4)**.
+
+### 💬 Grup Telegram Resmi
+Gabung ke grup Telegram resmi Bubble untuk diskusi, berbagi preset tema & mesin pencarian kustom, info pembaruan, serta tanya jawab komunitas:
+- 👉 **[Gabung Grup Telegram Bubble Android (`t.me/BubbleAndroid`)](https://t.me/BubbleAndroid)**
+
+---
+
 ## Kontributor, Kredit & Lisensi
 
 - **Kontributor:**
   - **[Ardyan (@kouzen-neo)](https://github.com/kouzen-neo)** — Pemberi ide untuk pembaruan antarmuka Bubble ke **Material You Expressive**.
-- **Kontribusi:** Laporan bug, masukan kompatibilitas perangkat, dan *pull request* sangat diterima melalui [GitHub Issues](https://github.com/AprionoN-Officials/Bubble-Android/issues). Sertakan versi Android, model perangkat, mode aktivasi (Asisten Default vs. Aksesibilitas), serta langkah reproduksinya.
+- **Kontribusi:** Laporan bug, masukan kompatibilitas perangkat, terjemahan, dan *pull request* terarah sangat diterima — silakan baca [CONTRIBUTING.md](CONTRIBUTING.md) dan [SECURITY.md](SECURITY.md) terlebih dahulu.
 - **Kredit:** Dikembangkan oleh **AprionoN-Officials**. Menggunakan [AndroidX & Material Components](https://developer.android.com/jetpack), [Google ML Kit](https://developers.google.com/ml-kit), dan [Tesseract4Android](https://github.com/adaptech-cz/Tesseract4Android).
-- **Lisensi:** Belum ada file lisensi open-source (`LICENSE`) pada repository ini. Seluruh hak cipta tetap berada pada pemilik repository hingga lisensi resmi ditetapkan.
+- **Lisensi:** Dirilis di bawah lisensi **[GNU General Public License v3.0 (GPL-3.0)](LICENSE)**. Anda bebas menggunakan, mempelajari, dan melakukan *fork* untuk membuat versi Anda sendiri selama karya turunannya tetap bersifat open-source di bawah GPL-3.0.

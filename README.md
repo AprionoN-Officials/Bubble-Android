@@ -15,6 +15,9 @@ A lightweight, privacy-first Android screen assistant for live on-screen transla
 [![Kotlin](https://img.shields.io/badge/Kotlin-2.0.21-7F52FF?style=flat-square&logo=kotlin&logoColor=white)](build.gradle.kts)
 [![Gradle](https://img.shields.io/badge/Gradle-8.9-02303A?style=flat-square&logo=gradle&logoColor=white)](gradle/wrapper/gradle-wrapper.properties)
 [![Releases](https://img.shields.io/badge/Download-GitHub%20Releases-181717?style=flat-square&logo=github)](https://github.com/AprionoN-Officials/Bubble-Android/releases)
+[![Telegram](https://img.shields.io/badge/Telegram-Community%20Group-26A5E4?style=flat-square&logo=telegram&logoColor=white)](https://t.me/BubbleAndroid)
+[![Translate](https://img.shields.io/badge/Translate-Studio%201%3A1-0EA5E9?style=flat-square&logo=googletranslate&logoColor=white)](https://apriononurhakim.store/Bubble-Android/)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue?style=flat-square)](LICENSE)
 
 </div>
 
@@ -433,10 +436,25 @@ cd Bubble-Android
 
 ---
 
+## 🌍 Help Translate Bubble & Join the Community
+
+### Help Translate Bubble (No Coding Required!)
+Bubble currently ships with **English** and **Indonesian**, and we would love your help bringing Bubble to more languages! You don't need Git, Android Studio, or coding skills:
+
+1. **🌐 Translate Online (Live 1:1 Android Preview):** Open **[Bubble Translation Studio](https://apriononurhakim.store/Bubble-Android/)** to translate directly in your browser with a 1:1 Bubble v1.1.1 UI mockup and export `strings.xml` in one click.
+2. **📊 Or Translate Offline in Excel / Sheets:** Download the **[Excel Translation Template (.xlsx)](https://apriononurhakim.store/Bubble-Android/Bubble-v1.1.1-Translation-Template.xlsx)**.
+3. **📤 Submit Without a Pull Request:** Attach your file via the **[🌍 Submit Translation Form](https://github.com/AprionoN-Officials/Bubble-Android/issues/new?template=03_translation_submission.yml)** — progress for every language is tracked in **[Localization Master Tracker #4](https://github.com/AprionoN-Officials/Bubble-Android/issues/4)**.
+
+### 💬 Official Telegram Community
+Join our official Telegram group for discussions, sharing custom themes/search engines, update news, and quick community support:
+- 👉 **[Join Bubble Android on Telegram (`t.me/BubbleAndroid`)](https://t.me/BubbleAndroid)**
+
+---
+
 ## Contributors, Credits & License
 
 - **Contributors:**
   - **[Ardyan (@kouzen-neo)](https://github.com/kouzen-neo)** — Contributed the idea for updating Bubble's UI to **Material You Expressive**.
-- **Contributing:** Bug reports, device compatibility feedback, and pull requests are welcome via [GitHub Issues](https://github.com/AprionoN-Officials/Bubble-Android/issues). Please include your Android version, device model, trigger mode (Default Assistant vs. Accessibility), and reproduction steps.
+- **Contributing:** Bug reports, device compatibility feedback, translations, and scoped pull requests are welcome — please see [CONTRIBUTING.md](CONTRIBUTING.md) and [SECURITY.md](SECURITY.md) first.
 - **Credits:** Built by **AprionoN-Officials**. Powered by [AndroidX & Material Components](https://developer.android.com/jetpack), [Google ML Kit](https://developers.google.com/ml-kit), and [Tesseract4Android](https://github.com/adaptech-cz/Tesseract4Android).
-- **License:** No open-source license file (`LICENSE`) is currently included in this repository. All rights remain with the repository owner until an explicit license is added.
+- **License:** Licensed under the **[GNU General Public License v3.0 (GPL-3.0)](LICENSE)**. You are free to use, study, and fork Bubble to build your own version, provided derivative works remain open-source under GPL-3.0.
